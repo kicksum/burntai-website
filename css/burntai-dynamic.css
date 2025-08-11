@@ -1,0 +1,431 @@
+/* BurntAI Dynamic Styles - For the living wasteland */
+
+:root {
+    --modal-backdrop: rgba(0, 0, 0, 0.8);
+    --modal-bg: #1a1a1a;
+    --notification-success: #00ff00;
+    --notification-error: #ff0040;
+    --notification-warning: #ffaa00;
+    --notification-info: #00aaff;
+}
+
+/* === Modal Styles === */
+
+.burntai-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: none;
+}
+
+.burntai-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-backdrop);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    position: relative;
+    background: var(--modal-bg);
+    border: 2px solid var(--neon-orange);
+    border-radius: 10px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 0 30px var(--neon-orange);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--neon-orange);
+    background: rgba(255, 102, 0, 0.1);
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: var(--neon-orange);
+    font-family: 'Orbitron', monospace;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--neon-orange);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    color: var(--neon-cyan);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 2rem;
+    overflow-y: auto;
+    max-height: calc(90vh - 100px);
+}
+
+/* === Form Styles === */
+
+.burntai-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: var(--neon-cyan);
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.form-input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--neon-orange);
+    color: white;
+    padding: 0.75rem;
+    font-family: 'Share Tech Mono', monospace;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.form-button {
+    background: linear-gradient(45deg, var(--neon-orange), var(--rust-red));
+    border: 2px solid var(--neon-orange);
+    color: white;
+    padding: 1rem;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.form-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 102, 0, 0.4);
+}
+
+.form-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* === Auth Tabs === */
+
+.auth-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--neon-orange);
+    margin-bottom: 2rem;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    color: #666;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.tab-button.active {
+    color: var(--neon-orange);
+    border-bottom: 2px solid var(--neon-orange);
+}
+
+.tab-button:hover {
+    color: var(--neon-cyan);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* === Notification Styles === */
+
+.burntai-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--dark-bg);
+    border: 2px solid;
+    border-radius: 5px;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 10001;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.burntai-notification.show {
+    transform: translateX(0);
+}
+
+.burntai-notification.success {
+    border-color: var(--notification-success);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+}
+
+.burntai-notification.error {
+    border-color: var(--notification-error);
+    box-shadow: 0 0 20px rgba(255, 0, 64, 0.4);
+}
+
+.burntai-notification.warning {
+    border-color: var(--notification-warning);
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.4);
+}
+
+.burntai-notification.info {
+    border-color: var(--notification-info);
+    box-shadow: 0 0 20px rgba(0, 170, 255, 0.4);
+}
+
+.notification-icon {
+    font-size: 1.5rem;
+}
+
+/* === Terminal Styles === */
+
+.burntai-terminal {
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid var(--terminal-green);
+    border-radius: 5px;
+    font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+}
+
+.terminal-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 255, 0, 0.1);
+    border-bottom: 1px solid var(--terminal-green);
+}
+
+.terminal-lights {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.terminal-lights .light {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.light.red { background: #ff0040; }
+.light.yellow { background: #ffff00; }
+.light.green { background: #00ff00; }
+
+.terminal-title {
+    margin-left: 1rem;
+    color: var(--terminal-green);
+}
+
+.terminal-body {
+    padding: 1rem;
+}
+
+.terminal-output {
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.terminal-line {
+    margin-bottom: 0.5rem;
+    color: var(--terminal-green);
+}
+
+.terminal-line.command {
+    color: var(--neon-cyan);
+}
+
+.terminal-line.error {
+    color: var(--neon-red);
+}
+
+.terminal-line.success {
+    color: var(--terminal-green);
+}
+
+.terminal-input-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.prompt {
+    color: var(--neon-orange);
+}
+
+.terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--terminal-green);
+    font-family: inherit;
+    outline: none;
+}
+
+/* === Loading Spinner === */
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* === Chat Interface === */
+
+.ai-chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.chat-message {
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.chat-message.user {
+    align-self: flex-end;
+    background: rgba(255, 102, 0, 0.2);
+    border: 1px solid var(--neon-orange);
+}
+
+.chat-message.ai {
+    align-self: flex-start;
+    background: rgba(0, 255, 255, 0.2);
+    border: 1px solid var(--neon-cyan);
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 1rem;
+    border-top: 1px solid var(--neon-cyan);
+}
+
+.chat-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--neon-orange);
+    color: white;
+    padding: 0.75rem;
+    font-family: 'Share Tech Mono', monospace;
+    border-radius: 5px 0 0 5px;
+}
+
+.chat-send {
+    background: var(--neon-orange);
+    border: none;
+    color: black;
+    padding: 0.75rem 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 0 5px 5px 0;
+    transition: all 0.3s ease;
+}
+
+.chat-send:hover {
+    background: var(--neon-cyan);
+}
+
+/* === Responsive === */
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 1rem;
+    }
+    
+    .burntai-notification {
+        right: 10px;
+        left: 10px;
+        transform: translateY(-100px);
+    }
+    
+    .burntai-notification.show {
+        transform: translateY(0);
+    }
+}

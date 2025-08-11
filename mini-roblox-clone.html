@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockWorld - Mini Roblox Clone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        #gameCanvas {
+            display: block;
+            cursor: crosshair;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99;
+        }
+        
+        #crosshair::before,
+        #crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        #crosshair::before {
+            width: 2px;
+            height: 8px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        #crosshair::after {
+            width: 8px;
+            height: 2px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        #instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 101;
+        }
+        
+        #blockSelector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 10px;
+            color: white;
+            z-index: 100;
+        }
+        
+        .blockOption {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            margin: 5px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        .blockOption.selected {
+            border-color: white;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        
+        #chat {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 300px;
+            height: 150px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 10px;
+            padding: 10px;
+            color: white;
+            display: none;
+            z-index: 102;
+        }
+        
+        #chatMessages {
+            height: 100px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        
+        #chatInput {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h2>BlockWorld</h2>
+        <p>Health: <span id="health">100</span></p>
+        <p>Score: <span id="score">0</span></p>
+        <p>Players Online: <span id="players">1</span></p>
+        <p>Current Block: <span id="currentBlock">Grass</span></p>
+    </div>
+    
+    <div id="crosshair"></div>
+    
+    <div id="blockSelector">
+        <div>Select Block (1-6):</div>
+    </div>
+    
+    <div id="instructions">
+        <strong>Controls:</strong><br>
+        WASD - Move | SPACE - Jump | SHIFT - Run<br>
+        Click - Place Block | Right Click - Remove Block<br>
+        1-6 Keys - Select Block Type | T - Chat | ESC - Menu<br>
+        Click anywhere to start!
+    </div>
+    
+    <div id="chat">
+        <div id="chatMessages"></div>
+        <input type="text" id="chatInput" placeholder="Press Enter to send...">
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Game Constants
+        const WORLD_SIZE = 100;
+        const BLOCK_SIZE = 2;
+        const PLAYER_HEIGHT = 3;
+        const PLAYER_SPEED = 0.15;
+        const JUMP_FORCE = 0.3;
+        const GRAVITY = -0.015;
+        
+        // Game State
+        let scene, camera, renderer;
+        let clock = new THREE.Clock();
+        let player = {
+            position: new THREE.Vector3(0, 10, 0),
+            velocity: new THREE.Vector3(0, 0, 0),
+            rotation: { x: 0, y: 0 },
+            onGround: false,
+            health: 100,
+            score: 0
+        };
+        
+        let blocks = new Map();
+        let specialBlocks = []; // For animated blocks
+        let keys = {};
+        let mouseControls = false;
+        let chatOpen = false;
+        
+        // Block Types
+        const BLOCK_TYPES = {
+            GRASS: { color: 0x2ECC40, name: 'Grass' },
+            STONE: { color: 0x95A5A6, name: 'Stone' },
+            WOOD: { color: 0x8B4513, name: 'Wood' },
+            WATER: { color: 0x3498DB, name: 'Water', transparent: true },
+            LAVA: { color: 0xFF4500, name: 'Lava', damage: true },
+            DIAMOND: { color: 0x00CED1, name: 'Diamond', score: 100, animated: true }
+        };
+        
+        let currentBlockType = 'GRASS';
+        
+        // Initialize Three.js
+        function init() {
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x87CEEB, 10, 200);
+            
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(
+                75, 
+                window.innerWidth / window.innerHeight, 
+                0.1, 
+                1000
+            );
+            
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('gameCanvas'),
+                antialias: true 
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+            directionalLight.position.set(50, 100, 50);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.camera.left = -50;
+            directionalLight.shadow.camera.right = 50;
+            directionalLight.shadow.camera.top = 50;
+            directionalLight.shadow.camera.bottom = -50;
+            scene.add(directionalLight);
+            
+            // Create skybox
+            const skyGeometry = new THREE.SphereGeometry(400, 32, 32);
+            const skyMaterial = new THREE.MeshBasicMaterial({
+                color: 0x87CEEB,
+                side: THREE.BackSide
+            });
+            const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+            scene.add(sky);
+            
+            // Generate world
+            generateWorld();
+            
+            // Setup block selector UI
+            setupBlockSelector();
+            
+            // Setup controls
+            setupControls();
+            
+            // Start game loop
+            animate();
+        }
+        
+        function generateWorld() {
+            // Create base terrain
+            const baseGeometry = new THREE.BoxGeometry(WORLD_SIZE, 1, WORLD_SIZE);
+            const baseMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x2ECC40,
+                shininess: 10
+            });
+            const base = new THREE.Mesh(baseGeometry, baseMaterial);
+            base.position.y = -1;
+            base.receiveShadow = true;
+            scene.add(base);
+            
+            // Add some random blocks
+            for (let i = 0; i < 30; i++) {
+                const x = Math.floor(Math.random() * 30 - 15) * BLOCK_SIZE;
+                const z = Math.floor(Math.random() * 30 - 15) * BLOCK_SIZE;
+                const y = Math.floor(Math.random() * 3) * BLOCK_SIZE;
+                const types = ['GRASS', 'STONE', 'WOOD'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                
+                createBlock(x, y, z, type);
+            }
+            
+            // Add a few special blocks
+            for (let i = 0; i < 5; i++) {
+                const x = Math.floor(Math.random() * 20 - 10) * BLOCK_SIZE;
+                const z = Math.floor(Math.random() * 20 - 10) * BLOCK_SIZE;
+                createBlock(x, BLOCK_SIZE * 2, z, 'DIAMOND');
+            }
+            
+            // Create simple structures
+            createTower(10, 0, 10);
+            createTower(-15, 0, -15);
+        }
+        
+        function createTower(x, y, z) {
+            for (let height = 0; height < 8; height++) {
+                createBlock(x, y + height * BLOCK_SIZE, z, 'STONE');
+                createBlock(x + BLOCK_SIZE, y + height * BLOCK_SIZE, z, 'STONE');
+                createBlock(x, y + height * BLOCK_SIZE, z + BLOCK_SIZE, 'STONE');
+                createBlock(x + BLOCK_SIZE, y + height * BLOCK_SIZE, z + BLOCK_SIZE, 'STONE');
+            }
+        }
+        
+        function createBlock(x, y, z, type) {
+            const blockData = BLOCK_TYPES[type];
+            const geometry = new THREE.BoxGeometry(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            const material = new THREE.MeshPhongMaterial({ 
+                color: blockData.color,
+                transparent: blockData.transparent || false,
+                opacity: blockData.transparent ? 0.7 : 1,
+                shininess: 30
+            });
+            
+            const block = new THREE.Mesh(geometry, material);
+            block.position.set(x, y, z);
+            block.castShadow = true;
+            block.receiveShadow = true;
+            block.userData = { 
+                type, 
+                ...blockData,
+                originalY: y  // Store original Y position for animations
+            };
+            
+            scene.add(block);
+            blocks.set(`${x},${y},${z}`, block);
+            
+            // Track special blocks separately for animation
+            if (blockData.animated) {
+                specialBlocks.push({
+                    mesh: block,
+                    baseY: y,
+                    offset: Math.random() * Math.PI * 2  // Random starting phase
+                });
+            }
+        }
+        
+        function setupBlockSelector() {
+            const selector = document.getElementById('blockSelector');
+            Object.entries(BLOCK_TYPES).forEach(([key, data], index) => {
+                const div = document.createElement('div');
+                div.className = 'blockOption';
+                if (key === currentBlockType) div.classList.add('selected');
+                div.style.backgroundColor = `#${data.color.toString(16).padStart(6, '0')}`;
+                div.title = data.name;
+                div.onclick = () => selectBlock(key);
+                selector.appendChild(div);
+            });
+        }
+        
+        function selectBlock(type) {
+            currentBlockType = type;
+            document.querySelectorAll('.blockOption').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.blockOption')[Object.keys(BLOCK_TYPES).indexOf(type)].classList.add('selected');
+            document.getElementById('currentBlock').textContent = BLOCK_TYPES[type].name;
+        }
+        
+        function setupControls() {
+            // Keyboard controls
+            document.addEventListener('keydown', (e) => {
+                keys[e.key.toLowerCase()] = true;
+                
+                // Block selection with number keys
+                const num = parseInt(e.key);
+                if (num >= 1 && num <= 6) {
+                    const types = Object.keys(BLOCK_TYPES);
+                    if (types[num - 1]) {
+                        selectBlock(types[num - 1]);
+                    }
+                }
+                
+                if (e.key.toLowerCase() === 't' && !chatOpen) {
+                    toggleChat();
+                }
+                
+                if (e.key === 'Escape') {
+                    document.exitPointerLock();
+                    mouseControls = false;
+                }
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                keys[e.key.toLowerCase()] = false;
+            });
+            
+            // Mouse controls
+            document.getElementById('gameCanvas').addEventListener('click', (e) => {
+                if (!mouseControls) {
+                    document.getElementById('gameCanvas').requestPointerLock();
+                    mouseControls = true;
+                    document.getElementById('instructions').style.display = 'none';
+                } else {
+                    placeBlock();
+                }
+            });
+            
+            document.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                if (mouseControls) {
+                    removeBlock();
+                }
+            });
+            
+            document.addEventListener('pointerlockchange', () => {
+                mouseControls = document.pointerLockElement === document.getElementById('gameCanvas');
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (mouseControls) {
+                    player.rotation.y -= e.movementX * 0.002;
+                    player.rotation.x -= e.movementY * 0.002;
+                    // Clamp vertical rotation
+                    player.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, player.rotation.x));
+                }
+            });
+            
+            // Window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            
+            // Chat controls
+            document.getElementById('chatInput').addEventListener('keydown', (e) => {
+                e.stopPropagation();
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+        }
+        
+        function updatePlayer() {
+            // Movement
+            const moveSpeed = keys['shift'] ? PLAYER_SPEED * 1.5 : PLAYER_SPEED;
+            let moveX = 0;
+            let moveZ = 0;
+            
+            if (keys['w']) {
+                moveX -= Math.sin(player.rotation.y) * moveSpeed;
+                moveZ -= Math.cos(player.rotation.y) * moveSpeed;
+            }
+            if (keys['s']) {
+                moveX += Math.sin(player.rotation.y) * moveSpeed;
+                moveZ += Math.cos(player.rotation.y) * moveSpeed;
+            }
+            if (keys['a']) {
+                moveX -= Math.cos(player.rotation.y) * moveSpeed;
+                moveZ += Math.sin(player.rotation.y) * moveSpeed;
+            }
+            if (keys['d']) {
+                moveX += Math.cos(player.rotation.y) * moveSpeed;
+                moveZ -= Math.sin(player.rotation.y) * moveSpeed;
+            }
+            
+            // Apply movement
+            player.position.x += moveX;
+            player.position.z += moveZ;
+            
+            // Jumping
+            if (keys[' '] && player.onGround) {
+                player.velocity.y = JUMP_FORCE;
+                player.onGround = false;
+            }
+            
+            // Apply gravity
+            player.velocity.y += GRAVITY;
+            player.position.y += player.velocity.y;
+            
+            // Ground collision
+            const groundLevel = PLAYER_HEIGHT;
+            if (player.position.y <= groundLevel) {
+                player.position.y = groundLevel;
+                player.velocity.y = 0;
+                player.onGround = true;
+            }
+            
+            // Simple block collision
+            checkBlockCollisions();
+            
+            // Update camera
+            camera.position.copy(player.position);
+            camera.position.y += 1;
+            camera.rotation.order = 'YXZ';
+            camera.rotation.y = player.rotation.y;
+            camera.rotation.x = player.rotation.x;
+            
+            // Keep player in bounds
+            player.position.x = Math.max(-WORLD_SIZE/2 + 5, Math.min(WORLD_SIZE/2 - 5, player.position.x));
+            player.position.z = Math.max(-WORLD_SIZE/2 + 5, Math.min(WORLD_SIZE/2 - 5, player.position.z));
+        }
+        
+        function checkBlockCollisions() {
+            const playerBox = new THREE.Box3(
+                new THREE.Vector3(
+                    player.position.x - 0.5,
+                    player.position.y - PLAYER_HEIGHT,
+                    player.position.z - 0.5
+                ),
+                new THREE.Vector3(
+                    player.position.x + 0.5,
+                    player.position.y + 0.5,
+                    player.position.z + 0.5
+                )
+            );
+            
+            blocks.forEach((block, key) => {
+                const blockBox = new THREE.Box3().setFromObject(block);
+                
+                if (playerBox.intersectsBox(blockBox)) {
+                    // Special block effects
+                    if (block.userData.damage && Math.random() > 0.95) {
+                        player.health = Math.max(0, player.health - 1);
+                        updateUI();
+                    }
+                    
+                    if (block.userData.score) {
+                        player.score += block.userData.score;
+                        scene.remove(block);
+                        blocks.delete(key);
+                        // Remove from special blocks array
+                        specialBlocks = specialBlocks.filter(sb => sb.mesh !== block);
+                        updateUI();
+                        return;
+                    }
+                    
+                    // Calculate push direction
+                    const center = new THREE.Vector3();
+                    blockBox.getCenter(center);
+                    const diff = new THREE.Vector3().subVectors(player.position, center);
+                    
+                    // Find the axis with smallest penetration
+                    const absX = Math.abs(diff.x);
+                    const absY = Math.abs(diff.y);
+                    const absZ = Math.abs(diff.z);
+                    
+                    if (absY < absX && absY < absZ) {
+                        // Vertical collision
+                        if (diff.y > 0) {
+                            // On top of block
+                            player.position.y = center.y + BLOCK_SIZE/2 + PLAYER_HEIGHT;
+                            player.velocity.y = 0;
+                            player.onGround = true;
+                        } else {
+                            // Hit from below
+                            player.position.y = center.y - BLOCK_SIZE/2 - 1;
+                            player.velocity.y = 0;
+                        }
+                    } else if (absX < absZ) {
+                        // X-axis collision
+                        if (diff.x > 0) {
+                            player.position.x = center.x + BLOCK_SIZE/2 + 0.5;
+                        } else {
+                            player.position.x = center.x - BLOCK_SIZE/2 - 0.5;
+                        }
+                    } else {
+                        // Z-axis collision
+                        if (diff.z > 0) {
+                            player.position.z = center.z + BLOCK_SIZE/2 + 0.5;
+                        } else {
+                            player.position.z = center.z - BLOCK_SIZE/2 - 0.5;
+                        }
+                    }
+                }
+            });
+        }
+        
+        function placeBlock() {
+            const raycaster = new THREE.Raycaster();
+            const center = new THREE.Vector2(0, 0);
+            raycaster.setFromCamera(center, camera);
+            
+            const intersects = raycaster.intersectObjects(scene.children);
+            
+            if (intersects.length > 0 && intersects[0].distance < 10) {
+                const point = intersects[0].point;
+                const normal = intersects[0].face.normal;
+                
+                // Calculate block position
+                const blockPos = point.clone().add(normal.multiplyScalar(0.5));
+                const x = Math.round(blockPos.x / BLOCK_SIZE) * BLOCK_SIZE;
+                const y = Math.round(blockPos.y / BLOCK_SIZE) * BLOCK_SIZE;
+                const z = Math.round(blockPos.z / BLOCK_SIZE) * BLOCK_SIZE;
+                
+                // Don't place if too close to player
+                const distToPlayer = new THREE.Vector3(x, y, z).distanceTo(player.position);
+                if (distToPlayer < 2) return;
+                
+                const key = `${x},${y},${z}`;
+                if (!blocks.has(key)) {
+                    createBlock(x, y, z, currentBlockType);
+                    player.score += 10;
+                    updateUI();
+                }
+            }
+        }
+        
+        function removeBlock() {
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+            
+            const blockArray = Array.from(blocks.values());
+            const intersects = raycaster.intersectObjects(blockArray);
+            
+            if (intersects.length > 0 && intersects[0].distance < 10) {
+                const block = intersects[0].object;
+                const key = `${block.position.x},${block.userData.originalY},${block.position.z}`;
+                
+                scene.remove(block);
+                blocks.delete(key);
+                // Remove from special blocks if applicable
+                specialBlocks = specialBlocks.filter(sb => sb.mesh !== block);
+                player.score += 5;
+                updateUI();
+            }
+        }
+        
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            document.getElementById('chat').style.display = chatOpen ? 'block' : 'none';
+            if (chatOpen) {
+                document.getElementById('chatInput').focus();
+            }
+        }
+        
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Simulate responses
+                if (Math.random() > 0.5) {
+                    setTimeout(() => {
+                        const responses = [
+                            "nice build!",
+                            "gg",
+                            "anyone wanna team?",
+                            "trading diamonds",
+                            "oof",
+                            "EZ",
+                            "wow",
+                            "follow me"
+                        ];
+                        const response = responses[Math.floor(Math.random() * responses.length)];
+                        chatMessages.innerHTML += `<div><strong>Player${Math.floor(Math.random() * 1000)}:</strong> ${response}</div>`;
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }, 1000 + Math.random() * 2000);
+                }
+                
+                input.value = '';
+            }
+        }
+        
+        function updateUI() {
+            document.getElementById('health').textContent = Math.max(0, player.health);
+            document.getElementById('score').textContent = player.score;
+            
+            if (player.health <= 0) {
+                alert('OOF! You died! Respawning...');
+                player.health = 100;
+                player.position.set(0, 10, 0);
+                player.velocity.set(0, 0, 0);
+            }
+        }
+        
+        function animateSpecialBlocks() {
+            const time = clock.getElapsedTime();
+            
+            specialBlocks.forEach(special => {
+                if (special.mesh.parent) {  // Check if still in scene
+                    // Gentle floating animation
+                    special.mesh.position.y = special.baseY + Math.sin(time * 2 + special.offset) * 0.2;
+                    special.mesh.rotation.y = time + special.offset;
+                }
+            });
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            updatePlayer();
+            animateSpecialBlocks();
+            
+            // Occasional player count update
+            if (Math.random() > 0.995) {
+                const playerCount = parseInt(document.getElementById('players').textContent);
+                const newCount = Math.max(1, playerCount + (Math.random() > 0.5 ? 1 : -1));
+                document.getElementById('players').textContent = newCount;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Start the game!
+        init();
+    </script>
+</body>
+</html>

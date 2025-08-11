@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BurntAI - AI Interaction Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/burntai-dynamic.css">
+    <style>
+        :root {
+            --neon-orange: #ff6600;
+            --neon-cyan: #00ffff;
+            --neon-red: #ff0040;
+            --terminal-green: #00ff00;
+            --rust-red: #8b0000;
+            --dark-bg: #0a0a0a;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: white;
+            font-family: 'Orbitron', monospace;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .demo-header h1 {
+            font-size: 3rem;
+            color: #ff6600;
+            text-shadow: 0 0 20px #ff6600;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .demo-section {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ff6600;
+            border-radius: 10px;
+            padding: 2rem;
+        }
+        
+        .demo-section h2 {
+            color: #00ffff;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>AI INTERACTION DEMO</h1>
+            <p>Test the wasteland's neural networks</p>
+        </div>
+        
+        <div class="demo-grid">
+            <div class="demo-section">
+                <h2>TERMINAL INTERFACE</h2>
+                <div id="terminal-container"></div>
+            </div>
+            
+            <div class="demo-section">
+                <h2>AI CHAT INTERFACE</h2>
+                <div class="ai-chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="chat-message ai">
+                            Welcome to BurntAI. How can I assist you in the wasteland today?
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chat-input" 
+                               placeholder="Ask the AI anything..." 
+                               disabled title="Login required">
+                        <button class="chat-send" id="chat-send" disabled>SEND</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/" style="color: #ff6600;">← Back to Main Vault</a>
+        </div>
+    </div>
+    
+    <script src="/js/burntai-api.js"></script>
+    <script src="/js/burntai-ui.js"></script>
+    <script src="/js/auth-module.js"></script>
+    <script>
+        // Terminal implementation
+        const { terminal, output, input } = window.burntaiUI.createTerminal('terminal-container');
+        
+        // Override terminal execute
+        window.burntaiUI.terminalExecute = async function(command, output) {
+            this.terminalPrint(output, `$ ${command}`, 'command');
+            
+            if (command === 'help') {
+                this.terminalPrint(output, 'Available commands:');
+                this.terminalPrint(output, '  status - Check system status');
+                this.terminalPrint(output, '  ai <message> - Talk to AI');
+                this.terminalPrint(output, '  clear - Clear terminal');
+                this.terminalPrint(output, '  help - Show this help');
+            } else if (command === 'status') {
+                const health = await window.burntaiAPI.checkHealth();
+                this.terminalPrint(output, `System Status: ${health.status}`, 'success');
+                this.terminalPrint(output, `Database: ${health.database || 'Unknown'}`);
+            } else if (command.startsWith('ai ')) {
+                if (!window.burntaiAPI.isAuthenticated()) {
+                    this.terminalPrint(output, 'Error: Authentication required', 'error');
+                    return;
+                }
+                const message = command.substring(3);
+                this.terminalPrint(output, 'Processing...', 'info');
+                const result = await window.burntaiAPI.aiInteract('terminal', message);
+                if (result.ok) {
+                    this.terminalPrint(output, result.data.response || 'AI response received', 'success');
+                } else {
+                    this.terminalPrint(output, 'AI system error', 'error');
+                }
+            } else if (command === 'clear') {
+                output.innerHTML = '';
+            } else {
+                this.terminalPrint(output, `Unknown command: ${command}`, 'error');
+                this.terminalPrint(output, 'Type "help" for available commands');
+            }
+        };
+        
+        // Initial terminal message
+        window.burntaiUI.terminalPrint(output, 'BurntAI Terminal initialized', 'success');
+        window.burntaiUI.terminalPrint(output, 'Type "help" for available commands');
+        
+        // Chat implementation
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        
+        // Enable chat if authenticated
+        if (window.burntaiAPI.isAuthenticated()) {
+            chatInput.disabled = false;
+            chatSend.disabled = false;
+            chatInput.placeholder = "Ask the AI anything...";
+        }
+        
+        async function sendChatMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-message user';
+            userMsg.textContent = message;
+            chatMessages.appendChild(userMsg);
+            
+            // Clear input and disable while processing
+            chatInput.value = '';
+            chatInput.disabled = true;
+            chatSend.disabled = true;
+            
+            // Add AI thinking message
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'chat-message ai';
+            aiMsg.innerHTML = '<span class="loading-spinner"></span> Thinking...';
+            chatMessages.appendChild(aiMsg);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            try {
+                const result = await window.burntaiAPI.aiInteract('chat', message);
+                if (result.ok) {
+                    aiMsg.innerHTML = result.data.response || 'I received your message.';
+                } else {
+                    aiMsg.innerHTML = 'Error: Could not process your request.';
+                }
+            } catch (error) {
+                aiMsg.innerHTML = 'Error: Connection to AI failed.';
+            }
+            
+            // Re-enable input
+            chatInput.disabled = false;
+            chatSend.disabled = false;
+            chatInput.focus();
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        chatSend.addEventListener('click', sendChatMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendChatMessage();
+        });
+        
+        // WebSocket real-time updates
+        window.burntaiAPI.onAIResponse = function(data) {
+            window.burntaiUI.notify('AI response received!', 'info');
+        };
+    </script>
+</body>
+</html>

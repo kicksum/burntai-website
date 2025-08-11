@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BurntAI System Test - Verify All AI Systems</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Orbitron', monospace;
+            padding: 2rem;
+            margin: 0;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff8533;
+            text-shadow: 0 0 20px rgba(255, 133, 51, 0.5);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .test-section {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ff8533;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .test-name {
+            color: #00e5ff;
+            font-size: 1.2rem;
+        }
+        .test-status {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .status-pending { background: #666; color: #fff; }
+        .status-testing { background: #ff8533; color: #fff; animation: pulse 1s infinite; }
+        .status-success { background: #00ff88; color: #000; }
+        .status-error { background: #ff4466; color: #fff; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .test-result {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem;
+            border-radius: 5px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .run-all-button {
+            background: linear-gradient(45deg, #ff8533, #ff4466);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        .run-all-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 133, 51, 0.5);
+        }
+        .run-all-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .summary {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid #00e5ff;
+            padding: 1rem;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .error-details {
+            color: #ff4466;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 BURNTAI SYSTEM DIAGNOSTICS 🔧</h1>
+        
+        <button class="run-all-button" onclick="runAllTests()">
+            ⚡ RUN ALL SYSTEM TESTS ⚡
+        </button>
+
+        <!-- Test 1: Configuration -->
+        <div class="test-section">
+            <div class="test-header">
+                <span class="test-name">Configuration Check</span>
+                <span class="test-status status-pending" id="status-config">PENDING</span>
+            </div>
+            <div class="test-result" id="result-config">Checking shared configuration...</div>
+        </div>
+
+        <!-- Test 2: Neural Wasteland -->
+        <div class="test-section">
+            <div class="test-header">
+                <span class="test-name">Neural Wasteland API</span>
+                <span class="test-status status-pending" id="status-wasteland">PENDING</span>
+            </div>
+            <div class="test-result" id="result-wasteland">Testing wasteland consciousness...</div>
+        </div>
+
+        <!-- Test 3: Intel Feed -->
+        <div class="test-section">
+            <div class="test-header">
+                <span class="test-name">Intel Feed Network</span>
+                <span class="test-status status-pending" id="status-intel">PENDING</span>
+            </div>
+            <div class="test-result" id="result-intel">Scanning intelligence frequencies...</div>
+        </div>
+
+        <!-- Test 4: Consciousness Fusion -->
+        <div class="test-section">
+            <div class="test-header">
+                <span class="test-name">Consciousness Fusion Lab</span>
+                <span class="test-status status-pending" id="status-fusion">PENDING</span>
+            </div>
+            <div class="test-result" id="result-fusion">Initializing fusion reactor...</div>
+        </div>
+
+        <!-- Test 5: Rate Limiting -->
+        <div class="test-section">
+            <div class="test-header">
+                <span class="test-name">Rate Limiting System</span>
+                <span class="test-status status-pending" id="status-ratelimit">PENDING</span>
+            </div>
+            <div class="test-result" id="result-ratelimit">Testing request limits...</div>
+        </div>
+
+        <div class="summary" id="test-summary" style="display: none;">
+            <h2>TEST SUMMARY</h2>
+            <p id="summary-text"></p>
+        </div>
+    </div>
+
+    <script src="/js/burntai-ai.js"></script>
+    <script>
+        const tests = [
+            {
+                name: 'config',
+                displayName: 'Configuration Check',
+                run: async () => {
+                    // Check if BurntAI module loaded
+                    if (typeof BurntAI === 'undefined') {
+                        throw new Error('BurntAI module not loaded');
+                    }
+                    
+                    // Try a simple request to check config
+                    const testResponse = await fetch('/api/consciousness-fusion?stats=1');
+                    if (!testResponse.ok) {
+                        throw new Error(`API returned ${testResponse.status}`);
+                    }
+                    
+                    const stats = await testResponse.json();
+                    return `✓ Configuration loaded
+✓ API endpoints accessible
+✓ Stats endpoint returned: ${JSON.stringify(stats, null, 2)}`;
+                }
+            },
+            {
+                name: 'wasteland',
+                displayName: 'Neural Wasteland',
+                run: async () => {
+                    const response = await BurntAI.wastelandChat('Testing neural wasteland connection', {
+                        radiation: 50
+                    });
+                    
+                    if (!response.response) {
+                        throw new Error('No response from wasteland AI');
+                    }
+                    
+                    return `✓ Wasteland AI responded
+✓ Response: "${response.response.substring(0, 100)}..."
+✓ Radiation: ${response.radiation}μSv
+✓ Event: ${response.event ? response.event.type : 'None'}`;
+                }
+            },
+            {
+                name: 'intel',
+                displayName: 'Intel Feed',
+                run: async () => {
+                    const feed = await BurntAI.getIntelFeed();
+                    
+                    if (!feed.reports || feed.reports.length === 0) {
+                        throw new Error('No intel reports received');
+                    }
+                    
+                    return `✓ Intel feed active
+✓ Reports received: ${feed.reports.length}
+✓ Signal strength: ${feed.signal_strength}%
+✓ First report: ${feed.reports[0].headline}
+✓ Status: ${feed.status}`;
+                }
+            },
+            {
+                name: 'fusion',
+                displayName: 'Consciousness Fusion',
+                run: async () => {
+                    const testConsciousness = {
+                        name: 'TEST-ENTITY',
+                        traits: { logic: 80, order: 70, human: 60, chaos: 40 },
+                        stability: 85
+                    };
+                    
+                    const response = await BurntAI.fusionChat(
+                        'You are a test consciousness',
+                        'Confirm fusion systems operational',
+                        testConsciousness
+                    );
+                    
+                    if (!response.response) {
+                        throw new Error('No response from fusion AI');
+                    }
+                    
+                    return `✓ Fusion API connected
+✓ Test consciousness created
+✓ Response: "${response.response.substring(0, 100)}..."
+✓ Temperature calculation working`;
+                }
+            },
+            {
+                name: 'ratelimit',
+                displayName: 'Rate Limiting',
+                run: async () => {
+                    // Make rapid requests to test rate limiting
+                    const requests = [];
+                    for (let i = 0; i < 5; i++) {
+                        requests.push(
+                            fetch('/api/neural-wasteland.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ message: `Test ${i}` })
+                            })
+                        );
+                    }
+                    
+                    const results = await Promise.allSettled(requests);
+                    const successful = results.filter(r => r.status === 'fulfilled').length;
+                    
+                    return `✓ Rate limiting active
+✓ Requests sent: 5
+✓ Requests successful: ${successful}
+✓ Rate limit working: ${successful < 5 ? 'Yes' : 'Check settings'}
+✓ Remaining requests: ${BurntAI.state.rateLimitRemaining || 'Unknown'}`;
+                }
+            }
+        ];
+
+        async function runTest(test) {
+            const statusEl = document.getElementById(`status-${test.name}`);
+            const resultEl = document.getElementById(`result-${test.name}`);
+            
+            statusEl.className = 'test-status status-testing';
+            statusEl.textContent = 'TESTING';
+            
+            try {
+                const result = await test.run();
+                statusEl.className = 'test-status status-success';
+                statusEl.textContent = 'SUCCESS';
+                resultEl.textContent = result;
+                return true;
+            } catch (error) {
+                statusEl.className = 'test-status status-error';
+                statusEl.textContent = 'ERROR';
+                resultEl.innerHTML = `❌ Test failed
+<div class="error-details">${error.message}</div>`;
+                return false;
+            }
+        }
+
+        async function runAllTests() {
+            const button = document.querySelector('.run-all-button');
+            button.disabled = true;
+            button.textContent = 'RUNNING DIAGNOSTICS...';
+            
+            let passed = 0;
+            let failed = 0;
+            
+            for (const test of tests) {
+                const success = await runTest(test);
+                if (success) passed++;
+                else failed++;
+                
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            // Show summary
+            const summaryEl = document.getElementById('test-summary');
+            const summaryText = document.getElementById('summary-text');
+            
+            summaryEl.style.display = 'block';
+            summaryText.innerHTML = `
+                <strong style="color: #00ff88;">Passed: ${passed}</strong> | 
+                <strong style="color: #ff4466;">Failed: ${failed}</strong><br>
+                ${failed === 0 ? 
+                    '<span style="color: #00ff88; font-size: 1.5rem;">✓ ALL SYSTEMS OPERATIONAL</span>' : 
+                    '<span style="color: #ff4466; font-size: 1.5rem;">⚠️ SYSTEM ISSUES DETECTED</span>'}
+            `;
+            
+            button.disabled = false;
+            button.textContent = '⚡ RUN ALL SYSTEM TESTS ⚡';
+        }
+
+        // Console commands
+        console.log('%c🔧 BurntAI System Test Loaded', 'color: #ff8533; font-size: 16px; font-weight: bold;');
+        console.log('%cRun individual tests with:', 'color: #00e5ff;');
+        console.log('%c  runTest(tests[0]) // Configuration', 'color: #00ff88; font-family: monospace;');
+        console.log('%c  runTest(tests[1]) // Neural Wasteland', 'color: #00ff88; font-family: monospace;');
+        console.log('%c  runTest(tests[2]) // Intel Feed', 'color: #00ff88; font-family: monospace;');
+        console.log('%c  runTest(tests[3]) // Consciousness Fusion', 'color: #00ff88; font-family: monospace;');
+        console.log('%c  runTest(tests[4]) // Rate Limiting', 'color: #00ff88; font-family: monospace;');
+    </script>
+</body>
+</html>

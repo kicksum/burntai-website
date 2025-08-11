@@ -1,0 +1,205 @@
+// Digital Wasteland Arena: Doors now rendered as visible sliding walls
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Wasteland Arena</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: black;
+      color: white;
+      font-family: monospace;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+    #overlay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      border: 1px solid #0f0;
+      z-index: 100;
+    }
+    #minimap {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid #0f0;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="screen"></canvas>
+  <canvas id="minimap" width="256" height="128"></canvas>
+  <div id="overlay">WASD to move, ←/→ to look, E to open doors</div>
+  <script>
+    const canvas = document.getElementById('screen');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const minimapCanvas = document.getElementById('minimap');
+    const mctx = minimapCanvas.getContext('2d');
+
+    let map = [
+      "11111111111111111111",
+      "1     1            1",
+      "1     1   11111    1",
+      "1     1   1   1    1",
+      "1         1 D 1    1",
+      "1     1   1   1    1",
+      "1     1   11111    1",
+      "1     1            1",
+      "1111111    111111111",
+      "1     1            1",
+      "1     11111   1    1",
+      "1         1   1    1",
+      "1     1   1   1    1",
+      "1     1   11111    1",
+      "1                  1",
+      "11111111111111111111"
+    ];
+
+    const tileSize = 64;
+    const FOV = Math.PI / 3;
+    const numRays = canvas.width;
+    const distToProjPlane = (canvas.width / 2) / Math.tan(FOV / 2);
+
+    let player = {
+      x: 3.5 * tileSize,
+      y: 3.5 * tileSize,
+      angle: 0,
+      speed: 2
+    };
+
+    const doors = {}; // door positions and their open offset
+    const keys = {};
+
+    document.addEventListener('keydown', e => {
+      keys[e.code] = true;
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "KeyE"].includes(e.code)) e.preventDefault();
+    });
+    document.addEventListener('keyup', e => keys[e.code] = false);
+
+    function gameLoop() {
+      update();
+      render();
+      renderMinimap();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function update() {
+      const moveStep = (keys['KeyW'] ? 1 : 0) + (keys['KeyS'] ? -1 : 0);
+      const strafeStep = (keys['KeyD'] ? 1 : 0) + (keys['KeyA'] ? -1 : 0);
+      const dx = (Math.cos(player.angle) * moveStep + Math.cos(player.angle + Math.PI / 2) * strafeStep) * player.speed;
+      const dy = (Math.sin(player.angle) * moveStep + Math.sin(player.angle + Math.PI / 2) * strafeStep) * player.speed;
+
+      const nextX = player.x + dx;
+      const nextY = player.y + dy;
+
+      if (!isWall(nextX, player.y)) player.x = nextX;
+      if (!isWall(player.x, nextY)) player.y = nextY;
+
+      if (keys['ArrowLeft']) player.angle -= 0.04;
+      if (keys['ArrowRight']) player.angle += 0.04;
+
+      if (keys['KeyE']) {
+        const tx = Math.floor((player.x + Math.cos(player.angle) * 20) / tileSize);
+        const ty = Math.floor((player.y + Math.sin(player.angle) * 20) / tileSize);
+        const k = `${tx},${ty}`;
+        if (map[ty]?.[tx] === 'D' && !doors[k]) doors[k] = { offset: 0 };
+      }
+
+      for (const k in doors) {
+        if (doors[k].offset < tileSize) {
+          doors[k].offset += 2;
+        } else {
+          const [jx, iy] = k.split(',').map(Number);
+          map[iy] = map[iy].substring(0, jx) + ' ' + map[iy].substring(jx + 1);
+          delete doors[k];
+        }
+      }
+    }
+
+    function isWall(x, y) {
+      const i = Math.floor(y / tileSize);
+      const j = Math.floor(x / tileSize);
+      const tile = map[i]?.[j];
+      return tile && tile !== ' ' && tile !== 'D';
+    }
+
+    function castRay(angle) {
+      const sin = Math.sin(angle);
+      const cos = Math.cos(angle);
+      for (let t = 0; t < 1000; t++) {
+        const x = player.x + cos * t;
+        const y = player.y + sin * t;
+        const i = Math.floor(y / tileSize);
+        const j = Math.floor(x / tileSize);
+        const tile = map[i]?.[j];
+        if (tile && tile !== ' ') {
+          return { dist: t, wall: tile, x, y, i, j };
+        }
+      }
+      return { dist: 1000, wall: ' ', x: 0, y: 0, i: 0, j: 0 };
+    }
+
+    function render() {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < numRays; i++) {
+        const rayAngle = player.angle - FOV / 2 + (FOV * i / numRays);
+        const ray = castRay(rayAngle);
+        const distance = ray.dist * Math.cos(rayAngle - player.angle);
+        const wallHeight = (tileSize / distance) * distToProjPlane;
+
+        const doorKey = `${ray.j},${ray.i}`;
+        const isDoor = map[ray.i]?.[ray.j] === 'D';
+        let shade = 255 - distance * 0.4;
+        shade = Math.max(0, Math.min(255, shade));
+
+        let color = '#000';
+        if (ray.wall === '1') color = `rgb(${shade}, ${shade / 2}, ${shade / 4})`;
+        else if (isDoor || doors[doorKey]) color = `rgb(${shade / 2}, ${shade / 2}, 255)`;
+
+        ctx.fillStyle = color;
+        ctx.fillRect(i, (canvas.height / 2) - wallHeight / 2, 1, wallHeight);
+      }
+    }
+
+    function renderMinimap() {
+      const scale = 8;
+      mctx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+      for (let i = 0; i < map.length; i++) {
+        for (let j = 0; j < map[i].length; j++) {
+          const tile = map[i][j];
+          if (tile === '1') mctx.fillStyle = '#666';
+          else if (tile === 'D' || doors[`${j},${i}`]) mctx.fillStyle = '#0ff';
+          else continue;
+          mctx.fillRect(j * scale, i * scale, scale, scale);
+        }
+      }
+      mctx.fillStyle = '#0f0';
+      mctx.beginPath();
+      mctx.arc(player.x / tileSize * scale, player.y / tileSize * scale, 2, 0, Math.PI * 2);
+      mctx.fill();
+      mctx.strokeStyle = '#0f0';
+      mctx.beginPath();
+      mctx.moveTo(player.x / tileSize * scale, player.y / tileSize * scale);
+      mctx.lineTo((player.x + Math.cos(player.angle) * 20) / tileSize * scale,
+                  (player.y + Math.sin(player.angle) * 20) / tileSize * scale);
+      mctx.stroke();
+    }
+
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

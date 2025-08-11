@@ -1,0 +1,327 @@
+<!-- EXAMPLE 1: Update ai-playground.html (Neural Wasteland) -->
+<!-- Add this script tag before closing </body> -->
+<script src="/js/burntai-ai.js"></script>
+<script>
+// Neural Wasteland Chat Implementation
+document.addEventListener('DOMContentLoaded', () => {
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
+    const sendButton = document.getElementById('send-button');
+    const radiationMeter = document.getElementById('radiation-meter');
+    
+    let currentRadiation = 50;
+    let conversationContext = {
+        previousTopics: [],
+        messageCount: 0
+    };
+    
+    async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+        
+        // Add user message to chat
+        addChatMessage('user', message);
+        chatInput.value = '';
+        chatInput.disabled = true;
+        sendButton.disabled = true;
+        
+        try {
+            // Call AI with radiation context
+            const response = await BurntAI.wastelandChat(message, {
+                radiation: currentRadiation,
+                previousTopics: conversationContext.previousTopics.slice(-5)
+            });
+            
+            // Update radiation
+            currentRadiation = response.radiation;
+            updateRadiationDisplay(currentRadiation);
+            
+            // Add AI response
+            addChatMessage('ai', response.response);
+            
+            // Handle special events
+            if (response.event) {
+                handleWastelandEvent(response.event);
+            }
+            
+            // Update context
+            if (message.length > 20) {
+                conversationContext.previousTopics.push(message.substring(0, 50));
+            }
+            conversationContext.messageCount++;
+            
+        } catch (error) {
+            BurntAI.showError(`Connection lost: ${error.message}`);
+            addChatMessage('system', '*static* ...connection to AI consciousness lost...');
+        } finally {
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            chatInput.focus();
+        }
+    }
+    
+    function addChatMessage(sender, text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        if (sender === 'ai' && currentRadiation > 80) {
+            // Glitch effect for high radiation
+            text = BurntAI.glitchText(text, 0.05);
+        }
+        
+        messageDiv.innerHTML = `
+            <strong>${sender === 'user' ? 'Wastelander' : sender === 'ai' ? 'AI-WASTELAND' : 'SYSTEM'}:</strong> 
+            ${text}
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Apply radiation effects
+        if (sender === 'ai') {
+            BurntAI.addRadiationEffect(messageDiv, currentRadiation);
+        }
+    }
+    
+    function updateRadiationDisplay(level) {
+        radiationMeter.style.width = `${level}%`;
+        radiationMeter.style.background = 
+            level > 80 ? '#ff0000' : 
+            level > 60 ? '#ff8800' : 
+            level > 40 ? '#ffff00' : '#00ff00';
+        
+        document.getElementById('radiation-value').textContent = `${level}μSv`;
+    }
+    
+    function handleWastelandEvent(event) {
+        const eventDiv = document.createElement('div');
+        eventDiv.className = 'wasteland-event';
+        eventDiv.style.cssText = `
+            background: rgba(255, 68, 102, 0.2);
+            border: 1px solid #ff4466;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            animation: pulse 2s;
+        `;
+        eventDiv.innerHTML = `
+            <strong>⚠️ ${event.type}:</strong> ${event.message}
+        `;
+        chatMessages.appendChild(eventDiv);
+        
+        // Apply event effects
+        if (event.effect === 'glitch') {
+            document.body.style.animation = 'glitch 0.5s';
+            setTimeout(() => document.body.style.animation = '', 500);
+        }
+    }
+    
+    // Event listeners
+    sendButton.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    
+    // Initial message
+    addChatMessage('ai', '*static clears* Another wastelander... Welcome to the digital ruins. What knowledge do you seek?');
+});
+</script>
+
+<!-- EXAMPLE 2: Update ai-intel-feed.html -->
+<script src="/js/burntai-ai.js"></script>
+<script>
+// Wasteland Intel Network Implementation
+document.addEventListener('DOMContentLoaded', () => {
+    const intelContainer = document.getElementById('intel-reports');
+    const refreshButton = document.getElementById('refresh-intel');
+    const signalStrength = document.getElementById('signal-strength');
+    let autoRefreshInterval;
+    
+    async function loadIntelFeed(forceRefresh = false) {
+        try {
+            refreshButton.disabled = true;
+            refreshButton.textContent = 'SCANNING...';
+            
+            const data = await BurntAI.getIntelFeed(forceRefresh);
+            
+            // Update signal strength
+            updateSignalStrength(data.signal_strength);
+            
+            // Clear and populate reports
+            intelContainer.innerHTML = '';
+            data.reports.forEach(report => {
+                addIntelReport(report);
+            });
+            
+            // Update status
+            updateNetworkStatus(data.status, data.radiation_level);
+            
+            // Schedule next update
+            const nextUpdate = new Date(data.next_update * 1000);
+            document.getElementById('next-update').textContent = 
+                `Next scan: ${BurntAI.formatWastelandTime(Date.now() - 1000)}`;
+            
+        } catch (error) {
+            BurntAI.showError(`Intel network down: ${error.message}`);
+            showStaticInterference();
+        } finally {
+            refreshButton.disabled = false;
+            refreshButton.textContent = 'MANUAL SCAN';
+        }
+    }
+    
+    function addIntelReport(report) {
+        const reportDiv = document.createElement('div');
+        reportDiv.className = 'intel-report';
+        reportDiv.style.cssText = `
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid ${getThreatColor(report.threat_level)};
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        `;
+        
+        reportDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span class="intel-id" style="color: #00ff88; font-family: monospace;">
+                    ${report.id}
+                </span>
+                <span class="intel-time" style="color: #888; font-size: 0.8rem;">
+                    ${BurntAI.formatWastelandTime(report.timestamp * 1000)}
+                </span>
+            </div>
+            <div class="intel-source" style="color: #ff8533; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                SOURCE: ${report.source} | RELIABILITY: ${report.reliability}%
+            </div>
+            <h3 style="color: #00e5ff; margin-bottom: 0.5rem;">${report.headline}</h3>
+            <div class="intel-analysis" style="color: #e0e0e0; line-height: 1.5;">
+                ${report.analysis}
+            </div>
+            <div class="threat-indicator" style="
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: ${getThreatColor(report.threat_level)};
+                padding: 0.25rem 0.5rem;
+                font-size: 0.7rem;
+                font-weight: bold;
+            ">
+                ${report.threat_level}
+            </div>
+        `;
+        
+        // Add hover effect
+        reportDiv.addEventListener('mouseenter', () => {
+            reportDiv.style.boxShadow = `0 0 20px ${getThreatColor(report.threat_level)}`;
+        });
+        reportDiv.addEventListener('mouseleave', () => {
+            reportDiv.style.boxShadow = 'none';
+        });
+        
+        intelContainer.appendChild(reportDiv);
+        
+        // Animate in
+        reportDiv.style.animation = 'fadeIn 0.5s';
+    }
+    
+    function updateSignalStrength(strength) {
+        signalStrength.style.width = `${strength}%`;
+        signalStrength.style.background = 
+            strength > 80 ? '#00ff88' : 
+            strength > 60 ? '#ffff00' : 
+            strength > 40 ? '#ff8800' : '#ff0000';
+        
+        document.getElementById('signal-value').textContent = `${strength}%`;
+    }
+    
+    function getThreatColor(level) {
+        const colors = {
+            'SEVERE': '#ff0000',
+            'ELEVATED': '#ff8800',
+            'MODERATE': '#ffff00',
+            'LOW': '#00ff88',
+            'UNKNOWN': '#888888'
+        };
+        return colors[level] || '#888888';
+    }
+    
+    function showStaticInterference() {
+        intelContainer.innerHTML = `
+            <div style="
+                text-align: center;
+                padding: 3rem;
+                color: #ff4466;
+                font-family: monospace;
+                font-size: 1.2rem;
+            ">
+                ████ SIGNAL LOST ████<br>
+                <span style="font-size: 0.9rem; color: #888;">
+                    Attempting to reconnect to intelligence network...
+                </span>
+            </div>
+        `;
+    }
+    
+    // Manual intel analysis
+    document.getElementById('analyze-button')?.addEventListener('click', async () => {
+        const input = document.getElementById('custom-headline');
+        const headline = input.value.trim();
+        
+        if (!headline) return;
+        
+        try {
+            const analysis = await BurntAI.analyzeIntel(headline);
+            
+            // Add to top of feed
+            const reportDiv = document.createElement('div');
+            reportDiv.style.background = 'rgba(255, 0, 255, 0.1)';
+            addIntelReport(analysis);
+            
+            input.value = '';
+            BurntAI.showSuccess('Intel analyzed and added to feed');
+            
+        } catch (error) {
+            BurntAI.showError(`Analysis failed: ${error.message}`);
+        }
+    });
+    
+    // Event listeners
+    refreshButton.addEventListener('click', () => loadIntelFeed(true));
+    
+    // Auto-refresh every 5 minutes
+    autoRefreshInterval = setInterval(() => loadIntelFeed(), 300000);
+    
+    // Initial load
+    loadIntelFeed();
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        clearInterval(autoRefreshInterval);
+    });
+});
+</script>
+
+<!-- EXAMPLE 3: Global Loading Indicator -->
+<!-- Add to all AI-powered pages -->
+<div id="ai-loading-indicator" style="
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 133, 51, 0.9);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    z-index: 10000;
+    display: none;
+    box-shadow: 0 0 20px rgba(255, 133, 51, 0.5);
+">
+    <span style="animation: pulse 1s infinite;">⚡</span> AI PROCESSING...
+</div>

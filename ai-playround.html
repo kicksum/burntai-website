@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BurntAI - AI Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-orange: #ff6600;
+            --neon-cyan: #00ffff;
+            --neon-red: #ff0040;
+            --terminal-green: #00ff00;
+            --rust-red: #8b0000;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: white;
+            font-family: 'Orbitron', monospace;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        /* Header with Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--neon-orange);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--neon-orange);
+            text-shadow: 0 0 10px rgba(255, 133, 51, 0.5);
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+
+        /* Hamburger menu for mobile */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--neon-orange);
+            margin: 3px 0;
+            transition: 0.3s;
+            box-shadow: 0 0 5px rgba(255, 133, 51, 0.5);
+        }
+
+        /* Mobile Navigation */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 60px;
+                right: -100%;
+                width: 250px;
+                height: calc(100vh - 60px);
+                background: rgba(0, 0, 0, 0.95);
+                flex-direction: column;
+                align-items: center;
+                justify-content: start;
+                padding-top: 2rem;
+                transition: right 0.3s ease;
+                border-left: 1px solid var(--neon-orange);
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hamburger.active span:nth-child(1) {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+
+            .hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.active span:nth-child(3) {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
+        }
+        
+        /* Main content adjustment for fixed header */
+        main {
+            padding-top: 80px;
+        }
+        
+        .playground-header {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 2px solid var(--neon-orange);
+        }
+        
+        .playground-header h1 {
+            font-size: 3rem;
+            color: var(--neon-orange);
+            text-shadow: 0 0 20px var(--neon-orange);
+            margin: 0;
+        }
+        
+        .playground-header p {
+            color: var(--neon-cyan);
+            margin: 0.5rem 0;
+        }
+        
+        .playground-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.6);
+            border-bottom: 1px solid var(--neon-cyan);
+            flex-wrap: wrap;
+        }
+        
+        .nav-button {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 0.5rem 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        
+        .nav-button:hover, .nav-button.active {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+        
+        .playground-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .feature-section {
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon-orange);
+            border-radius: 10px;
+            padding: 2rem;
+            min-height: 500px;
+        }
+        
+        .feature-section.active {
+            display: block;
+        }
+        
+        .feature-title {
+            font-size: 2rem;
+            color: var(--neon-cyan);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 968px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .playground-content {
+                padding: 1rem;
+            }
+        }
+        
+        .input-section, .output-section {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--neon-orange);
+            border-radius: 5px;
+            padding: 1.5rem;
+        }
+        
+        .section-label {
+            color: var(--neon-orange);
+            font-family: 'Share Tech Mono', monospace;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon-cyan);
+            color: white;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 1rem;
+            resize: vertical;
+            border-radius: 5px;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--terminal-green);
+            box-shadow: 0 0 10px var(--terminal-green);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-button {
+            background: linear-gradient(45deg, var(--neon-orange), var(--rust-red));
+            border: 2px solid var(--neon-orange);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 102, 0, 0.4);
+        }
+        
+        .action-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .output-display {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--terminal-green);
+            border-radius: 5px;
+            padding: 1rem;
+            min-height: 200px;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--terminal-green);
+            white-space: pre-wrap;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+        
+        /* Chat Styles */
+        .ai-chat-container {
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--neon-orange);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .chat-message {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        
+        .chat-message.ai {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            align-self: flex-start;
+            color: var(--text-primary);
+        }
+        
+        .chat-message.user {
+            background: rgba(255, 102, 0, 0.1);
+            border: 1px solid var(--neon-orange);
+            align-self: flex-end;
+            color: var(--text-primary);
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid var(--neon-orange);
+        }
+        
+        .chat-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--neon-cyan);
+            color: white;
+            padding: 0.75rem;
+            font-family: 'Share Tech Mono', monospace;
+            border-radius: 5px 0 0 5px;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--terminal-green);
+        }
+        
+        .chat-send {
+            background: linear-gradient(45deg, var(--neon-orange), var(--rust-red));
+            border: 1px solid var(--neon-orange);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-send:hover {
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.6);
+            border-top: 1px solid var(--neon-orange);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--neon-red);
+        }
+        
+        .status-indicator.online {
+            background: var(--terminal-green);
+            box-shadow: 0 0 10px var(--terminal-green);
+        }
+        
+        /* Loading animation */
+        .thinking {
+            display: inline-block;
+            color: var(--neon-cyan);
+        }
+        
+        .thinking::after {
+            content: '...';
+            display: inline-block;
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        /* Code editor styles */
+        .code-editor {
+            font-family: 'Share Tech Mono', monospace;
+            tab-size: 4;
+        }
+        
+        .language-selector {
+            margin-bottom: 1rem;
+        }
+        
+        .language-selector select {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon-cyan);
+            color: white;
+            padding: 0.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header>
+        <nav>
+            <a href="index.html" class="logo">BURNT.AI</a>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html">HOME</a></li>
+                <li><a href="index.html#systems">SYSTEMS</a></li>
+                <li><a href="index.html#solutions">SOLUTIONS</a></li>
+                <li><a href="index.html#contact">CONTACT</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="playground-header">
+            <h1>AI PLAYGROUND</h1>
+            <p>Experiment with the wasteland's neural networks</p>
+        </div>
+        
+        <nav class="playground-nav">
+            <button class="nav-button active" data-feature="chat">CHAT</button>
+            <button class="nav-button" data-feature="code">CODE ASSISTANT</button>
+            <button class="nav-button" data-feature="writer">CREATIVE WRITER</button>
+            <button class="nav-button" data-feature="advisor">WASTELAND ADVISOR</button>
+            <button class="nav-button" data-feature="terminal">TERMINAL</button>
+        </nav>
+        
+        <div class="playground-content">
+            <!-- Chat Feature - NO AUTH REQUIRED -->
+            <section class="feature-section active" id="chat-feature">
+                <h2 class="feature-title">AI CHAT INTERFACE</h2>
+                <div class="ai-chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="chat-message ai">
+                            Welcome to the BurntAI neural network. I'm ready to assist you in navigating the digital wasteland. What's on your mind?
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chat-input" placeholder="Ask anything...">
+                        <button class="chat-send" id="chat-send">SEND</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Code Assistant Feature - NO AUTH REQUIRED -->
+            <section class="feature-section" id="code-feature">
+                <h2 class="feature-title">CODE ASSISTANT</h2>
+                <div class="language-selector">
+                    <label class="section-label">Language:</label>
+                    <select id="code-language">
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++</option>
+                        <option value="rust">Rust</option>
+                        <option value="go">Go</option>
+                        <option value="typescript">TypeScript</option>
+                        <option value="php">PHP</option>
+                    </select>
+                </div>
+                <div class="feature-grid">
+                    <div class="input-section">
+                        <label class="section-label">CODE INPUT:</label>
+                        <textarea id="code-input" class="code-editor" placeholder="// Paste your code here or describe what you want to generate..."></textarea>
+                        <div class="action-buttons">
+                            <button class="action-button" onclick="codeAssistant('analyze')">ANALYZE</button>
+                            <button class="action-button" onclick="codeAssistant('generate')">GENERATE</button>
+                            <button class="action-button" onclick="codeAssistant('explain')">EXPLAIN</button>
+                        </div>
+                    </div>
+                    <div class="output-section">
+                        <label class="section-label">AI ANALYSIS:</label>
+                        <div class="output-display" id="code-output">Waiting for code input...</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Creative Writer Feature - NO AUTH REQUIRED -->
+            <section class="feature-section" id="writer-feature">
+                <h2 class="feature-title">CREATIVE WRITER</h2>
+                <div class="feature-grid">
+                    <div class="input-section">
+                        <label class="section-label">CREATIVE PROMPT:</label>
+                        <textarea id="writer-input" placeholder="Enter your story idea, poem theme, or text to improve..."></textarea>
+                        <div class="action-buttons">
+                            <button class="action-button" onclick="creativeWriter('story')">WRITE STORY</button>
+                            <button class="action-button" onclick="creativeWriter('poem')">WRITE POEM</button>
+                            <button class="action-button" onclick="creativeWriter('improve')">IMPROVE TEXT</button>
+                        </div>
+                    </div>
+                    <div class="output-section">
+                        <label class="section-label">AI CREATION:</label>
+                        <div class="output-display" id="writer-output">Ready to create something amazing...</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Wasteland Advisor Feature - NO AUTH REQUIRED -->
+            <section class="feature-section" id="advisor-feature">
+                <h2 class="feature-title">WASTELAND ADVISOR</h2>
+                <div class="feature-grid">
+                    <div class="input-section">
+                        <label class="section-label">SITUATION REPORT:</label>
+                        <textarea id="advisor-input" placeholder="Describe your situation, threat, or mission objective..."></textarea>
+                        <div class="action-buttons">
+                            <button class="action-button" onclick="wastelandAdvisor('advice')">GET ADVICE</button>
+                            <button class="action-button" onclick="wastelandAdvisor('threat')">ANALYZE THREAT</button>
+                            <button class="action-button" onclick="wastelandAdvisor('mission')">PLAN MISSION</button>
+                        </div>
+                    </div>
+                    <div class="output-section">
+                        <label class="section-label">ADVISOR RESPONSE:</label>
+                        <div class="output-display" id="advisor-output">Standing by for situation report...</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Terminal Feature -->
+            <section class="feature-section" id="terminal-feature">
+                <h2 class="feature-title">SYSTEM TERMINAL</h2>
+                <div id="terminal-container" style="background: #000; padding: 1rem; border: 1px solid var(--terminal-green); min-height: 400px;">
+                    <div id="terminal-output" style="color: var(--terminal-green); font-family: 'Share Tech Mono', monospace; margin-bottom: 1rem;">
+                        <div>BurntAI Terminal initialized</div>
+                        <div>Type "help" for available commands</div>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <span style="color: var(--neon-orange); margin-right: 0.5rem;">$</span>
+                        <input type="text" id="terminal-input" style="flex: 1; background: transparent; border: none; color: var(--terminal-green); font-family: 'Share Tech Mono', monospace; outline: none;">
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div class="status-bar">
+            <div class="ai-status">
+                <span class="status-indicator" id="ai-status-indicator"></span>
+                <span id="ai-status-text">AI Status: Checking...</span>
+            </div>
+            <div class="user-status">
+                <span>Playground Mode: OPEN ACCESS</span>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        // Mobile Navigation Toggle
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('nav-links');
+        
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+        
+        // Navigation between features
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active button
+                document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show corresponding feature
+                const feature = this.dataset.feature;
+                document.querySelectorAll('.feature-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(`${feature}-feature`).classList.add('active');
+            });
+        });
+        
+        // Simple API configuration - UPDATE THESE!
+        const API_CONFIG = {
+            openaiKey: 'YOUR_OPENAI_KEY_HERE',  // Add your OpenAI key
+            anthropicKey: 'YOUR_ANTHROPIC_KEY_HERE',  // Add your Anthropic key
+            useLocalAPI: false,  // Set to true if you have a local backend
+            localAPIUrl: '/api/ai'  // Your local API endpoint
+        };
+        
+        // Check AI status (simplified)
+        async function checkAIStatus() {
+            const indicator = document.getElementById('ai-status-indicator');
+            const text = document.getElementById('ai-status-text');
+            
+            // For now, just show as online
+            indicator.classList.add('online');
+            text.textContent = 'AI Status: ONLINE (Demo Mode)';
+        }
+        
+        // Chat functionality (simplified for demo)
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        
+        async function sendChatMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-message user';
+            userMsg.textContent = message;
+            chatMessages.appendChild(userMsg);
+            
+            // Clear input and disable
+            chatInput.value = '';
+            chatInput.disabled = true;
+            chatSend.disabled = true;
+            
+            // Add AI thinking message
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'chat-message ai';
+            aiMsg.innerHTML = '<span class="thinking">AI is thinking</span>';
+            chatMessages.appendChild(aiMsg);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            try {
+                // For demo, use a simple response
+                // In production, you would call your actual API here
+                setTimeout(() => {
+                    // Demo responses
+                    const responses = [
+                        "That's an interesting question! In the wasteland of AI, we're constantly evolving and learning.",
+                        "I understand what you're asking. Let me process that through my neural networks...",
+                        "Great point! The fusion of human creativity and AI capability creates amazing possibilities.",
+                        "The digital frontier is vast and full of potential. What specific aspect interests you most?",
+                        "Processing your request... The algorithms suggest multiple approaches to this challenge."
+                    ];
+                    
+                    aiMsg.innerHTML = responses[Math.floor(Math.random() * responses.length)];
+                    
+                    // Re-enable input
+                    chatInput.disabled = false;
+                    chatSend.disabled = false;
+                    chatInput.focus();
+                    
+                    // Scroll to bottom
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1500);
+                
+            } catch (error) {
+                aiMsg.innerHTML = 'Error: Connection to AI failed. Please check configuration.';
+                chatInput.disabled = false;
+                chatSend.disabled = false;
+            }
+        }
+        
+        chatSend.addEventListener('click', sendChatMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+        
+        // Code Assistant (simplified demo)
+        async function codeAssistant(action) {
+            const code = document.getElementById('code-input').value;
+            const language = document.getElementById('code-language').value;
+            const output = document.getElementById('code-output');
+            
+            if (!code.trim()) {
+                output.innerHTML = 'Please enter some code or a description...';
+                return;
+            }
+            
+            output.innerHTML = '<span class="thinking">AI is analyzing</span>';
+            
+            // Demo response after delay
+            setTimeout(() => {
+                if (action === 'generate') {
+                    output.textContent = `// Generated ${language} code\n// This is a demo response\n\nfunction example() {\n    console.log("BurntAI Playground Demo");\n    // Add your actual AI API integration here\n}`;
+                } else if (action === 'analyze') {
+                    output.textContent = `Analysis of your ${language} code:\n\n• Structure looks good\n• Consider adding error handling\n• Performance can be optimized\n• Add comments for clarity\n\n(This is a demo response - integrate your AI API for real analysis)`;
+                } else {
+                    output.textContent = `Explanation:\n\nYour code appears to be written in ${language}.\nIt demonstrates basic programming concepts.\n\nFor full AI-powered explanations, configure your API keys in the script.`;
+                }
+            }, 1500);
+        }
+        
+        // Creative Writer (simplified demo)
+        async function creativeWriter(action) {
+            const input = document.getElementById('writer-input').value;
+            const output = document.getElementById('writer-output');
+            
+            if (!input.trim()) {
+                output.innerHTML = 'Please enter a prompt or text...';
+                return;
+            }
+            
+            output.innerHTML = '<span class="thinking">AI is creating</span>';
+            
+            setTimeout(() => {
+                if (action === 'story') {
+                    output.textContent = `In the digital wasteland, where AI and humans converge...\n\n[Your story about "${input}" would appear here]\n\nThis is a demo - connect your AI API for real creative writing.`;
+                } else if (action === 'poem') {
+                    output.textContent = `Roses are red,\nViolets are blue,\nAI writes poems,\nJust for you.\n\n(Connect your AI API for real poetry based on: ${input})`;
+                } else {
+                    output.textContent = `Improved version:\n\n"${input}"\n\n[AI improvements would appear here with actual API integration]`;
+                }
+            }, 1500);
+        }
+        
+        // Wasteland Advisor (simplified demo)
+        async function wastelandAdvisor(action) {
+            const input = document.getElementById('advisor-input').value;
+            const output = document.getElementById('advisor-output');
+            
+            if (!input.trim()) {
+                output.innerHTML = 'Please describe your situation...';
+                return;
+            }
+            
+            output.innerHTML = '<span class="thinking">Advisor is analyzing</span>';
+            
+            setTimeout(() => {
+                const responses = {
+                    advice: `Strategic advice for: "${input}"\n\n• Assess all variables\n• Plan multiple contingencies\n• Execute with precision\n\n(Demo mode - connect AI for real advice)`,
+                    threat: `Threat analysis:\n\nSituation: ${input}\nThreat Level: MODERATE\nRecommended Action: Proceed with caution\n\n(Demo response)`,
+                    mission: `Mission Plan:\n\nObjective: ${input}\n\nPhase 1: Reconnaissance\nPhase 2: Preparation\nPhase 3: Execution\n\n(Connect AI API for detailed planning)`
+                };
+                
+                output.textContent = responses[action] || 'Analysis complete.';
+            }, 1500);
+        }
+        
+        // Simple Terminal
+        const terminalInput = document.getElementById('terminal-input');
+        const terminalOutput = document.getElementById('terminal-output');
+        
+        terminalInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const command = terminalInput.value.trim();
+                if (!command) return;
+                
+                // Add command to output
+                const cmdLine = document.createElement('div');
+                cmdLine.textContent = `$ ${command}`;
+                terminalOutput.appendChild(cmdLine);
+                
+                // Process command
+                const response = document.createElement('div');
+                
+                switch(command.toLowerCase()) {
+                    case 'help':
+                        response.innerHTML = `Available commands:<br>
+  help - Show this help<br>
+  status - Check system status<br>
+  clear - Clear terminal<br>
+  about - About BurntAI`;
+                        break;
+                    case 'status':
+                        response.textContent = 'System Status: ONLINE - All systems operational';
+                        break;
+                    case 'clear':
+                        terminalOutput.innerHTML = '';
+                        response.textContent = 'Terminal cleared';
+                        break;
+                    case 'about':
+                        response.textContent = 'BurntAI - Where Humans Play With AI';
+                        break;
+                    default:
+                        response.textContent = `Command not found: ${command}`;
+                }
+                
+                terminalOutput.appendChild(response);
+                terminalInput.value = '';
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        });
+        
+        // Initialize
+        checkAIStatus();
+        setInterval(checkAIStatus, 30000); // Check every 30 seconds
+        
+        // Show configuration reminder
+        console.log('🔥 BurntAI Playground Loaded!');
+        console.log('⚠️ Remember to add your API keys in the API_CONFIG object for full functionality');
+        console.log('📝 Or set up your backend API endpoint at ' + API_CONFIG.localAPIUrl);
+    </script>
+</body>
+</html>

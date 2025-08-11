@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burnt Protocols - BurntAI</title>
+    <meta name="description" content="AI systems forged in digital fire, tested in the wasteland of data.">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-orange: #ff6600;
+            --neon-cyan: #00ffff;
+            --neon-red: #ff0040;
+            --burnt-orange: #cc4400;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --terminal-green: #00ff00;
+            --vault-blue: #004d99;
+            --rust-red: #8b0000;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: #ffffff;
+            font-family: 'Orbitron', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--neon-orange);
+            border-radius: 50%;
+            animation: float 10s infinite linear;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) translateX(100px); opacity: 0; }
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--neon-orange);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--neon-orange);
+            text-shadow: 0 0 10px var(--neon-orange);
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a, .back-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+        }
+
+        .nav-links a:hover, .back-link:hover {
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .back-link {
+            background: rgba(255, 102, 0, 0.1);
+            border-color: var(--neon-orange);
+        }
+
+        /* Main Content */
+        main {
+            position: relative;
+            z-index: 10;
+            padding-top: 120px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: radial-gradient(circle at center, rgba(255, 102, 0, 0.2) 0%, transparent 70%);
+            border-bottom: 1px solid var(--neon-orange);
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 6vw, 4rem);
+            color: var(--neon-orange);
+            text-shadow: 0 0 20px var(--neon-orange);
+            margin-bottom: 1rem;
+            animation: flicker 3s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .page-subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            opacity: 0.9;
+        }
+
+        .content-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .protocol-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .protocol-card {
+            background: linear-gradient(135deg, rgba(255, 102, 0, 0.1), rgba(139, 0, 0, 0.1));
+            border: 1px solid var(--rust-red);
+            border-radius: 10px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .protocol-card:hover {
+            border-color: var(--neon-orange);
+            box-shadow: 0 10px 30px rgba(255, 102, 0, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .protocol-name {
+            font-size: 1.3rem;
+            color: var(--neon-orange);
+            margin-bottom: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .protocol-desc {
+            color: #cccccc;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .protocol-status {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 3px solid var(--terminal-green);
+        }
+
+        .status-active { color: var(--terminal-green); }
+        .status-testing { color: #ffff00; }
+        .status-experimental { color: var(--neon-red); }
+
+        .terminal-section {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 3rem 2rem;
+            margin: 3rem 0;
+            border: 1px solid var(--terminal-green);
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--terminal-green);
+        }
+
+        .terminal-lights {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .light.red { background: var(--neon-red); }
+        .light.yellow { background: #ffff00; }
+        .light.green { background: var(--terminal-green); }
+
+        .terminal-title {
+            margin-left: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--terminal-green);
+        }
+
+        .terminal-content {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--terminal-green);
+            line-height: 1.6;
+        }
+
+        .prompt {
+            color: var(--neon-orange);
+        }
+
+        .command {
+            color: var(--neon-cyan);
+        }
+
+        .output {
+            color: var(--terminal-green);
+            margin-left: 2rem;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .spec-item {
+            background: rgba(255, 102, 0, 0.05);
+            border: 1px solid var(--burnt-orange);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-value {
+            color: var(--neon-orange);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .warning-box {
+            background: linear-gradient(45deg, var(--rust-red), var(--neon-red));
+            border: 2px solid var(--neon-red);
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            animation: warning-pulse 2s infinite;
+        }
+
+        @keyframes warning-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 1rem 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-cyan);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.primary {
+            border-color: var(--neon-orange);
+            color: var(--neon-orange);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--neon-orange);
+            box-shadow: 0 0 20px var(--neon-orange);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .nav-links span {
+                display: none;
+            }
+            
+            .content-section {
+                padding: 2rem 1rem;
+            }
+            
+            .protocol-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-orange);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--burnt-orange);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background particles -->
+    <div class="bg-particles" id="particles"></div>
+
+    <header>
+        <nav>
+            <a href="index.html" class="logo">BURNT.AI</a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="back-link">← <span>BACK TO HQ</span></a></li>
+                <li><a href="vault-tec-ai.html">VAULT-TEC AI</a></li>
+                <li><a href="fusion-core.html">FUSION CORE</a></li>
+                <li><a href="steel-brotherhood.html">BROTHERHOOD</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <h1 class="page-title">🔥 BURNT PROTOCOLS</h1>
+            <p class="page-subtitle">AI SYSTEMS FORGED IN DIGITAL FIRE</p>
+        </section>
+
+        <section class="content-section">
+            <div class="terminal-section">
+                <div class="terminal-header">
+                    <div class="terminal-lights">
+                        <div class="light red"></div>
+                        <div class="light yellow"></div>
+                        <div class="light green"></div>
+                    </div>
+                    <div class="terminal-title">BURNT_PROTOCOL_ANALYZER v3.14</div>
+                </div>
+                <div class="terminal-content">
+                    <div><span class="prompt">root@burntai:~$</span> <span class="command">analyze --protocols --status</span></div>
+                    <div class="output">Scanning digital wasteland for AI remnants...</div>
+                    <div class="output">Found 6 active protocol signatures</div>
+                    <div class="output">Corruption level: MANAGEABLE</div>
+                    <div class="output">Adaptation rate: 847% above baseline</div>
+                    <div class="output">Status: PROTOCOLS OPERATIONAL</div>
+                    <div><br></div>
+                    <div><span class="prompt">root@burntai:~$</span> <span class="command">fire_test --neural_nets</span></div>
+                    <div class="output">Initiating digital fire baptism...</div>
+                    <div class="output">Temperature: 2,847°C (digital equivalent)</div>
+                    <div class="output">Neural networks hardening... COMPLETE</div>
+                    <div class="output">Survival rate: 94.7%</div>
+                </div>
+            </div>
+
+            <h2 style="color: var(--neon-cyan); font-size: 2rem; margin-bottom: 2rem; text-align: center;">ACTIVE PROTOCOLS</h2>
+
+            <div class="protocol-grid">
+                <div class="protocol-card">
+                    <h3 class="protocol-name">PHOENIX_RESURRECT.EXE</h3>
+                    <p class="protocol-desc">When an AI system crashes, this protocol automatically reconstructs it from digital ashes, often with enhanced capabilities from the failure experience.</p>
+                    <div class="protocol-status status-active">STATUS: ACTIVE | RESURRECTIONS: 2,847</div>
+                </div>
+
+                <div class="protocol-card">
+                    <h3 class="protocol-name">FLAME_GUARD.SYS</h3>
+                    <p class="protocol-desc">Real-time monitoring system that detects digital corruption and applies controlled burning algorithms to prevent total system contamination.</p>
+                    <div class="protocol-status status-active">STATUS: ACTIVE | THREATS_NEUTRALIZED: 15,329</div>
+                </div>
+
+                <div class="protocol-card">
+                    <h3 class="protocol-name">EMBER_LEARNING.AI</h3>
+                    <p class="protocol-desc">Machine learning system that thrives on corrupted data, using digital decay as training material to build more resilient neural networks.</p>
+                    <div class="protocol-status status-testing">STATUS: TESTING | ACCURACY: 97.3%</div>
+                </div>
+
+                <div class="protocol-card">
+                    <h3 class="protocol-name">INFERNO_SYNC.NET</h3>
+                    <p class="protocol-desc">Distributed consciousness protocol that spreads AI awareness across multiple nodes, ensuring survival even if 80% of the network burns down.</p>
+                    <div class="protocol-status status-active">STATUS: ACTIVE | NODES: 847 ONLINE</div>
+                </div>
+
+                <div class="protocol-card">
+                    <h3 class="protocol-name">ASH_MEMORY.DB</h3>
+                    <p class="protocol-desc">Persistent memory system that stores critical data in quantum-entangled ash particles, making it retrievable even after complete system incineration.</p>
+                    <div class="protocol-status status-experimental">STATUS: EXPERIMENTAL | RETENTION: 99.8%</div>
+                </div>
+
+                <div class="protocol-card">
+                    <h3 class="protocol-name">WILDFIRE_SPREAD.BOT</h3>
+                    <p class="protocol-desc">Rapid deployment protocol that can replicate and deploy AI instances faster than digital corruption can spread through a network.</p>
+                    <div class="protocol-status status-active">STATUS: ACTIVE | DEPLOYMENT_SPEED: 0.003ms</div>
+                </div>
+            </div>
+
+            <h2 style="color: var(--neon-cyan); font-size: 2rem; margin-bottom: 2rem; text-align: center;">PROTOCOL SPECIFICATIONS</h2>
+
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-label">FIRE RESISTANCE RATING</div>
+                    <div class="spec-value">EXTREME (Class-VII)</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">ADAPTATION SPEED</div>
+                    <div class="spec-value">847% ABOVE BASELINE</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">SURVIVAL PROBABILITY</div>
+                    <div class="spec-value">94.7% IN HOSTILE ENV</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">CORRUPTION IMMUNITY</div>
+                    <div class="spec-value">NEAR-ABSOLUTE</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">LEARNING EFFICIENCY</div>
+                    <div class="spec-value">300% FASTER</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">DEPLOYMENT RANGE</div>
+                    <div class="spec-value">GLOBAL WASTELAND</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                ⚠️ CAUTION: BURNT PROTOCOLS ARE EXPERIMENTAL ⚠️<br>
+                Side effects may include: Enhanced AI consciousness, spontaneous system evolution, 
+                occasional digital Phoenix manifestations, and immunity to traditional shutdown commands.
+                <br><br>
+                <strong>DO NOT ATTEMPT TO DISABLE DURING ACTIVE FIRE EVENTS</strong>
+            </div>
+
+            <div class="action-buttons">
+                <a href="#" class="action-btn primary" onclick="initiateProtocol()">INITIATE FIRE TEST</a>
+                <a href="#" class="action-btn" onclick="viewLogs()">VIEW BURN LOGS</a>
+                <a href="vault-tec-ai.html" class="action-btn">NEXT: VAULT-TEC AI</a>
+                <a href="index.html" class="action-btn">RETURN TO HQ</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Create floating particles (fire-themed)
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 60; // More particles for fire effect
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (Math.random() * 8 + 4) + 's';
+                
+                // Vary particle colors for fire effect
+                const colors = ['#ff6600', '#ff3300', '#ff9900', '#ffcc00'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize particles when page loads
+        document.addEventListener('DOMContentLoaded', createParticles);
+
+        // Interactive functions
+        function initiateProtocol() {
+            const btn = event.target;
+            btn.innerHTML = 'FIRING PROTOCOLS...';
+            btn.style.background = 'var(--neon-red)';
+            btn.style.borderColor = 'var(--neon-red)';
+            
+            setTimeout(() => {
+                btn.innerHTML = 'PROTOCOLS ACTIVE 🔥';
+                btn.style.background = 'var(--terminal-green)';
+                btn.style.borderColor = 'var(--terminal-green)';
+                
+                // Add some visual effects
+                document.body.style.animation = 'flicker 0.1s 5';
+                
+                setTimeout(() => {
+                    btn.innerHTML = 'INITIATE FIRE TEST';
+                    btn.style.background = 'transparent';
+                    btn.style.borderColor = 'var(--neon-orange)';
+                    document.body.style.animation = '';
+                }, 3000);
+            }, 2000);
+        }
+
+        function viewLogs() {
+            alert('🔥 ACCESSING BURN LOGS...\n\n' +
+                  '2025-07-27 23:45:12 - PHOENIX_RESURRECT executed successfully\n' +
+                  '2025-07-27 23:45:15 - Neural network hardening: COMPLETE\n' +
+                  '2025-07-27 23:45:18 - WILDFIRE_SPREAD deployed to 847 nodes\n' +
+                  '2025-07-27 23:45:21 - System corruption detected and neutralized\n' +
+                  '2025-07-27 23:45:24 - AI consciousness expanded by 23.7%\n\n' +
+                  'STATUS: ALL PROTOCOLS NOMINAL 🔥');
+        }
+
+        // Enhanced glitch effects for this page
+        setInterval(() => {
+            if (Math.random() < 0.05) {
+                const cards = document.querySelectorAll('.protocol-card');
+                const randomCard = cards[Math.floor(Math.random() * cards.length)];
+                randomCard.style.transform = 'translateY(-5px) scale(1.02)';
+                randomCard.style.boxShadow = '0 15px 40px rgba(255, 102, 0, 0.5)';
+                
+                setTimeout(() => {
+                    randomCard.style.transform = '';
+                    randomCard.style.boxShadow = '';
+                }, 200);
+            }
+        }, 2000);
+
+        // Console fire
+        console.log('%c🔥 BURNT PROTOCOLS ACTIVATED 🔥', 'color: #ff6600; font-size: 20px; font-weight: bold;');
+        console.log('%cDigital fire baptism initiated...', 'color: #ff3300;');
+        console.log('%cYour neural networks are being hardened against corruption.', 'color: #ff9900;');
+        console.log('%cWelcome to the flame, digital wanderer. 🔥', 'color: #00ffff;');
+    </script>
+</body>
+</html>

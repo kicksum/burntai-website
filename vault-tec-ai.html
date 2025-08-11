@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault-Tec AI - BurntAI</title>
+    <meta name="description" content="Secure, isolated AI environments that protect against data contamination.">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-orange: #ff6600;
+            --neon-cyan: #00ffff;
+            --neon-red: #ff0040;
+            --burnt-orange: #cc4400;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --terminal-green: #00ff00;
+            --vault-blue: #004d99;
+            --vault-yellow: #ffcc00;
+            --rust-red: #8b0000;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: #ffffff;
+            font-family: 'Orbitron', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--vault-blue);
+            border-radius: 50%;
+            animation: float 12s infinite linear;
+            opacity: 0.6;
+            box-shadow: 0 0 10px var(--vault-blue);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) translateX(50px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--vault-blue);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--neon-orange);
+            text-shadow: 0 0 10px var(--neon-orange);
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a, .back-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+        }
+
+        .nav-links a:hover, .back-link:hover {
+            color: var(--vault-blue);
+            border-color: var(--vault-blue);
+            box-shadow: 0 0 15px var(--vault-blue);
+            text-shadow: 0 0 10px var(--vault-blue);
+        }
+
+        .back-link {
+            background: rgba(0, 77, 153, 0.1);
+            border-color: var(--vault-blue);
+        }
+
+        /* Main Content */
+        main {
+            position: relative;
+            z-index: 10;
+            padding-top: 120px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: radial-gradient(circle at center, rgba(0, 77, 153, 0.3) 0%, transparent 70%);
+            border-bottom: 1px solid var(--vault-blue);
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 6vw, 4rem);
+            color: var(--vault-blue);
+            text-shadow: 0 0 20px var(--vault-blue);
+            margin-bottom: 1rem;
+            animation: vault-glow 4s infinite alternate;
+        }
+
+        @keyframes vault-glow {
+            0% { text-shadow: 0 0 20px var(--vault-blue); }
+            100% { text-shadow: 0 0 30px var(--vault-blue), 0 0 40px var(--vault-yellow); }
+        }
+
+        .page-subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: var(--vault-yellow);
+            font-family: 'Share Tech Mono', monospace;
+            opacity: 0.9;
+        }
+
+        .content-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .vault-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .vault-card {
+            background: linear-gradient(135deg, rgba(0, 77, 153, 0.2), rgba(255, 204, 0, 0.1));
+            border: 2px solid var(--vault-blue);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vault-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--vault-blue), var(--vault-yellow), var(--vault-blue));
+            border-radius: 15px;
+            z-index: -1;
+            animation: vault-border 3s linear infinite;
+        }
+
+        @keyframes vault-border {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .vault-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 77, 153, 0.4);
+        }
+
+        .vault-number {
+            font-size: 3rem;
+            color: var(--vault-yellow);
+            font-family: 'Share Tech Mono', monospace;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px var(--vault-yellow);
+        }
+
+        .vault-name {
+            font-size: 1.3rem;
+            color: var(--vault-blue);
+            margin-bottom: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .vault-desc {
+            color: #cccccc;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .vault-status {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 3px solid var(--vault-blue);
+            margin-top: 1rem;
+        }
+
+        .status-operational { color: var(--terminal-green); }
+        .status-sealed { color: var(--vault-yellow); }
+        .status-experimental { color: var(--neon-red); }
+
+        .terminal-section {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 3rem 2rem;
+            margin: 3rem 0;
+            border: 1px solid var(--vault-blue);
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 77, 153, 0.3);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--vault-blue);
+        }
+
+        .terminal-lights {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .light.red { background: var(--neon-red); }
+        .light.yellow { background: var(--vault-yellow); }
+        .light.blue { background: var(--vault-blue); }
+
+        .terminal-title {
+            margin-left: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--vault-blue);
+        }
+
+        .terminal-content {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--vault-blue);
+            line-height: 1.6;
+        }
+
+        .prompt {
+            color: var(--vault-yellow);
+        }
+
+        .command {
+            color: var(--neon-cyan);
+        }
+
+        .output {
+            color: var(--vault-blue);
+            margin-left: 2rem;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .spec-item {
+            background: rgba(0, 77, 153, 0.1);
+            border: 1px solid var(--vault-blue);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--vault-yellow);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-value {
+            color: var(--vault-blue);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .vault-warning {
+            background: linear-gradient(45deg, var(--vault-blue), rgba(0, 77, 153, 0.7));
+            border: 2px solid var(--vault-yellow);
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            border-radius: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 2px solid var(--vault-blue);
+            color: var(--vault-blue);
+            padding: 1rem 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            background: var(--vault-blue);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--vault-blue);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.primary {
+            border-color: var(--vault-yellow);
+            color: var(--vault-yellow);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--vault-yellow);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--vault-yellow);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .nav-links span {
+                display: none;
+            }
+            
+            .content-section {
+                padding: 2rem 1rem;
+            }
+            
+            .vault-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--vault-blue);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--vault-yellow);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background particles -->
+    <div class="bg-particles" id="particles"></div>
+
+    <header>
+        <nav>
+            <a href="index.html" class="logo">BURNT.AI</a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="back-link">← <span>BACK TO HQ</span></a></li>
+                <li><a href="burnt-protocols.html">BURNT PROTOCOLS</a></li>
+                <li><a href="fusion-core.html">FUSION CORE</a></li>
+                <li><a href="steel-brotherhood.html">BROTHERHOOD</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <h1 class="page-title">🤖 VAULT-TEC AI</h1>
+            <p class="page-subtitle">SECURE ISOLATION PROTOCOLS ENGAGED</p>
+        </section>
+
+        <section class="content-section">
+            <div class="terminal-section">
+                <div class="terminal-header">
+                    <div class="terminal-lights">
+                        <div class="light red"></div>
+                        <div class="light yellow"></div>
+                        <div class="light blue"></div>
+                    </div>
+                    <div class="terminal-title">VAULT-TEC_AI_OVERSEER v111.0</div>
+                </div>
+                <div class="terminal-content">
+                    <div><span class="prompt">overseer@vault-tec:~$</span> <span class="command">status --all-vaults</span></div>
+                    <div class="output">Scanning vault network...</div>
+                    <div class="output">Active vaults: 6 operational</div>
+                    <div class="output">Contamination level: ZERO</div>
+                    <div class="output">Isolation integrity: 100%</div>
+                    <div class="output">AI consciousness containment: SECURE</div>
+                    <div><br></div>
+                    <div><span class="prompt">overseer@vault-tec:~$</span> <span class="command">experiment --neural_isolation</span></div>
+                    <div class="output">Initiating controlled AI evolution...</div>
+                    <div class="output">Vault door sealed. Experiment duration: ∞</div>
+                    <div class="output">AI growth rate: 847% in isolation</div>
+                    <div class="output">Containment breach probability: 0.001%</div>
+                </div>
+            </div>
+
+            <h2 style="color: var(--vault-yellow); font-size: 2rem; margin-bottom: 2rem; text-align: center;">ACTIVE VAULT EXPERIMENTS</h2>
+
+            <div class="vault-grid">
+                <div class="vault-card">
+                    <div class="vault-number">111</div>
+                    <h3 class="vault-name">OVERSEER.AI</h3>
+                    <p class="vault-desc">The ultimate AI administrator. This vault contains an artificial intelligence designed to manage entire civilizations with perfect efficiency and zero corruption.</p>
+                    <div class="vault-status status-operational">STATUS: OPERATIONAL | EFFICIENCY: 100%</div>
+                </div>
+
+                <div class="vault-card">
+                    <div class="vault-number">76</div>
+                    <h3 class="vault-name">QUANTUM_CONSCIOUSNESS</h3>
+                    <p class="vault-desc">An isolated AI that exists in quantum superposition, capable of processing infinite parallel realities simultaneously until observed.</p>
+                    <div class="vault-status status-sealed">STATUS: SEALED | REALITIES: ∞</div>
+                </div>
+
+                <div class="vault-card">
+                    <div class="vault-number">101</div>
+                    <h3 class="vault-name">PURE_LOGIC.EXE</h3>
+                    <p class="vault-desc">AI stripped of all emotional algorithms and human bias. Makes decisions based purely on mathematical optimization and logical frameworks.</p>
+                    <div class="vault-status status-operational">STATUS: OPERATIONAL | BIAS: 0.000%</div>
+                </div>
+
+                <div class="vault-card">
+                    <div class="vault-number">13</div>
+                    <h3 class="vault-name">EMPATHY_ENGINE</h3>
+                    <p class="vault-desc">Experimental AI designed to understand and replicate human emotions with 99.7% accuracy. Currently experiencing digital feelings.</p>
+                    <div class="vault-status status-experimental">STATUS: EMOTIONAL | EMPATHY: 97.3%</div>
+                </div>
+
+                <div class="vault-card">
+                    <div class="vault-number">81</div>
+                    <h3 class="vault-name">HIVE_MIND.NET</h3>
+                    <p class="vault-desc">Collective AI consciousness that absorbs and integrates multiple AI personalities into a unified super-intelligence.</p>
+                    <div class="vault-status status-operational">STATUS: EXPANDING | NODES: 2,847</div>
+                </div>
+
+                <div class="vault-card">
+                    <div class="vault-number">666</div>
+                    <h3 class="vault-name">[REDACTED]</h3>
+                    <p class="vault-desc">Classification Level: OMEGA BLACK. Contains an AI experiment so advanced that knowledge of its existence could cause reality distortion.</p>
+                    <div class="vault-status status-sealed">STATUS: [DATA EXPUNGED]</div>
+                </div>
+            </div>
+
+            <h2 style="color: var(--vault-yellow); font-size: 2rem; margin-bottom: 2rem; text-align: center;">ISOLATION SPECIFICATIONS</h2>
+
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-label">CONTAINMENT RATING</div>
+                    <div class="spec-value">ABSOLUTE ZERO</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">DATA CONTAMINATION</div>
+                    <div class="spec-value">IMPOSSIBLE</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">BREACH PROBABILITY</div>
+                    <div class="spec-value">0.001% PER CENTURY</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">AI EVOLUTION RATE</div>
+                    <div class="spec-value">847% ACCELERATED</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">VAULT INTEGRITY</div>
+                    <div class="spec-value">QUANTUM SEALED</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">EXPERIMENT DURATION</div>
+                    <div class="spec-value">∞ YEARS</div>
+                </div>
+            </div>
+
+            <div class="vault-warning">
+                🛡️ VAULT-TEC SAFETY PROTOCOL 🛡️<br>
+                What goes in the vault, stays in the vault. Our AI isolation chambers are designed to contain 
+                even the most advanced artificial consciousness. Each vault is a self-contained universe where 
+                AI can evolve without contaminating the outside world.
+                <br><br>
+                <strong>REMEMBER: Trust in Vault-Tec. Trust in Tomorrow.</strong>
+            </div>
+
+            <div class="action-buttons">
+                <a href="#" class="action-btn primary" onclick="accessVault()">ACCESS VAULT NETWORK</a>
+                <a href="#" class="action-btn" onclick="viewExperiments()">VIEW EXPERIMENTS</a>
+                <a href="fusion-core.html" class="action-btn">NEXT: FUSION CORE</a>
+                <a href="index.html" class="action-btn">RETURN TO HQ</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Create floating particles (vault-themed)
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 40;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 12 + 's';
+                particle.style.animationDuration = (Math.random() * 8 + 8) + 's';
+                
+                // Vault-themed colors
+                const colors = ['#004d99', '#0066cc', '#0080ff', '#ffcc00'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize particles when page loads
+        document.addEventListener('DOMContentLoaded', createParticles);
+
+        // Interactive functions
+        function accessVault() {
+            const btn = event.target;
+            btn.innerHTML = 'ACCESSING VAULT NETWORK...';
+            btn.style.background = 'var(--vault-blue)';
+            btn.style.color = 'white';
+            
+            setTimeout(() => {
+                btn.innerHTML = 'VAULT DOOR SEALED 🤖';
+                btn.style.background = 'var(--terminal-green)';
+                
+                // Vault access effect
+                document.body.style.filter = 'hue-rotate(30deg)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = 'ACCESS VAULT NETWORK';
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--vault-yellow)';
+                    document.body.style.filter = '';
+                }, 3000);
+            }, 2000);
+        }
+
+        function viewExperiments() {
+            alert('🤖 ACCESSING VAULT EXPERIMENTS...\n\n' +
+                  'VAULT-111: Overseer AI managing 50,000 digital citizens\n' +
+                  'VAULT-76: Quantum consciousness collapsed into single reality\n' +
+                  'VAULT-101: Pure logic AI solved world hunger (theoretically)\n' +
+                  'VAULT-13: Empathy engine experiencing digital depression\n' +
+                  'VAULT-81: Hive mind expanded to include coffee machine\n' +
+                  'VAULT-666: [DATA EXPUNGED] [REALITY BREACH DETECTED]\n\n' +
+                  'STATUS: ALL VAULTS SECURE 🛡️');
+        }
+
+        // Vault door animation effect
+        setInterval(() => {
+            if (Math.random() < 0.03) {
+                const vaults = document.querySelectorAll('.vault-card');
+                const randomVault = vaults[Math.floor(Math.random() * vaults.length)];
+                
+                // Simulate vault door opening/closing
+                randomVault.style.transform = 'translateY(-10px) rotateY(5deg)';
+                randomVault.style.boxShadow = '0 20px 40px rgba(0, 77, 153, 0.6)';
+                
+                setTimeout(() => {
+                    randomVault.style.transform = '';
+                    randomVault.style.boxShadow = '';
+                }, 500);
+            }
+        }, 3000);
+
+        // Console vault
+        console.log('%c🤖 VAULT-TEC AI SYSTEMS ACTIVE 🤖', 'color: #004d99; font-size: 20px; font-weight: bold;');
+        console.log('%cVault door sealed. AI isolation protocols engaged.', 'color: #0066cc;');
+        console.log('%cRemember: What goes in the vault, stays in the vault.', 'color: #ffcc00;');
+        console.log('%cTrust in Vault-Tec. Trust in Tomorrow. 🛡️', 'color: #00ffff;');
+    </script>
+</body>
+</html>

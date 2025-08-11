@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Certification Master Guide - From Zero to Hero</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #107c41 0%, #185a2e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: "📊";
+            position: absolute;
+            font-size: 200px;
+            opacity: 0.1;
+            right: -50px;
+            top: -50px;
+            transform: rotate(-15deg);
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+            font-style: italic;
+        }
+        
+        .progress-bar {
+            background: rgba(255,255,255,0.2);
+            height: 30px;
+            border-radius: 15px;
+            margin: 30px 0 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            height: 100%;
+            width: 0%;
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #f5f5f5;
+            padding: 0;
+            list-style: none;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+        
+        .nav-tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+            font-weight: 500;
+        }
+        
+        .nav-tab:hover {
+            background: #e0e0e0;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            color: #107c41;
+            font-weight: bold;
+        }
+        
+        .nav-tab.completed::after {
+            content: "✓";
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .content {
+            padding: 40px;
+            min-height: 500px;
+        }
+        
+        .lesson {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .lesson.active {
+            display: block;
+        }
+        
+        .lesson h2 {
+            color: #107c41;
+            margin-bottom: 20px;
+            font-size: 2em;
+            border-bottom: 3px solid #107c41;
+            padding-bottom: 10px;
+        }
+        
+        .lesson h3 {
+            color: #333;
+            margin: 25px 0 15px 0;
+            font-size: 1.4em;
+        }
+        
+        .lesson p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+            color: #555;
+            font-size: 1.05em;
+        }
+        
+        .tip-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffeb99 100%);
+            border-left: 5px solid #FFC107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .tip-box::before {
+            content: "💡 Pro Tip:";
+            font-weight: bold;
+            color: #FF6B00;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #ffe6e6 0%, #ffcccc 100%);
+            border-left: 5px solid #f44336;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        
+        .warning-box::before {
+            content: "⚠️ Watch Out:";
+            font-weight: bold;
+            color: #d32f2f;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .formula-box {
+            background: #f0f7ff;
+            border: 2px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+        }
+        
+        .quiz-section {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        
+        .quiz-question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .quiz-question h4 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .quiz-options {
+            list-style: none;
+        }
+        
+        .quiz-option {
+            padding: 10px 15px;
+            margin: 8px 0;
+            background: #f9f9f9;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-option:hover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+            transform: translateX(5px);
+        }
+        
+        .quiz-option.selected {
+            background: #c8e6c9;
+            border-color: #4CAF50;
+        }
+        
+        .quiz-option.correct {
+            background: #4CAF50;
+            color: white;
+            border-color: #45a049;
+        }
+        
+        .quiz-option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #da190b;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #107c41 0%, #185a2e 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            display: inline-block;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(16, 124, 65, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 124, 65, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+        }
+        
+        .score-display {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 15px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .score-display h3 {
+            color: #2e7d32;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .score-display p {
+            font-size: 1.2em;
+            color: #1b5e20;
+        }
+        
+        .practice-exercise {
+            background: #fafafa;
+            border: 2px dashed #107c41;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        
+        .practice-exercise h4 {
+            color: #107c41;
+            margin-bottom: 15px;
+        }
+        
+        .excel-shortcut {
+            display: inline-block;
+            background: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 0 5px;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .certificate {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #fff 0%, #f5f5f5 100%);
+            border: 5px solid #107c41;
+            border-radius: 20px;
+            margin: 30px auto;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .certificate h2 {
+            color: #107c41;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-family: 'Georgia', serif;
+        }
+        
+        .certificate .cert-text {
+            font-size: 1.2em;
+            margin: 20px 0;
+            color: #333;
+        }
+        
+        .certificate .cert-score {
+            font-size: 3em;
+            color: #107c41;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Excel Certification Master Guide 📊</h1>
+            <p class="subtitle">From "What's a spreadsheet?" to "I'm basically Neo in The Matrix of Excel"</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar">0%</div>
+            </div>
+            <p id="motivationalQuote" style="margin-top: 10px; font-style: italic;"></p>
+        </div>
+        
+        <ul class="nav-tabs" id="navTabs">
+            <li class="nav-tab active" onclick="showLesson(0)">📚 Introduction</li>
+            <li class="nav-tab" onclick="showLesson(1)">☁️ What is MS 365?</li>
+            <li class="nav-tab" onclick="showLesson(2)">🎯 Excel Basics</li>
+            <li class="nav-tab" onclick="showLesson(3)">📝 Formulas & Functions</li>
+            <li class="nav-tab" onclick="showLesson(4)">📊 Data & Charts</li>
+            <li class="nav-tab" onclick="showLesson(5)">🔧 Advanced Features</li>
+            <li class="nav-tab" onclick="showLesson(6)">💼 Business Applications</li>
+            <li class="nav-tab" onclick="showLesson(7)">🎓 Final Exam</li>
+        </ul>
+        
+        <div class="content">
+            <!-- Lesson 0: Introduction -->
+            <div class="lesson active" id="lesson0">
+                <h2>Welcome to Your Excel Journey! 🚀</h2>
+                
+                <p><strong>Hey there, future Excel wizard!</strong> So you're working at Home Depot and looking to level up into the business world? Smart move! This guide will take you from "Excel? Is that a gum brand?" to "I can make spreadsheets dance the cha-cha." 💃</p>
+                
+                <div class="tip-box">
+                    Think of Excel as the Swiss Army knife of the business world. While a hammer is great at Home Depot, Excel is the tool that'll help you nail that business job (pun intended).
+                </div>
+                
+                <h3>What This Guide Will Do For You</h3>
+                <p>By the end of this journey, you'll be able to:</p>
+                <ul style="margin-left: 30px; line-height: 2;">
+                    <li>✅ Understand what Microsoft 365 actually is (spoiler: it's not 365 different Microsofts)</li>
+                    <li>✅ Navigate Excel like you navigate the aisles at Home Depot</li>
+                    <li>✅ Create formulas that would make Einstein jealous</li>
+                    <li>✅ Build charts that tell stories better than Netflix documentaries</li>
+                    <li>✅ Pass that Microsoft Excel Certification exam with flying colors</li>
+                </ul>
+                
+                <h3>The Microsoft Excel Certification - What's the Big Deal?</h3>
+                <p>The <strong>Microsoft Office Specialist (MOS) Excel Associate</strong> certification is like a golden ticket in the business world. It proves you're not just clicking random buttons hoping something good happens (we've all been there).</p>
+                
+                <div class="practice-exercise">
+                    <h4>🎯 Your Mission (Should You Choose to Accept It)</h4>
+                    <p>This certification typically covers:</p>
+                    <ul style="margin-left: 20px;">
+                        <li>Managing worksheets and workbooks (35-40% of exam)</li>
+                        <li>Managing data cells and ranges (15-20% of exam)</li>
+                        <li>Managing tables and table data (15-20% of exam)</li>
+                        <li>Performing operations using formulas and functions (20-25% of exam)</li>
+                        <li>Managing charts (15-20% of exam)</li>
+                    </ul>
+                </div>
+                
+                <h3>How to Use This Guide</h3>
+                <p>Each section builds on the previous one, just like stacking lumber (but way less heavy). Complete each lesson, tackle the quizzes, and by the time you reach the final exam, you'll be ready to show Microsoft what you're made of!</p>
+                
+                <div class="warning-box">
+                    Don't skip sections! Even if you think you know something, there might be a golden nugget of wisdom hiding in there. Trust the process!
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="btn" onclick="showLesson(1)">Let's Get Started! 🚀</button>
+                </div>
+            </div>
+            
+            <!-- Lesson 1: What is MS 365? -->
+            <div class="lesson" id="lesson1">
+                <h2>Chapter 1: What is Microsoft 365? (No, It's Not a Calendar) 📅</h2>
+                
+                <p>Alright, let's clear up the confusion. <strong>Microsoft 365</strong> (formerly Office 365) is like Netflix, but for productivity apps. Instead of binge-watching shows, you're binge-creating spreadsheets, documents, and presentations!</p>
+                
+                <h3>The Cloud Revolution ☁️</h3>
+                <p>Remember when you had to install software from a CD? (If you don't, congrats on being young!) Microsoft 365 lives in "the cloud" - which isn't actually a fluffy white thing in the sky, but massive data centers that let you access your files from anywhere.</p>
+                
+                <div class="tip-box">
+                    Think of it this way: Traditional Office is like owning a toolbox that stays in your garage. Microsoft 365 is like having a magical toolbox that follows you everywhere - work, home, even that coffee shop with the good Wi-Fi.
+                </div>
+                
+                <h3>What's Included in Microsoft 365?</h3>
+                <div class="practice-exercise">
+                    <h4>The All-Star Lineup:</h4>
+                    <ul style="margin-left: 20px; line-height: 2;">
+                        <li><strong>Excel</strong> - The spreadsheet superhero (our focus!)</li>
+                        <li><strong>Word</strong> - For when you need to use actual words</li>
+                        <li><strong>PowerPoint</strong> - Making presentations that don't put people to sleep</li>
+                        <li><strong>Outlook</strong> - Email, calendar, and pretending to be organized</li>
+                        <li><strong>OneDrive</strong> - Your files' home in the cloud</li>
+                        <li><strong>Teams</strong> - Video calls where you hope your cat doesn't walk by</li>
+                        <li><strong>OneNote</strong> - Digital sticky notes on steroids</li>
+                    </ul>
+                </div>
+                
+                <h3>Excel in the Microsoft 365 Universe</h3>
+                <p>Excel in Microsoft 365 is like Excel's cooler, more connected cousin. It can:</p>
+                <ul style="margin-left: 30px; line-height: 1.8;">
+                    <li>🔄 Auto-save your work (goodbye, panic attacks!)</li>
+                    <li>👥 Let multiple people work on the same spreadsheet simultaneously</li>
+                    <li>📱 Work on any device - computer, tablet, phone, smart fridge (okay, maybe not the fridge)</li>
+                    <li>🤖 Use AI to suggest formulas and insights</li>
+                </ul>
+                
+                <h3>Subscription vs. One-Time Purchase</h3>
+                <p><strong>Microsoft 365:</strong> Monthly/yearly subscription, always updated, cloud storage included<br>
+                <strong>Office 2021/2024:</strong> Buy once, use forever (on that version), no cloud perks</p>
+                
+                <div class="warning-box">
+                    For certification purposes, most features are the same between versions. But employers LOVE seeing Microsoft 365 experience because it shows you're current with technology!
+                </div>
+                
+                <div class="quiz-section">
+                    <h3>Quick Check! 🎯</h3>
+                    <div class="quiz-question">
+                        <h4>1. What's the main advantage of Microsoft 365 over traditional Office?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) It's free (wouldn't that be nice?)</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) Cloud storage and collaboration features</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) It comes with a free laptop</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) It only works on Tuesdays</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>2. Which of these is NOT typically included in Microsoft 365?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) Excel</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">B) Word</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">C) Photoshop</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Teams</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="showLesson(0)">← Previous</button>
+                    <button class="btn" onclick="completeLesson(1); showLesson(2)">Next: Excel Basics →</button>
+                </div>
+            </div>
+            
+            <!-- Lesson 2: Excel Basics -->
+            <div class="lesson" id="lesson2">
+                <h2>Chapter 2: Excel Basics - Your Spreadsheet Survival Guide 🗺️</h2>
+                
+                <p>Time to meet Excel! Think of it as a giant grid where magic happens. It's like graph paper met a calculator and had a super-powered baby.</p>
+                
+                <h3>The Excel Interface - Your New Home</h3>
+                <p>When you open Excel, you'll see:</p>
+                
+                <div class="practice-exercise">
+                    <h4>The Command Center:</h4>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Ribbon</strong> - The menu at the top with all the tools (like the tool aisle at Home Depot)</li>
+                        <li><strong>Formula Bar</strong> - Where you type formulas (your command line)</li>
+                        <li><strong>Cells</strong> - The little boxes where data lives</li>
+                        <li><strong>Columns</strong> - Vertical, labeled A, B, C... (goes up to XFD - that's 16,384 columns!)</li>
+                        <li><strong>Rows</strong> - Horizontal, numbered 1, 2, 3... (goes up to 1,048,576!)</li>
+                        <li><strong>Sheet Tabs</strong> - Different pages in your workbook</li>
+                    </ul>
+                </div>
+                
+                <h3>Cell References - The GPS of Excel</h3>
+                <p>Every cell has an address, like <strong>A1</strong> (column A, row 1). It's like the coordinate system in Battleship, but less explosive.</p>
+                
+                <div class="formula-box">
+                    Examples:<br>
+                    • A1 = First column, first row<br>
+                    • B5 = Second column, fifth row<br>
+                    • Z100 = 26th column, 100th row
+                </div>
+                
+                <h3>Essential Keyboard Shortcuts (Your Secret Weapons)</h3>
+                <p>These shortcuts will make you look like a wizard:</p>
+                
+                <div class="tip-box">
+                    <strong>The Big Three:</strong><br>
+                    <span class="excel-shortcut">Ctrl+C</span> = Copy<br>
+                    <span class="excel-shortcut">Ctrl+V</span> = Paste<br>
+                    <span class="excel-shortcut">Ctrl+Z</span> = Undo (your best friend!)<br><br>
+                    
+                    <strong>Navigation Ninjas:</strong><br>
+                    <span class="excel-shortcut">Ctrl+Home</span> = Jump to A1<br>
+                    <span class="excel-shortcut">Ctrl+End</span> = Jump to last used cell<br>
+                    <span class="excel-shortcut">Ctrl+Arrow</span> = Jump to edge of data<br><br>
+                    
+                    <strong>Time Savers:</strong><br>
+                    <span class="excel-shortcut">Ctrl+S</span> = Save (do this obsessively!)<br>
+                    <span class="excel-shortcut">F2</span> = Edit active cell<br>
+                    <span class="excel-shortcut">Ctrl+Shift+L</span> = Toggle filters
+                </div>
+                
+                <h3>Data Types in Excel</h3>
+                <p>Excel is smart enough to recognize different types of data:</p>
+                <ul style="margin-left: 30px; line-height: 2;">
+                    <li><strong>Numbers</strong> - For math stuff (1, 2, 3.14, etc.)</li>
+                    <li><strong>Text</strong> - Words and labels ("Product", "Customer Name")</li>
+                    <li><strong>Dates</strong> - Excel stores these as numbers (sneaky!)</li>
+                    <li><strong>Currency</strong> - Money money money 💰</li>
+                    <li><strong>Percentages</strong> - Because 0.15 looks better as 15%</li>
+                </ul>
+                
+                <h3>Formatting - Making Things Pretty</h3>
+                <p>Raw data is like wearing sweatpants to a job interview. Formatting is your business suit!</p>
+                
+                <div class="practice-exercise">
+                    <h4>Try This Exercise:</h4>
+                    <p>1. Type "1234.5" in a cell<br>
+                    2. Format it as currency: <span class="excel-shortcut">Ctrl+Shift+$</span><br>
+                    3. Watch it transform to $1,234.50 ✨</p>
+                </div>
+                
+                <div class="warning-box">
+                    Common Rookie Mistake: Typing "$" or "%" manually. Let Excel format it for you - it's cleaner and allows for calculations!
+                </div>
+                
+                <h3>Working with Multiple Sheets</h3>
+                <p>Think of sheets like tabs in your browser, but for data. You can have "Sales", "Inventory", "Customers" all in one file!</p>
+                
+                <div class="quiz-section">
+                    <h3>Knowledge Check! 📝</h3>
+                    <div class="quiz-question">
+                        <h4>1. What does cell reference "D10" mean?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) 10th column, D row</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) Column D, row 10</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) Delete 10 cells</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Dimension 10</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>2. Which shortcut saves your work?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) Ctrl+X</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) Ctrl+S</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) Ctrl+D</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Alt+F4 (this closes Excel!)</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>3. How many rows can Excel handle?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) 1,000</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">B) 65,536</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">C) 1,048,576</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Unlimited</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="showLesson(1)">← Previous</button>
+                    <button class="btn" onclick="completeLesson(2); showLesson(3)">Next: Formulas & Functions →</button>
+                </div>
+            </div>
+            
+            <!-- Lesson 3: Formulas & Functions -->
+            <div class="lesson" id="lesson3">
+                <h2>Chapter 3: Formulas & Functions - Where the Magic Happens 🪄</h2>
+                
+                <p>This is where Excel goes from "fancy calculator" to "data manipulation wizardry". Buckle up!</p>
+                
+                <h3>Formula Basics - Your First Spell</h3>
+                <p>Every formula starts with <strong>=</strong> (the equal sign is like saying "Hey Excel, calculate this!")</p>
+                
+                <div class="formula-box">
+                    Basic Operations:<br>
+                    • = A1 + B1 (Addition)<br>
+                    • = A1 - B1 (Subtraction)<br>
+                    • = A1 * B1 (Multiplication)<br>
+                    • = A1 / B1 (Division)<br>
+                    • = A1 ^ 2 (Power/Exponent)
+                </div>
+                
+                <h3>Cell References - Absolute vs. Relative</h3>
+                <p>This is CRUCIAL for the certification!</p>
+                
+                <div class="tip-box">
+                    <strong>Relative Reference (A1):</strong> Changes when you copy the formula<br>
+                    <strong>Absolute Reference ($A$1):</strong> Stays the same no matter what<br>
+                    <strong>Mixed Reference ($A1 or A$1):</strong> Locks either column or row<br><br>
+                    
+                    Pro tip: Press <span class="excel-shortcut">F4</span> to cycle through reference types!
+                </div>
+                
+                <h3>Essential Functions for Certification</h3>
+                
+                <h4>1. The Math Squad</h4>
+                <div class="formula-box">
+                    =SUM(A1:A10) - Adds everything<br>
+                    =AVERAGE(A1:A10) - Finds the middle ground<br>
+                    =COUNT(A1:A10) - Counts numbers only<br>
+                    =COUNTA(A1:A10) - Counts anything that's not empty<br>
+                    =MAX(A1:A10) - Finds the biggest<br>
+                    =MIN(A1:A10) - Finds the smallest
+                </div>
+                
+                <h4>2. The Logic Team</h4>
+                <div class="formula-box">
+                    =IF(A1>100, "High", "Low") - Makes decisions<br>
+                    =AND(A1>0, B1>0) - Both must be true<br>
+                    =OR(A1>100, B1>100) - Either can be true<br>
+                    =NOT(A1="Complete") - Reverses logic
+                </div>
+                
+                <h4>3. The Text Handlers</h4>
+                <div class="formula-box">
+                    =CONCATENATE(A1, " ", B1) - Or just use &<br>
+                    =LEFT(A1, 5) - First 5 characters<br>
+                    =RIGHT(A1, 3) - Last 3 characters<br>
+                    =TRIM(A1) - Removes extra spaces<br>
+                    =UPPER(A1) - MAKES EVERYTHING SHOUTY<br>
+                    =LOWER(A1) - makes everything quiet<br>
+                    =PROPER(A1) - Makes Everything Title Case
+                </div>
+                
+                <h4>4. The Lookup Legends</h4>
+                <div class="formula-box">
+                    =VLOOKUP(A1, Table, 2, FALSE) - Vertical lookup<br>
+                    =HLOOKUP(A1, Table, 2, FALSE) - Horizontal lookup<br>
+                    =XLOOKUP(A1, Range1, Range2) - The new kid on the block<br>
+                    =INDEX(Range, Row, Column) - Surgical precision<br>
+                    =MATCH(A1, Range, 0) - Finds position
+                </div>
+                
+                <div class="warning-box">
+                    VLOOKUP is on EVERY Excel certification exam. Master it! FALSE means exact match - use this 99% of the time.
+                </div>
+                
+                <h4>5. Date & Time Functions</h4>
+                <div class="formula-box">
+                    =TODAY() - Today's date (updates daily)<br>
+                    =NOW() - Current date and time<br>
+                    =DATE(2024, 12, 25) - Christmas 2024<br>
+                    =DATEDIF(A1, B1, "D") - Days between dates<br>
+                    =NETWORKDAYS(A1, B1) - Working days only
+                </div>
+                
+                <h3>Nested Functions - Functions Inside Functions</h3>
+                <p>Like Russian dolls, but with formulas!</p>
+                
+                <div class="practice-exercise">
+                    <h4>Example: Grade Calculator</h4>
+                    <p>=IF(AVERAGE(A1:A5)>=90, "A", IF(AVERAGE(A1:A5)>=80, "B", IF(AVERAGE(A1:A5)>=70, "C", "F")))</p>
+                    <p>This calculates the average and assigns a letter grade. Mind = blown! 🤯</p>
+                </div>
+                
+                <h3>Error Messages - Don't Panic!</h3>
+                <ul style="margin-left: 30px; line-height: 2;">
+                    <li><strong>#DIV/0!</strong> - You're dividing by zero (math says no)</li>
+                    <li><strong>#VALUE!</strong> - Wrong data type (like adding text to numbers)</li>
+                    <li><strong>#REF!</strong> - Reference doesn't exist (you deleted something important)</li>
+                    <li><strong>#NAME?</strong> - Excel doesn't recognize the function (typo alert!)</li>
+                    <li><strong>#N/A</strong> - Value not available (VLOOKUP couldn't find it)</li>
+                </ul>
+                
+                <div class="quiz-section">
+                    <h3>Function Junction! 🚂</h3>
+                    <div class="quiz-question">
+                        <h4>1. What does $A$1 represent?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) A cell worth money</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) An absolute reference</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) A relative reference</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) An error</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>2. Which function would you use to find the highest value in a range?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) =HIGH()</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">B) =TOP()</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">C) =MAX()</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) =BIGGEST()</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>3. What's wrong with this formula: =VLOOKUP(A1, B1:D10, 5, FALSE)?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) VLOOKUP doesn't exist</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) Column index 5 is outside the table range (only 3 columns)</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) FALSE should be TRUE</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Nothing's wrong</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="showLesson(2)">← Previous</button>
+                    <button class="btn" onclick="completeLesson(3); showLesson(4)">Next: Data & Charts →</button>
+                </div>
+            </div>
+            
+            <!-- Lesson 4: Data & Charts -->
+            <div class="lesson" id="lesson4">
+                <h2>Chapter 4: Data Management & Visualization 📊</h2>
+                
+                <p>Time to make your data look so good, it could get its own Instagram account! 📸</p>
+                
+                <h3>Sorting & Filtering - Organizing the Chaos</h3>
+                
+                <h4>Sorting Data</h4>
+                <p>Like organizing inventory at Home Depot, but digitally!</p>
+                
+                <div class="tip-box">
+                    Quick Sort: Select your data → Data tab → Sort A-Z or Z-A<br>
+                    Custom Sort: For multiple levels (like sorting by department, then by price)
+                </div>
+                
+                <h4>Filtering - Finding the Needle in the Haystack</h4>
+                <div class="formula-box">
+                    AutoFilter: <span class="excel-shortcut">Ctrl+Shift+L</span><br>
+                    • Click dropdown arrows in headers<br>
+                    • Check/uncheck items<br>
+                    • Use text/number/date filters for precision
+                </div>
+                
+                <h3>Tables - Your Data's Best Friend</h3>
+                <p>Convert your range to a table with <span class="excel-shortcut">Ctrl+T</span> and watch the magic happen!</p>
+                
+                <div class="practice-exercise">
+                    <h4>Table Superpowers:</h4>
+                    <ul style="margin-left: 20px;">
+                        <li>Auto-expanding formulas</li>
+                        <li>Built-in filtering</li>
+                        <li>Structured references (Table1[Sales] instead of B2:B100)</li>
+                        <li>Automatic formatting</li>
+                        <li>Total row with quick calculations</li>
+                    </ul>
+                </div>
+                
+                <h3>Conditional Formatting - Making Data Pop!</h3>
+                <p>Like a heat map for your spreadsheet!</p>
+                
+                <div class="tip-box">
+                    Popular Conditional Formatting:<br>
+                    • <strong>Data Bars</strong> - In-cell bar charts<br>
+                    • <strong>Color Scales</strong> - Hot to cold coloring<br>
+                    • <strong>Icon Sets</strong> - Traffic lights, arrows, stars<br>
+                    • <strong>Highlight Rules</strong> - Greater than, less than, between
+                </div>
+                
+                <h3>Charts - A Picture Worth a Thousand Cells</h3>
+                
+                <h4>Choosing the Right Chart</h4>
+                <div class="practice-exercise">
+                    <h4>Chart Selection Guide:</h4>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Column/Bar</strong> - Comparing values</li>
+                        <li><strong>Line</strong> - Trends over time</li>
+                        <li><strong>Pie</strong> - Parts of a whole (use sparingly!)</li>
+                        <li><strong>Scatter</strong> - Relationships between variables</li>
+                        <li><strong>Combo</strong> - Multiple data types together</li>
+                    </ul>
+                </div>
+                
+                <h4>Creating a Chart</h4>
+                <p>1. Select your data (including headers)<br>
+                2. Insert tab → Choose chart type<br>
+                3. Customize with Chart Tools</p>
+                
+                <div class="warning-box">
+                    Certification Tip: Know how to add/remove chart elements (title, legend, axis labels, data labels). The exam LOVES testing this!
+                </div>
+                
+                <h3>PivotTables - The Data Analysis Superhero</h3>
+                <p>If Excel functions are soldiers, PivotTables are the entire army!</p>
+                
+                <div class="formula-box">
+                    Creating a PivotTable:<br>
+                    1. Select your data<br>
+                    2. Insert → PivotTable<br>
+                    3. Drag fields to Rows, Columns, Values, Filters<br>
+                    4. Watch Excel crunch numbers like a boss
+                </div>
+                
+                <h3>Data Validation - Keeping Data Clean</h3>
+                <p>Like a bouncer for your cells - only the right data gets in!</p>
+                
+                <div class="tip-box">
+                    Common Validation Rules:<br>
+                    • Dropdown lists (pick from predefined options)<br>
+                    • Number ranges (between 0 and 100)<br>
+                    • Date ranges (only future dates)<br>
+                    • Text length (max 10 characters)<br>
+                    • Custom formulas (sky's the limit!)
+                </div>
+                
+                <div class="quiz-section">
+                    <h3>Data Visualization Quiz! 📈</h3>
+                    <div class="quiz-question">
+                        <h4>1. Which chart type is best for showing trends over time?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) Pie chart</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) Line chart</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) Donut chart</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Funnel chart</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>2. What keyboard shortcut converts a range to a table?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) Ctrl+A</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) Ctrl+T</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) Ctrl+Tab</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Alt+T</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>3. What's the main benefit of using a PivotTable?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) It makes tables spin</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) Quickly summarize and analyze large datasets</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) It creates 3D effects</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) It pivots your monitor</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="showLesson(3)">← Previous</button>
+                    <button class="btn" onclick="completeLesson(4); showLesson(5)">Next: Advanced Features →</button>
+                </div>
+            </div>
+            
+            <!-- Lesson 5: Advanced Features -->
+            <div class="lesson" id="lesson5">
+                <h2>Chapter 5: Advanced Excel Features - Level Up! 🚀</h2>
+                
+                <p>Welcome to the Excel dojo! Time to learn the advanced moves that separate the rookies from the masters.</p>
+                
+                <h3>Advanced Formulas & Array Functions</h3>
+                
+                <h4>Array Formulas (Dynamic Arrays in 365)</h4>
+                <div class="formula-box">
+                    =UNIQUE(A1:A100) - Removes duplicates<br>
+                    =SORT(A1:B100, 2, -1) - Sorts by column 2, descending<br>
+                    =FILTER(A1:C100, B1:B100>1000) - Filters on the fly<br>
+                    =SEQUENCE(10, 3) - Creates number sequences<br>
+                    =RANDARRAY(5, 5) - Random number grid
+                </div>
+                
+                <div class="tip-box">
+                    These "spill" functions are game-changers in Excel 365. They automatically expand to show all results. No more Ctrl+Shift+Enter!
+                </div>
+                
+                <h4>SUMIF, COUNTIF, and Their Siblings</h4>
+                <div class="formula-box">
+                    =SUMIF(A:A, ">100", B:B) - Sum B where A > 100<br>
+                    =COUNTIFS(A:A, "Red", B:B, ">50") - Multiple criteria<br>
+                    =AVERAGEIF(A:A, "Sales", B:B) - Conditional average<br>
+                    =MAXIFS(C:C, A:A, "Q1", B:B, "Complete") - Conditional maximum
+                </div>
+                
+                <h3>Power Query - Data Transformation Magic</h3>
+                <p>Like having a data prep chef in Excel!</p>
+                
+                <div class="practice-exercise">
+                    <h4>Power Query Can:</h4>
+                    <ul style="margin-left: 20px;">
+                        <li>Import data from multiple sources</li>
+                        <li>Clean messy data automatically</li>
+                        <li>Combine multiple files/sheets</li>
+                        <li>Transform data without formulas</li>
+                        <li>Refresh with one click</li>
+                    </ul>
+                </div>
+                
+                <h3>Macros & VBA - Automation Station</h3>
+                <p>Teaching Excel to do your repetitive tasks while you get coffee!</p>
+                
+                <div class="warning-box">
+                    Basic macro recording is often tested in certification. Know how to:<br>
+                    • Record a macro (Developer tab → Record Macro)<br>
+                    • Assign it to a button<br>
+                    • Run it with a shortcut key
+                </div>
+                
+                <h3>Collaboration Features</h3>
+                
+                <h4>Comments vs. Notes</h4>
+                <ul style="margin-left: 30px;">
+                    <li><strong>Comments</strong> - Threaded conversations, @mentions</li>
+                    <li><strong>Notes</strong> - Old-style yellow sticky notes</li>
+                </ul>
+                
+                <h4>Co-authoring in Real-Time</h4>
+                <p>Multiple people editing simultaneously - like Google Docs, but it's Excel!</p>
+                
+                <h3>Protecting Your Work</h3>
+                
+                <div class="tip-box">
+                    Protection Levels:<br>
+                    • <strong>Protect Sheet</strong> - Lock cells/formulas<br>
+                    • <strong>Protect Workbook</strong> - Lock structure<br>
+                    • <strong>Allow Edit Ranges</strong> - Selective permissions<br>
+                    • <strong>Mark as Final</strong> - Read-only recommendation
+                </div>
+                
+                <h3>What-If Analysis Tools</h3>
+                
+                <div class="practice-exercise">
+                    <h4>The Analysis Trio:</h4>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Goal Seek</strong> - Find input for desired output</li>
+                        <li><strong>Scenario Manager</strong> - Compare multiple scenarios</li>
+                        <li><strong>Data Tables</strong> - See impact of variable changes</li>
+                    </ul>
+                </div>
+                
+                <h3>Printing Like a Pro</h3>
+                <p>Because sometimes paper still matters!</p>
+                
+                <div class="formula-box">
+                    Essential Print Settings:<br>
+                    • Page Layout → Print Area<br>
+                    • Scale to fit on X pages<br>
+                    • Repeat rows/columns on each page<br>
+                    • Headers and footers with page numbers<br>
+                    • Page break preview (<span class="excel-shortcut">Alt+P, I</span>)
+                </div>
+                
+                <div class="quiz-section">
+                    <h3>Advanced Features Challenge! 💪</h3>
+                    <div class="quiz-question">
+                        <h4>1. Which function removes duplicate values in Excel 365?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) =REMOVEDUPE()</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) =UNIQUE()</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) =DISTINCT()</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) =NODUPE()</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>2. What tool helps find the input value needed for a specific result?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">A) Goal Seek</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">B) Solver</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) Scenario Manager</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Input Finder</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>3. What's the difference between Comments and Notes?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) No difference</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) Comments are threaded conversations, Notes are simple annotations</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) Notes are for VBA only</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Comments are yellow, Notes are blue</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="showLesson(4)">← Previous</button>
+                    <button class="btn" onclick="completeLesson(5); showLesson(6)">Next: Business Applications →</button>
+                </div>
+            </div>
+            
+            <!-- Lesson 6: Business Applications -->
+            <div class="lesson" id="lesson6">
+                <h2>Chapter 6: Real-World Business Applications 💼</h2>
+                
+                <p>Time to put it all together! These are the skills that'll make employers say "When can you start?"</p>
+                
+                <h3>Financial Analysis & Budgeting</h3>
+                
+                <h4>Essential Financial Functions</h4>
+                <div class="formula-box">
+                    =PMT(rate, periods, present_value) - Loan payments<br>
+                    =FV(rate, periods, payment) - Future value<br>
+                    =NPV(rate, cash_flows) - Net present value<br>
+                    =IRR(cash_flows) - Internal rate of return<br>
+                    =XIRR(cash_flows, dates) - IRR with irregular periods
+                </div>
+                
+                <div class="practice-exercise">
+                    <h4>Real Example: Loan Calculator</h4>
+                    <p>Car loan: $25,000, 5% annual rate, 60 months<br>
+                    =PMT(5%/12, 60, -25000) = $471.78/month</p>
+                    <p>Excel just saved you from surprise at the dealership!</p>
+                </div>
+                
+                <h3>Sales Dashboards & KPIs</h3>
+                <p>Turn boring numbers into executive-impressing visuals!</p>
+                
+                <div class="tip-box">
+                    Dashboard Best Practices:<br>
+                    • Use consistent color schemes<br>
+                    • Include period comparisons (YoY, MoM)<br>
+                    • Add sparklines for mini-trends<br>
+                    • Use slicers for interactive filtering<br>
+                    • Keep it to one page (executives have short attention spans)
+                </div>
+                
+                <h3>Inventory Management</h3>
+                
+                <h4>Key Inventory Formulas</h4>
+                <div class="formula-box">
+                    Reorder Point = (Daily Usage × Lead Time) + Safety Stock<br>
+                    Economic Order Quantity = SQRT((2 × Demand × Order Cost) / Holding Cost)<br>
+                    Stock Turnover = Cost of Goods Sold / Average Inventory
+                </div>
+                
+                <h3>HR Analytics</h3>
+                
+                <div class="practice-exercise">
+                    <h4>Common HR Calculations:</h4>
+                    <ul style="margin-left: 20px;">
+                        <li>Employee turnover rate</li>
+                        <li>Average time to hire</li>
+                        <li>Training cost per employee</li>
+                        <li>Attendance tracking</li>
+                        <li>Performance rating distributions</li>
+                    </ul>
+                </div>
+                
+                <h3>Project Management</h3>
+                
+                <h4>Gantt Charts in Excel</h4>
+                <p>Yes, you can make Gantt charts without expensive software!</p>
+                
+                <div class="tip-box">
+                    Steps:<br>
+                    1. List tasks with start dates and durations<br>
+                    2. Create a stacked bar chart<br>
+                    3. Make the first series invisible<br>
+                    4. Format to look professional<br>
+                    5. Impress your project manager!
+                </div>
+                
+                <h3>Customer Data Analysis</h3>
+                
+                <h4>Customer Segmentation</h4>
+                <div class="formula-box">
+                    RFM Analysis:<br>
+                    • Recency - Days since last purchase<br>
+                    • Frequency - Number of purchases<br>
+                    • Monetary - Total spend<br>
+                    Use PERCENTRANK to score each dimension
+                </div>
+                
+                <h3>Reporting Best Practices</h3>
+                
+                <div class="warning-box">
+                    The 5 Commandments of Business Reports:<br>
+                    1. Always include a summary/dashboard page<br>
+                    2. Use consistent formatting throughout<br>
+                    3. Include data sources and update dates<br>
+                    4. Make it printable (because someone always prints)<br>
+                    5. Test all formulas with edge cases
+                </div>
+                
+                <h3>Common Business Scenarios for Certification</h3>
+                
+                <div class="practice-exercise">
+                    <h4>You'll likely see questions about:</h4>
+                    <ul style="margin-left: 20px;">
+                        <li>Creating invoice templates</li>
+                        <li>Calculating commissions with tiers</li>
+                        <li>Analyzing survey results</li>
+                        <li>Forecasting sales trends</li>
+                        <li>Budget vs. actual variance analysis</li>
+                        <li>Employee scheduling</li>
+                        <li>Price list management</li>
+                    </ul>
+                </div>
+                
+                <div class="tip-box">
+                    Interview Gold: "I automated our inventory tracking at Home Depot using Excel, reducing manual counting time by 40%." Even if you haven't done this yet, you now know how you COULD do it!
+                </div>
+                
+                <div class="quiz-section">
+                    <h3>Business Application Quiz! 📊</h3>
+                    <div class="quiz-question">
+                        <h4>1. Which function calculates loan payments?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) =LOAN()</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) =PMT()</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) =PAYMENT()</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) =CALCULATE()</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>2. What's the best chart type for showing project timelines?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) Pie chart</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">B) Line chart</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">C) Gantt chart (modified bar chart)</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Scatter plot</li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question">
+                        <h4>3. What does KPI stand for?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">A) Keep People Informed</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, true)">B) Key Performance Indicator</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">C) Knowledge Processing Interface</li>
+                            <li class="quiz-option" onclick="checkAnswer(this, false)">D) Keyboard Pressing Intensity</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="showLesson(5)">← Previous</button>
+                    <button class="btn" onclick="completeLesson(6); showLesson(7)">Ready for Final Exam! →</button>
+                </div>
+            </div>
+            
+            <!-- Lesson 7: Final Exam -->
+            <div class="lesson" id="lesson7">
+                <h2>🎓 Final Certification Practice Exam</h2>
+                
+                <p><strong>You've made it to the final boss level!</strong> This comprehensive exam simulates the real Microsoft Excel Certification test. You need 70% or higher to pass. Take a deep breath, trust your training, and show Excel who's boss!</p>
+                
+                <div class="warning-box">
+                    Remember: The real exam is typically 35-40 questions in 50 minutes. This practice exam gives you a taste of what to expect. Read each question carefully!
+                </div>
+                
+                <div class="quiz-section" id="finalExam">
+                    <h3>Final Exam - 25 Questions</h3>
+                    
+                    <!-- Questions 1-25 -->
+                    <div class="quiz-question">
+                        <h4>1. You need to keep the header row visible while scrolling through 1000 rows of data. What feature should you use?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Split panes</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Freeze panes</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Lock cells</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Pin rows</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>2. Which formula correctly calculates the average of cells A1 through A10, excluding blank cells?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">A) =AVERAGE(A1:A10)</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">B) =AVG(A1:A10)</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) =MEAN(A1:A10)</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) =AVERAGEA(A1:A10)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>3. What happens when you press F4 while editing a cell reference in a formula?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Deletes the reference</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Cycles through absolute/relative reference types</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Copies the reference</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Opens help menu</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>4. You want to find "Johnson" in column A and return the corresponding value from column C. Which function should you use?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) =HLOOKUP("Johnson", A:C, 3, FALSE)</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) =VLOOKUP("Johnson", A:C, 3, FALSE)</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) =LOOKUP("Johnson", A:C, 3)</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) =FIND("Johnson", A:C, 3)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>5. Which chart type is best for showing the proportion of sales by region?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Line chart</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">B) Scatter chart</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">C) Pie chart</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Area chart</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>6. What is the keyboard shortcut to insert today's date?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Ctrl+D</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Ctrl+;</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Ctrl+T</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Alt+D</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>7. You see #REF! in a cell. What does this mean?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Division by zero</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Invalid cell reference</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Wrong data type</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Formula too long</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>8. Which function counts only cells containing numbers?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">A) =COUNT()</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">B) =COUNTA()</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) =COUNTBLANK()</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) =COUNTIF()</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>9. To create a drop-down list in a cell, which feature do you use?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Conditional Formatting</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Data Validation</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Filter</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Form Controls</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>10. What does the formula =IF(A1>100, "High", "Low") do?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Adds 100 to A1</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Returns "High" if A1 is greater than 100, otherwise "Low"</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Counts values over 100</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Highlights cells over 100</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>11. Which tool would you use to quickly analyze large amounts of data with drag-and-drop functionality?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Goal Seek</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) PivotTable</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Scenario Manager</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Solver</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>12. To combine first name in A1 and last name in B1 with a space, which formula works?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) =A1+B1</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) =A1&" "&B1</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) =A1 B1</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) =COMBINE(A1,B1)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>13. What is the maximum number of worksheets in an Excel workbook?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) 256</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">B) 1,024</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">C) Limited by available memory</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) 65,536</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>14. Which function removes extra spaces from text, except single spaces between words?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) =CLEAN()</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) =TRIM()</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) =REMOVE()</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) =SPACE()</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>15. To apply the same formula to an entire column quickly, what should you do after entering the formula in the first cell?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Press F4</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Double-click the fill handle</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Press Ctrl+Enter</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Right-click and select Apply</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>16. What does Conditional Formatting do?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Changes formulas based on conditions</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Changes cell appearance based on values or rules</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Filters data automatically</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Creates charts conditionally</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>17. Which formula calculates the total of cells B2 through B10 only if the corresponding cell in column A equals "Sales"?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) =SUM(A2:A10="Sales", B2:B10)</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) =SUMIF(A2:A10, "Sales", B2:B10)</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) =IF(A2:A10="Sales", SUM(B2:B10))</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) =SUMIFS(B2:B10, A2:A10="Sales")</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>18. What is the purpose of the $ symbol in a cell reference like $A$1?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Indicates currency format</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Makes the reference absolute</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Protects the cell</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Indicates a formula</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>19. To remove duplicate values from a dataset, which feature should you use?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Filter → Unique</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Data → Remove Duplicates</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Sort → No Duplicates</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Home → Clear Duplicates</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>20. Which function returns the current date AND time?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) =TODAY()</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) =NOW()</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) =CURRENT()</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) =DATETIME()</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>21. What keyboard shortcut opens the Find and Replace dialog?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Ctrl+F only</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Ctrl+H</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Ctrl+R</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Alt+H</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>22. In a PivotTable, where do you typically place fields you want to summarize?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Rows area</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">B) Columns area</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">C) Values area</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Filters area</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>23. Which of these is NOT a valid Excel file format?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) .xlsx</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">B) .xlsm</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) .csv</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">D) .exl</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>24. To quickly select all cells with data in a worksheet, you press:</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Ctrl+A once</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Ctrl+Shift+End</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Ctrl+*</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Shift+Space</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>25. What feature allows multiple users to edit the same Excel file simultaneously in Microsoft 365?</h4>
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">A) Share Workbook</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, true)">B) Co-authoring</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">C) Track Changes</li>
+                            <li class="quiz-option" onclick="checkFinalAnswer(this, false)">D) Collaboration Mode</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 40px;">
+                        <button class="btn" onclick="submitFinalExam()" style="font-size: 1.3em; padding: 20px 40px;">
+                            Submit Final Exam 🎯
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="score-display" id="finalScoreDisplay">
+                    <h3>Your Final Score</h3>
+                    <p class="cert-score" id="finalScoreText"></p>
+                    <p id="finalMessage"></p>
+                </div>
+                
+                <div class="certificate" id="certificate">
+                    <h2>🏆 Certificate of Completion</h2>
+                    <p class="cert-text">This certifies that</p>
+                    <h3 style="color: #107c41; font-size: 2em; margin: 20px 0;">Excel Champion</h3>
+                    <p class="cert-text">has successfully completed the</p>
+                    <p style="font-size: 1.5em; font-weight: bold; margin: 20px 0;">Microsoft Excel Certification Preparation Course</p>
+                    <p class="cert-score" id="certScore"></p>
+                    <p class="cert-text">Ready to conquer the business world! 🚀</p>
+                    <p style="margin-top: 30px; font-style: italic;">Date: <span id="certDate"></span></p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="showLesson(6)">← Review Business Applications</button>
+                    <button class="btn" onclick="resetExam()" style="display: none;" id="retakeBtn">Retake Exam</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentLesson = 0;
+        let completedLessons = [];
+        let quizScore = 0;
+        let totalQuestions = 0;
+        let finalExamAnswers = [];
+        
+        const motivationalQuotes = [
+            "You're crushing it! Excel fears you now! 💪",
+            "From Home Depot to corporate hero! 🦸‍♂️",
+            "Look at you, becoming a spreadsheet sorcerer! 🧙‍♂️",
+            "Your future boss is going to love you! 💼",
+            "Excel certification? More like Excel domination! 👑",
+            "Keep going! That corner office is calling your name! 🏢",
+            "You're not just learning Excel, you're mastering it! 🎯"
+        ];
+        
+        function showLesson(lessonIndex) {
+            // Hide all lessons
+            document.querySelectorAll('.lesson').forEach(lesson => {
+                lesson.classList.remove('active');
+            });
+            
+            // Show selected lesson
+            document.getElementById(`lesson${lessonIndex}`).classList.add('active');
+            
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach((tab, index) => {
+                tab.classList.toggle('active', index === lessonIndex);
+            });
+            
+            currentLesson = lessonIndex;
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        function completeLesson(lessonIndex) {
+            if (!completedLessons.includes(lessonIndex)) {
+                completedLessons.push(lessonIndex);
+                document.querySelectorAll('.nav-tab')[lessonIndex].classList.add('completed');
+                updateProgress();
+            }
+        }
+        
+        function updateProgress() {
+            const progress = (completedLessons.length / 7) * 100;
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = Math.round(progress) + '%';
+            
+            // Update motivational quote
+            if (completedLessons.length > 0) {
+                const quote = motivationalQuotes[completedLessons.length - 1] || motivationalQuotes[motivationalQuotes.length - 1];
+                document.getElementById('motivationalQuote').textContent = quote;
+            }
+        }
+        
+        function checkAnswer(element, isCorrect) {
+            // Remove previous selections
+            element.parentElement.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+                option.onclick = null;
+            });
+            
+            // Mark the answer
+            if (isCorrect) {
+                element.classList.add('correct');
+                quizScore++;
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                element.parentElement.querySelectorAll('.quiz-option').forEach(option => {
+                    if (option.onclick && option.onclick.toString().includes('true')) {
+                        option.classList.add('correct');
+                    }
+                });
+            }
+            
+            totalQuestions++;
+        }
+        
+        function checkFinalAnswer(element, isCorrect) {
+            // Prevent multiple answers
+            if (element.classList.contains('correct') || element.classList.contains('incorrect')) {
+                return;
+            }
+            
+            // Remove previous selections in this question
+            element.parentElement.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+            
+            // Store answer
+            const questionIndex = Array.from(document.querySelectorAll('#finalExam .quiz-question')).indexOf(element.closest('.quiz-question'));
+            finalExamAnswers[questionIndex] = isCorrect;
+        }
+        
+        function submitFinalExam() {
+            let correctAnswers = 0;
+            const totalExamQuestions = 25;
+            
+            // Count correct answers
+            finalExamAnswers.forEach(answer => {
+                if (answer === true) correctAnswers++;
+            });
+            
+            const percentage = Math.round((correctAnswers / totalExamQuestions) * 100);
+            const passed = percentage >= 70;
+            
+            // Show score
+            document.getElementById('finalScoreDisplay').style.display = 'block';
+            document.getElementById('finalScoreText').textContent = `${correctAnswers}/${totalExamQuestions} (${percentage}%)`;
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = "🌟 OUTSTANDING! You're an Excel master! Time to update that resume and get that business job!";
+            } else if (percentage >= 80) {
+                message = "🎉 EXCELLENT! You're ready for the certification exam! Go show Microsoft what you've got!";
+            } else if (percentage >= 70) {
+                message = "✅ PASSED! Good job! You might want to review the sections you struggled with, but you're certification-ready!";
+            } else {
+                message = "📚 Not quite there yet, but don't give up! Review the lessons and try again. Every expert was once a beginner!";
+                document.getElementById('retakeBtn').style.display = 'inline-block';
+            }
+            
+            document.getElementById('finalMessage').textContent = message;
+            
+            // Show certificate if passed
+            if (passed) {
+                document.getElementById('certificate').style.display = 'block';
+                document.getElementById('certScore').textContent = `Score: ${percentage}%`;
+                document.getElementById('certDate').textContent = new Date().toLocaleDateString();
+                completeLesson(7);
+            }
+            
+            // Scroll to results
+            document.getElementById('finalScoreDisplay').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function resetExam() {
+            finalExamAnswers = [];
+            document.querySelectorAll('#finalExam .quiz-option').forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            document.getElementById('finalScoreDisplay').style.display = 'none';
+            document.getElementById('certificate').style.display = 'none';
+            document.getElementById('retakeBtn').style.display = 'none';
+            window.scrollTo(0, 0);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

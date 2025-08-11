@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inferno Metrics - Global Intelligence Heat Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --fire-red: #ff4444;
+            --fire-orange: #ff8833;
+            --fire-yellow: #ffcc00;
+            --plasma-blue: #00ddff;
+            --hot-white: #ffffff;
+            --ember-glow: #ff6600;
+            --ash-gray: #333333;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --success-green: #00ff88;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #050505 100%);
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 2px solid var(--fire-orange);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(255, 136, 51, 0.3);
+            position: relative;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--fire-orange);
+            text-shadow: 0 0 20px rgba(255, 136, 51, 0.8);
+            animation: flicker 2s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--success-green);
+            font-size: 0.9rem;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success-green);
+            border-radius: 50%;
+            animation: live-pulse 1s infinite;
+        }
+
+        @keyframes live-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+        }
+
+        /* World Map Container */
+        .world-map-section {
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid var(--fire-orange);
+            border-radius: 10px;
+            margin: 2rem;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 136, 51, 0.3);
+        }
+
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .map-title {
+            font-size: 1.3rem;
+            color: var(--plasma-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 221, 255, 0.5);
+        }
+
+        .heat-legend {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        /* SVG World Map */
+        .world-map {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(0, 50, 100, 0.2) 0%, transparent 70%);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .world-map svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .country {
+            fill: #1a1a1a;
+            stroke: var(--fire-orange);
+            stroke-width: 0.5;
+            stroke-opacity: 0.3;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .country:hover {
+            fill: rgba(255, 136, 51, 0.3);
+            stroke-opacity: 1;
+            stroke-width: 1;
+        }
+
+        .country.hot {
+            fill: rgba(255, 136, 51, 0.4);
+            animation: country-pulse 2s infinite;
+        }
+
+        .country.critical {
+            fill: rgba(255, 68, 68, 0.5);
+            animation: country-pulse 1s infinite;
+        }
+
+        @keyframes country-pulse {
+            0%, 100% { fill-opacity: 0.5; }
+            50% { fill-opacity: 0.8; }
+        }
+
+        /* Hot Spots */
+        .hotspot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--fire-red) 0%, transparent 70%);
+            animation: hotspot-pulse 1.5s infinite;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+        }
+
+        .hotspot::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: inherit;
+            animation: ripple 2s infinite;
+        }
+
+        @keyframes hotspot-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        .hotspot.critical {
+            background: radial-gradient(circle, var(--hot-white) 0%, var(--fire-red) 30%, transparent 70%);
+            animation-duration: 0.5s;
+        }
+
+        .hotspot.major {
+            background: radial-gradient(circle, var(--fire-orange) 0%, transparent 70%);
+        }
+
+        .hotspot.minor {
+            background: radial-gradient(circle, var(--fire-yellow) 0%, transparent 70%);
+        }
+
+        /* News Ticker */
+        .news-ticker {
+            background: linear-gradient(90deg, transparent, rgba(255, 136, 51, 0.1), transparent);
+            border-top: 1px solid var(--fire-orange);
+            border-bottom: 1px solid var(--fire-orange);
+            padding: 0.5rem 0;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .ticker-content {
+            display: flex;
+            animation: scroll-ticker 60s linear infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes scroll-ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .ticker-item {
+            font-family: 'Courier New', monospace;
+            color: var(--fire-orange);
+            margin: 0 3rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ticker-location {
+            color: var(--plasma-blue);
+            font-weight: bold;
+        }
+
+        /* Event Cards Grid */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .event-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--ember-glow);
+            border-radius: 6px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--fire-orange), transparent);
+            animation: scan 3s infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .event-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 136, 51, 0.3);
+            border-color: var(--fire-yellow);
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-location {
+            color: var(--plasma-blue);
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .event-time {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .event-title {
+            color: var(--fire-yellow);
+            font-size: 1rem;
+            margin: 0.5rem 0;
+            line-height: 1.3;
+        }
+
+        .event-heat {
+            display: flex;
+            gap: 0.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .heat-bar {
+            width: 20px;
+            height: 4px;
+            background: var(--fire-orange);
+            opacity: 0.3;
+        }
+
+        .heat-bar.active {
+            opacity: 1;
+            box-shadow: 0 0 5px var(--fire-orange);
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--ember-glow);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .metric-title {
+            font-size: 1.1rem;
+            color: var(--plasma-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Regional Stats */
+        .regional-stats {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .region-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            background: rgba(255, 136, 51, 0.05);
+            border-left: 3px solid var(--fire-orange);
+            transition: all 0.3s ease;
+        }
+
+        .region-item:hover {
+            background: rgba(255, 136, 51, 0.1);
+            border-left-color: var(--fire-yellow);
+        }
+
+        .region-name {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .region-value {
+            color: var(--fire-orange);
+            font-weight: bold;
+        }
+
+        /* Particle System */
+        .particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .ember {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--fire-orange);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float-up 4s linear forwards;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) translateX(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) translateX(var(--drift));
+            }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--fire-orange);
+            border-radius: 4px;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 0 10px rgba(255, 136, 51, 0.5);
+        }
+
+        .tooltip.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .world-map {
+                height: 250px;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Container -->
+    <div class="particle-container" id="particleContainer"></div>
+    
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">🔥 INFERNO METRICS - GLOBAL INTELLIGENCE</div>
+        <div class="live-indicator">
+            <div class="live-dot"></div>
+            <span>LIVE GLOBAL MONITORING</span>
+        </div>
+    </div>
+
+    <!-- World Map Section -->
+    <div class="world-map-section">
+        <div class="map-header">
+            <div class="map-title">🌍 GLOBAL HEAT MAP - LIVE EVENTS</div>
+            <div class="heat-legend">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: var(--fire-yellow);"></div>
+                    <span>Low</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: var(--fire-orange);"></div>
+                    <span>Medium</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: var(--fire-red);"></div>
+                    <span>Critical</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="world-map" id="worldMap">
+            <canvas id="mapCanvas"></canvas>
+        </div>
+
+        <!-- News Ticker -->
+        <div class="news-ticker">
+            <div class="ticker-content" id="tickerContent">
+                <!-- Dynamic news items will scroll here -->
+            </div>
+        </div>
+
+        <!-- Live Events Grid -->
+        <div class="events-grid" id="eventsGrid">
+            <!-- Event cards will be dynamically added -->
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard">
+        <!-- Regional Activity Monitor -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <span class="metric-title">🌏 Regional Activity Index</span>
+            </div>
+            <div class="regional-stats" id="regionalStats">
+                <div class="region-item">
+                    <span class="region-name">North America</span>
+                    <span class="region-value" id="na-activity">0 events/hr</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Europe</span>
+                    <span class="region-value" id="eu-activity">0 events/hr</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Asia-Pacific</span>
+                    <span class="region-value" id="ap-activity">0 events/hr</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Latin America</span>
+                    <span class="region-value" id="la-activity">0 events/hr</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Middle East</span>
+                    <span class="region-value" id="me-activity">0 events/hr</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Africa</span>
+                    <span class="region-value" id="af-activity">0 events/hr</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Threat Level -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <span class="metric-title">⚠️ Global Threat Matrix</span>
+            </div>
+            <div id="threatMatrix">
+                <div class="region-item">
+                    <span class="region-name">Cyber Attacks</span>
+                    <span class="region-value" style="color: var(--fire-red);">HIGH</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Market Volatility</span>
+                    <span class="region-value" style="color: var(--fire-orange);">MEDIUM</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">AI Incidents</span>
+                    <span class="region-value" style="color: var(--fire-yellow);">LOW</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Infrastructure</span>
+                    <span class="region-value" style="color: var(--success-green);">STABLE</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Social Unrest</span>
+                    <span class="region-value" style="color: var(--fire-orange);">ELEVATED</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Climate Events</span>
+                    <span class="region-value" style="color: var(--fire-red);">CRITICAL</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- News Sources Monitor -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <span class="metric-title">📡 Intelligence Sources</span>
+            </div>
+            <div id="sourcesMonitor">
+                <div class="region-item">
+                    <span class="region-name">Reuters</span>
+                    <span class="region-value" style="color: var(--success-green);">ONLINE</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Bloomberg</span>
+                    <span class="region-value" style="color: var(--success-green);">ONLINE</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">TechCrunch</span>
+                    <span class="region-value" style="color: var(--success-green);">ONLINE</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Hacker News</span>
+                    <span class="region-value" style="color: var(--fire-yellow);">DELAYED</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">ArXiv</span>
+                    <span class="region-value" style="color: var(--success-green);">ONLINE</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-name">Dark Web Monitor</span>
+                    <span class="region-value" style="color: var(--fire-red);">RESTRICTED</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize canvas and context
+        let canvas, ctx;
+        let mapWidth, mapHeight;
+        let hotspots = [];
+
+        // World map coordinates (simplified but recognizable continents)
+        const continents = {
+            northAmerica: {
+                color: 'rgba(255, 136, 51, 0.15)',
+                points: [
+                    // Alaska
+                    { x: 10, y: 15 }, { x: 15, y: 10 }, { x: 25, y: 12 }, { x: 20, y: 18 },
+                    // Canada and USA
+                    { x: 15, y: 25 }, { x: 30, y: 20 }, { x: 35, y: 25 }, { x: 40, y: 30 },
+                    { x: 35, y: 35 }, { x: 30, y: 38 }, { x: 25, y: 40 }, { x: 20, y: 38 },
+                    { x: 18, y: 35 }, { x: 15, y: 30 }
+                ]
+            },
+            southAmerica: {
+                color: 'rgba(255, 136, 51, 0.15)',
+                points: [
+                    { x: 25, y: 50 }, { x: 30, y: 48 }, { x: 32, y: 52 }, { x: 30, y: 60 },
+                    { x: 28, y: 70 }, { x: 25, y: 75 }, { x: 22, y: 70 }, { x: 20, y: 60 },
+                    { x: 22, y: 55 }
+                ]
+            },
+            europe: {
+                color: 'rgba(255, 136, 51, 0.15)',
+                points: [
+                    { x: 47, y: 20 }, { x: 50, y: 18 }, { x: 55, y: 20 }, { x: 58, y: 25 },
+                    { x: 55, y: 28 }, { x: 52, y: 30 }, { x: 48, y: 28 }, { x: 45, y: 25 }
+                ]
+            },
+            africa: {
+                color: 'rgba(255, 136, 51, 0.15)',
+                points: [
+                    { x: 48, y: 35 }, { x: 55, y: 33 }, { x: 58, y: 38 }, { x: 56, y: 45 },
+                    { x: 54, y: 55 }, { x: 50, y: 60 }, { x: 46, y: 58 }, { x: 44, y: 50 },
+                    { x: 45, y: 42 }, { x: 46, y: 38 }
+                ]
+            },
+            asia: {
+                color: 'rgba(255, 136, 51, 0.15)',
+                points: [
+                    // Russia and China
+                    { x: 58, y: 15 }, { x: 75, y: 12 }, { x: 85, y: 18 }, { x: 88, y: 25 },
+                    { x: 85, y: 30 }, { x: 80, y: 35 }, { x: 75, y: 32 }, { x: 70, y: 30 },
+                    // India
+                    { x: 68, y: 35 }, { x: 70, y: 40 }, { x: 68, y: 42 }, { x: 65, y: 38 },
+                    // Southeast Asia
+                    { x: 75, y: 40 }, { x: 78, y: 45 }, { x: 75, y: 48 }, { x: 72, y: 45 },
+                    // Back to Russia
+                    { x: 65, y: 28 }, { x: 60, y: 25 }, { x: 58, y: 20 }
+                ]
+            },
+            australia: {
+                color: 'rgba(255, 136, 51, 0.15)',
+                points: [
+                    { x: 78, y: 60 }, { x: 85, y: 58 }, { x: 88, y: 62 }, { x: 86, y: 68 },
+                    { x: 82, y: 70 }, { x: 78, y: 68 }, { x: 76, y: 64 }
+                ]
+            }
+        };
+
+        // Global event data with better geographic coordinates
+        const globalEvents = [
+            { location: 'New York', coords: { x: 28, y: 32 }, heat: 'critical', title: 'NYSE Trading Halt - AI Algorithm Glitch', category: 'finance' },
+            { location: 'Silicon Valley', coords: { x: 18, y: 33 }, heat: 'critical', title: 'OpenAI Emergency Model Shutdown', category: 'tech' },
+            { location: 'Tokyo', coords: { x: 82, y: 34 }, heat: 'major', title: 'Quantum Computer Achieves Supremacy', category: 'tech' },
+            { location: 'London', coords: { x: 49, y: 24 }, heat: 'major', title: 'Crypto Exchange Hack - $500M Lost', category: 'security' },
+            { location: 'Beijing', coords: { x: 77, y: 32 }, heat: 'critical', title: 'New AI Regulations Announced', category: 'policy' },
+            { location: 'Mumbai', coords: { x: 68, y: 40 }, heat: 'minor', title: 'Tech Unicorn IPO Launch', category: 'finance' },
+            { location: 'São Paulo', coords: { x: 26, y: 62 }, heat: 'minor', title: 'Data Center Fire - Services Down', category: 'infrastructure' },
+            { location: 'Berlin', coords: { x: 52, y: 25 }, heat: 'major', title: 'EU Privacy Law Violation - Meta Fined', category: 'policy' },
+            { location: 'Singapore', coords: { x: 75, y: 47 }, heat: 'major', title: 'Blockchain Summit - CBDCs Unveiled', category: 'tech' },
+            { location: 'Dubai', coords: { x: 60, y: 38 }, heat: 'minor', title: 'AI City Initiative Launched', category: 'tech' },
+            { location: 'Sydney', coords: { x: 84, y: 66 }, heat: 'minor', title: 'Cyber Defense Treaty Signed', category: 'security' },
+            { location: 'Moscow', coords: { x: 58, y: 22 }, heat: 'major', title: 'Satellite Network Disruption', category: 'infrastructure' },
+            { location: 'Lagos', coords: { x: 48, y: 48 }, heat: 'minor', title: 'Fintech Revolution Accelerates', category: 'finance' },
+            { location: 'Toronto', coords: { x: 28, y: 28 }, heat: 'minor', title: 'AI Ethics Summit Begins', category: 'policy' }
+        ];
+
+        // Initialize canvas
+        function initCanvas() {
+            canvas = document.getElementById('mapCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            const container = document.getElementById('worldMap');
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+            mapWidth = canvas.width;
+            mapHeight = canvas.height;
+            
+            // Enable glow effect
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(255, 136, 51, 0.5)';
+        }
+
+        // Convert percentage coordinates to canvas coordinates
+        function toCanvasCoords(x, y) {
+            return {
+                x: (x / 100) * mapWidth,
+                y: (y / 100) * mapHeight
+            };
+        }
+
+        // Draw continent
+        function drawContinent(continent) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255, 136, 51, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = continent.color;
+            
+            const points = continent.points.map(p => toCanvasCoords(p.x, p.y));
+            
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.closePath();
+            
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // Draw world map
+        function drawWorldMap() {
+            // Clear canvas
+            ctx.clearRect(0, 0, mapWidth, mapHeight);
+            
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.05)';
+            ctx.lineWidth = 0.5;
+            
+            // Vertical lines
+            for (let x = 0; x < mapWidth; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, mapHeight);
+                ctx.stroke();
+            }
+            
+            // Horizontal lines
+            for (let y = 0; y < mapHeight; y += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(mapWidth, y);
+                ctx.stroke();
+            }
+            
+            // Draw continents
+            Object.values(continents).forEach(continent => {
+                drawContinent(continent);
+            });
+            
+            // Draw equator and meridians
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+            ctx.setLineDash([5, 5]);
+            
+            // Equator
+            ctx.beginPath();
+            ctx.moveTo(0, mapHeight / 2);
+            ctx.lineTo(mapWidth, mapHeight / 2);
+            ctx.stroke();
+            
+            // Prime meridian
+            ctx.beginPath();
+            ctx.moveTo(mapWidth / 2, 0);
+            ctx.lineTo(mapWidth / 2, mapHeight);
+            ctx.stroke();
+            
+            ctx.setLineDash([]);
+        }
+
+        // Draw hotspot
+        function drawHotspot(event, index) {
+            const coords = toCanvasCoords(event.coords.x, event.coords.y);
+            const time = Date.now() / 1000;
+            
+            // Pulsing effect
+            const pulse = Math.sin(time * 2 + index) * 0.3 + 1;
+            
+            // Set color based on heat level
+            let color;
+            if (event.heat === 'critical') {
+                color = 'rgba(255, 255, 255, 0.9)';
+                ctx.shadowColor = 'rgba(255, 68, 68, 0.8)';
+            } else if (event.heat === 'major') {
+                color = 'rgba(255, 136, 51, 0.8)';
+                ctx.shadowColor = 'rgba(255, 136, 51, 0.6)';
+            } else {
+                color = 'rgba(255, 204, 0, 0.7)';
+                ctx.shadowColor = 'rgba(255, 204, 0, 0.4)';
+            }
+            
+            // Draw ripple effect
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.arc(coords.x, coords.y, (10 + i * 15) * pulse, 0, Math.PI * 2);
+                ctx.strokeStyle = color;
+                ctx.globalAlpha = 0.3 - i * 0.1;
+                ctx.lineWidth = 2 - i * 0.5;
+                ctx.stroke();
+            }
+            
+            // Draw center point
+            ctx.globalAlpha = 1;
+            ctx.beginPath();
+            ctx.arc(coords.x, coords.y, 5 * pulse, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            
+            // Draw location label on hover
+            if (event.hover) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fillRect(coords.x + 10, coords.y - 25, 200, 40);
+                ctx.strokeStyle = 'rgba(255, 136, 51, 0.8)';
+                ctx.strokeRect(coords.x + 10, coords.y - 25, 200, 40);
+                
+                ctx.fillStyle = '#00ddff';
+                ctx.font = 'bold 12px Courier New';
+                ctx.fillText(event.location, coords.x + 15, coords.y - 10);
+                
+                ctx.fillStyle = '#ffcc00';
+                ctx.font = '10px Courier New';
+                ctx.fillText(event.title, coords.x + 15, coords.y + 5);
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            drawWorldMap();
+            
+            // Draw all hotspots
+            globalEvents.forEach((event, index) => {
+                drawHotspot(event, index);
+            });
+            
+            requestAnimationFrame(animate);
+        }
+
+        // Handle mouse movement for hover effects
+        function handleMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if mouse is over any hotspot
+            globalEvents.forEach(event => {
+                const coords = toCanvasCoords(event.coords.x, event.coords.y);
+                const distance = Math.sqrt(Math.pow(x - coords.x, 2) + Math.pow(y - coords.y, 2));
+                event.hover = distance < 20;
+            });
+        }
+
+        // Handle mouse click on hotspots
+        function handleMouseClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if clicked on hotspot
+            globalEvents.forEach(event => {
+                const coords = toCanvasCoords(event.coords.x, event.coords.y);
+                const distance = Math.sqrt(Math.pow(x - coords.x, 2) + Math.pow(y - coords.y, 2));
+                
+                if (distance < 20) {
+                    // Create ember explosion
+                    for (let i = 0; i < 10; i++) {
+                        setTimeout(() => {
+                            createEmber(e.clientX, e.clientY);
+                        }, i * 50);
+                    }
+                    
+                    // Flash the continent
+                    const continent = getContintentForLocation(event.coords);
+                    if (continent) {
+                        continent.color = 'rgba(255, 68, 68, 0.4)';
+                        setTimeout(() => {
+                            continent.color = 'rgba(255, 136, 51, 0.15)';
+                        }, 500);
+                    }
+                }
+            });
+        }
+
+        // Get continent for coordinates
+        function getContintentForLocation(coords) {
+            // Simple region detection based on coordinates
+            if (coords.x < 40 && coords.y < 45) return continents.northAmerica;
+            if (coords.x < 35 && coords.y > 45) return continents.southAmerica;
+            if (coords.x > 40 && coords.x < 60 && coords.y < 35) return continents.europe;
+            if (coords.x > 40 && coords.x < 60 && coords.y > 35) return continents.africa;
+            if (coords.x > 60 && coords.y < 50) return continents.asia;
+            if (coords.x > 70 && coords.y > 55) return continents.australia;
+            return null;
+        }
+
+        // Create floating embers
+        function createEmber(x, y) {
+            const container = document.getElementById('particleContainer');
+            const ember = document.createElement('div');
+            ember.className = 'ember';
+            ember.style.left = (x || Math.random() * window.innerWidth) + 'px';
+            ember.style.top = (y || window.innerHeight) + 'px';
+            ember.style.setProperty('--drift', (Math.random() - 0.5) * 100 + 'px');
+            
+            const colors = ['#ff4444', '#ff8833', '#ffcc00', '#ffffff'];
+            ember.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            container.appendChild(ember);
+            setTimeout(() => ember.remove(), 4000);
+        }
+
+        // Regular ember generation
+        setInterval(() => {
+            if (Math.random() > 0.5) {
+                createEmber();
+            }
+        }, 1000);
+
+        // Update news ticker
+        function updateNewsTicker() {
+            const ticker = document.getElementById('tickerContent');
+            ticker.innerHTML = '';
+            
+            // Duplicate events for continuous scroll
+            [...globalEvents, ...globalEvents].forEach(event => {
+                const item = document.createElement('div');
+                item.className = 'ticker-item';
+                item.innerHTML = `
+                    🔥 <span class="ticker-location">[${event.location}]</span> ${event.title}
+                `;
+                ticker.appendChild(item);
+            });
+        }
+
+        // Generate event cards
+        function generateEventCards() {
+            const grid = document.getElementById('eventsGrid');
+            grid.innerHTML = '';
+            
+            // Show latest 6 events
+            globalEvents.slice(0, 6).forEach(event => {
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                
+                const timeAgo = Math.floor(Math.random() * 60) + ' min ago';
+                const heatLevel = event.heat === 'critical' ? 5 : event.heat === 'major' ? 3 : 1;
+                
+                card.innerHTML = `
+                    <div class="event-header">
+                        <div class="event-location">${event.location}</div>
+                        <div class="event-time">${timeAgo}</div>
+                    </div>
+                    <div class="event-title">${event.title}</div>
+                    <div class="event-heat">
+                        ${Array(5).fill('').map((_, i) => 
+                            `<div class="heat-bar ${i < heatLevel ? 'active' : ''}"></div>`
+                        ).join('')}
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    // Create explosion of embers
+                    const rect = card.getBoundingClientRect();
+                    for (let i = 0; i < 10; i++) {
+                        setTimeout(() => {
+                            createEmber(
+                                rect.left + rect.width / 2 + (Math.random() - 0.5) * 50,
+                                rect.top + rect.height / 2
+                            );
+                        }, i * 50);
+                    }
+                });
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Update regional activity
+        function updateRegionalActivity() {
+            const regions = {
+                'na': Math.floor(Math.random() * 50) + 20,
+                'eu': Math.floor(Math.random() * 40) + 15,
+                'ap': Math.floor(Math.random() * 60) + 30,
+                'la': Math.floor(Math.random() * 20) + 5,
+                'me': Math.floor(Math.random() * 25) + 10,
+                'af': Math.floor(Math.random() * 15) + 5
+            };
+            
+            Object.entries(regions).forEach(([region, count]) => {
+                const element = document.getElementById(`${region}-activity`);
+                if (element) {
+                    element.textContent = `${count} events/hr`;
+                    
+                    // Color based on intensity
+                    if (count > 40) {
+                        element.style.color = 'var(--fire-red)';
+                    } else if (count > 20) {
+                        element.style.color = 'var(--fire-orange)';
+                    } else {
+                        element.style.color = 'var(--fire-yellow)';
+                    }
+                }
+            });
+        }
+
+        // Simulate new events
+        function simulateNewEvent() {
+            const locations = ['New York', 'Paris', 'Hong Kong', 'Moscow', 'Cairo', 'Mexico City', 'Seoul', 'Tel Aviv'];
+            const titles = [
+                'AI Breakthrough Announced',
+                'Cyber Attack Detected',
+                'Market Flash Crash',
+                'Data Breach Reported',
+                'Quantum Computer Online',
+                'Satellite Launch Success',
+                'Critical Infrastructure Alert',
+                'Blockchain Fork Initiated'
+            ];
+            
+            const newEvent = {
+                location: locations[Math.floor(Math.random() * locations.length)],
+                coords: { 
+                    x: Math.random() * 90 + 5,
+                    y: Math.random() * 80 + 10
+                },
+                heat: ['minor', 'major', 'critical'][Math.floor(Math.random() * 3)],
+                title: titles[Math.floor(Math.random() * titles.length)],
+                category: ['tech', 'security', 'finance', 'infrastructure'][Math.floor(Math.random() * 4)]
+            };
+            
+            // Add to beginning of array
+            globalEvents.unshift(newEvent);
+            if (globalEvents.length > 20) {
+                globalEvents.pop();
+            }
+            
+            // Refresh displays
+            placeHotspots();
+            generateEventCards();
+            updateNewsTicker();
+        }
+
+        // Fetch real news (using RSS feeds via proxy or news API)
+        async function fetchRealNews() {
+            try {
+                // Note: In production, you'd use a proper news API like NewsAPI.org
+                // For demo, we'll use simulated updates
+                console.log('Fetching real-time news updates...');
+                
+                // Simulate API response with real-looking data
+                const techNews = [
+                    { location: 'San Francisco', title: 'OpenAI Announces GPT-5 Beta', heat: 'critical' },
+                    { location: 'Seattle', title: 'Amazon Quantum Lab Discovery', heat: 'major' },
+                    { location: 'Shanghai', title: 'Alibaba AI Chip Production Doubles', heat: 'major' },
+                    { location: 'Zurich', title: 'CERN Data Processing Record', heat: 'minor' }
+                ];
+                
+                // Add some randomness
+                if (Math.random() > 0.5) {
+                    const randomNews = techNews[Math.floor(Math.random() * techNews.length)];
+                    simulateNewEvent();
+                }
+            } catch (error) {
+                console.error('News fetch error:', error);
+            }
+        }
+
+        // Heat map animation
+        function animateHeatMap() {
+            const countries = document.querySelectorAll('.country');
+            countries.forEach(country => {
+                if (Math.random() > 0.8) {
+                    country.classList.add(Math.random() > 0.5 ? 'hot' : 'critical');
+                    setTimeout(() => {
+                        country.classList.remove('hot', 'critical');
+                    }, 3000);
+                }
+            });
+        }
+
+        // Update news ticker
+        function updateNewsTicker() {
+            const ticker = document.getElementById('tickerContent');
+            ticker.innerHTML = '';
+            
+            // Duplicate events for continuous scroll
+            [...globalEvents, ...globalEvents].forEach(event => {
+                const item = document.createElement('div');
+                item.className = 'ticker-item';
+                item.innerHTML = `
+                    🔥 <span class="ticker-location">[${event.location}]</span> ${event.title}
+                `;
+                ticker.appendChild(item);
+            });
+        }
+
+        // Generate event cards
+        function generateEventCards() {
+            const grid = document.getElementById('eventsGrid');
+            grid.innerHTML = '';
+            
+            // Show latest 6 events
+            globalEvents.slice(0, 6).forEach(event => {
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                
+                const timeAgo = Math.floor(Math.random() * 60) + ' min ago';
+                const heatLevel = event.heat === 'critical' ? 5 : event.heat === 'major' ? 3 : 1;
+                
+                card.innerHTML = `
+                    <div class="event-header">
+                        <div class="event-location">${event.location}</div>
+                        <div class="event-time">${timeAgo}</div>
+                    </div>
+                    <div class="event-title">${event.title}</div>
+                    <div class="event-heat">
+                        ${Array(5).fill('').map((_, i) => 
+                            `<div class="heat-bar ${i < heatLevel ? 'active' : ''}"></div>`
+                        ).join('')}
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    // Create explosion of embers
+                    const rect = card.getBoundingClientRect();
+                    for (let i = 0; i < 10; i++) {
+                        setTimeout(() => {
+                            createEmber(
+                                rect.left + rect.width / 2 + (Math.random() - 0.5) * 50,
+                                rect.top + rect.height / 2
+                            );
+                        }, i * 50);
+                    }
+                });
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Update regional activity
+        function updateRegionalActivity() {
+            const regions = {
+                'na': Math.floor(Math.random() * 50) + 20,
+                'eu': Math.floor(Math.random() * 40) + 15,
+                'ap': Math.floor(Math.random() * 60) + 30,
+                'la': Math.floor(Math.random() * 20) + 5,
+                'me': Math.floor(Math.random() * 25) + 10,
+                'af': Math.floor(Math.random() * 15) + 5
+            };
+            
+            Object.entries(regions).forEach(([region, count]) => {
+                const element = document.getElementById(`${region}-activity`);
+                if (element) {
+                    element.textContent = `${count} events/hr`;
+                    
+                    // Color based on intensity
+                    if (count > 40) {
+                        element.style.color = 'var(--fire-red)';
+                    } else if (count > 20) {
+                        element.style.color = 'var(--fire-orange)';
+                    } else {
+                        element.style.color = 'var(--fire-yellow)';
+                    }
+                }
+            });
+        }
+
+        // Simulate new events
+        function simulateNewEvent() {
+            const locations = [
+                { name: 'New York', x: 28, y: 32 },
+                { name: 'Paris', x: 50, y: 26 },
+                { name: 'Hong Kong', x: 76, y: 41 },
+                { name: 'Moscow', x: 58, y: 22 },
+                { name: 'Cairo', x: 53, y: 42 },
+                { name: 'Mexico City', x: 22, y: 40 },
+                { name: 'Seoul', x: 79, y: 33 },
+                { name: 'Tel Aviv', x: 56, y: 36 }
+            ];
+            
+            const titles = [
+                'AI Model Breach Detected',
+                'Quantum Network Established',
+                'Crypto Flash Crash Alert',
+                'Neural Interface Approved',
+                'Satellite Constellation Deployed',
+                'Deepfake Detection System Live',
+                'Autonomous Zone Declared',
+                'Fusion Reactor Critical'
+            ];
+            
+            const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+            const newEvent = {
+                location: randomLocation.name,
+                coords: { x: randomLocation.x, y: randomLocation.y },
+                heat: ['minor', 'major', 'critical'][Math.floor(Math.random() * 3)],
+                title: titles[Math.floor(Math.random() * titles.length)],
+                category: ['tech', 'security', 'finance', 'infrastructure'][Math.floor(Math.random() * 4)]
+            };
+            
+            // Add to beginning of array
+            globalEvents.unshift(newEvent);
+            if (globalEvents.length > 20) {
+                globalEvents.pop();
+            }
+            
+            // Refresh displays
+            generateEventCards();
+            updateNewsTicker();
+        }
+
+        // Fetch real news (simulated)
+        async function fetchRealNews() {
+            try {
+                console.log('Fetching real-time intelligence updates...');
+                
+                // In production, integrate with real news APIs
+                const criticalEvents = [
+                    'Zero-Day Exploit in Wild',
+                    'AGI Benchmark Exceeded',
+                    'Quantum Supremacy Achieved',
+                    'Global DNS Attack Underway'
+                ];
+                
+                if (Math.random() > 0.7) {
+                    simulateNewEvent();
+                }
+            } catch (error) {
+                console.error('Intelligence feed error:', error);
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'h') {
+                // H for "heat" - create explosion at random location
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => createEmber(x, y), i * 50);
+                }
+            }
+        });
+            
+            // Set up canvas event listeners
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('click', handleMouseClick);
+            
+            // Start animation
+            animate();
+            
+            // Initialize other components
+            updateNewsTicker();
+            generateEventCards();
+            updateRegionalActivity();
+            
+            // Set up refresh intervals
+            setInterval(updateRegionalActivity, 5000);
+            setInterval(simulateNewEvent, 15000);
+            setInterval(fetchRealNews, 30000);
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                initCanvas();
+            });
+        }
+
+        // Start the dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+        // Mouse tracking for dynamic ember generation
+        let mouseTimer;
+        document.addEventListener('mousemove', (e) => {
+            clearTimeout(mouseTimer);
+            mouseTimer = setTimeout(() => {
+                if (Math.random() > 0.9) {
+                    createEmber(e.clientX, e.clientY);
+                }
+            }, 100);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'h') {
+                // H for "heat" - create explosion at random location
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => createEmber(x, y), i * 50);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

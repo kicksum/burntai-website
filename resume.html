@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeffrey A. Perry - Infrastructure Survivor</title>
+    <meta name="description" content="Senior Systems Infrastructure Expert. Forged in the fires of enterprise IT. Still standing after 20+ years in the wasteland.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --neon-orange: #ff8533;
+            --neon-cyan: #00e5ff;
+            --neon-red: #ff4466;
+            --burnt-orange: #ff6b1a;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --terminal-green: #00ff88;
+            --rust-red: #cc4444;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Animated background particles */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--neon-orange);
+            border-radius: 50%;
+            animation: float 10s infinite linear;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) translateX(100px); opacity: 0; }
+        }
+
+        /* Glitch effect */
+        .glitch {
+            position: relative;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes pulse {
+            0% { text-shadow: 0 0 10px var(--neon-orange), 0 0 20px var(--burnt-orange); }
+            100% { text-shadow: 0 0 15px var(--neon-orange), 0 0 30px var(--burnt-orange), 0 0 40px rgba(255, 133, 51, 0.4); }
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 1000px;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--neon-orange);
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 133, 51, 0.15);
+        }
+
+        .main-title {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 900;
+            color: var(--neon-orange);
+            text-shadow: 0 0 20px rgba(255, 133, 51, 0.6), 0 0 40px rgba(255, 107, 26, 0.4);
+            margin-bottom: 2rem;
+            letter-spacing: 0.1em;
+            animation: pulse 3s infinite alternate;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.4rem);
+            opacity: 0.9;
+            margin-bottom: 3rem;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .button {
+            background: linear-gradient(45deg, var(--neon-orange), var(--rust-red));
+            border: 2px solid var(--neon-orange);
+            color: white;
+            padding: 20px 40px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(255, 102, 0, 0.3);
+            margin: 10px;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: 'Orbitron', monospace;
+            border-radius: 5px;
+        }
+
+        .button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .button:hover:before {
+            left: 100%;
+        }
+
+        .button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(255, 102, 0, 0.4);
+            background: linear-gradient(45deg, var(--rust-red), var(--neon-red));
+            text-decoration: none;
+            color: white;
+        }
+
+        .button.secondary {
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .button.secondary:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 8px 30px rgba(0, 229, 255, 0.4);
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 2rem;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 14px;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--text-secondary);
+            z-index: 10;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .button {
+                padding: 16px 24px;
+                font-size: 16px;
+                margin: 8px 4px;
+                display: block;
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-orange);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--burnt-orange);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background particles -->
+    <div class="bg-particles" id="particles"></div>
+
+    <div class="main-container">
+        <h1 class="main-title glitch">READY TO FORTIFY YOUR INFRASTRUCTURE?</h1>
+        
+        <p class="subtitle">
+            Your systems need a survivor. Let's build something that lasts beyond the apocalypse.
+        </p>
+        
+        <div class="button-container">
+            <a href="mailto:japerry@gmail.com" class="button">
+                INITIATE CONTACT
+            </a>
+            <a href="https://linkedin.com/in/jeffaperry" class="button secondary" target="_blank">
+                SCAN PROFILE
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2025 Jeffrey A. Perry | Forged in the Digital Wasteland</p>
+        <p>🔥 STILL BURNING BRIGHT | 🛡️ SYSTEMS SECURED | ⚡ INFRASTRUCTURE IMMORTAL</p>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                
+                // Vary particle colors
+                if (Math.random() > 0.7) {
+                    particle.style.background = '#00e5ff';  // Softer cyan
+                } else if (Math.random() > 0.5) {
+                    particle.style.background = '#ff4466';  // Softer red
+                }
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize particles when page loads
+        document.addEventListener('DOMContentLoaded', createParticles);
+
+        // Add some random glitch effects
+        setInterval(() => {
+            const glitchElements = document.querySelectorAll('.glitch');
+            glitchElements.forEach(el => {
+                if (Math.random() < 0.1) {
+                    el.style.transform = `translate(${Math.random() * 4 - 2}px, ${Math.random() * 4 - 2}px)`;
+                    setTimeout(() => {
+                        el.style.transform = 'translate(0)';
+                    }, 100);
+                }
+            });
+        }, 3000);
+
+        // Terminal typing effect in console
+        console.log('%cINFRASTRUCTURE SURVIVOR DETECTED', 'color: #ff8533; font-size: 20px; font-weight: bold;');
+        console.log('%cScanning credentials... VERIFIED', 'color: #00ff88;');
+        console.log('%cWelcome to the wasteland, wanderer. Your systems are in good hands. 🔥', 'color: #00e5ff;');
+    </script>
+</body>
+</html>

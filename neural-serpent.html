@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BURNTAI: NEURAL SERPENT v3.077 - ENHANCED WASTELAND EDITION</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/css/arg-styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-orange: #ff6600;
+            --neon-cyan: #00ffff;
+            --neon-red: #ff0040;
+            --burnt-orange: #cc4400;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --terminal-green: #00ff00;
+            --vault-blue: #004d99;
+            --rust-red: #8b0000;
+            --quantum-purple: #9400d3;
+            --rad-yellow: #ffff00;
+        }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            font-family: 'Orbitron', monospace;
+            color: #ffffff;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        /* Background particles */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--neon-orange);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+            opacity: 0.5;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) translateX(100px); opacity: 0; }
+        }
+        
+        .game-container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(255, 102, 0, 0.3);
+            border: 2px solid var(--neon-orange);
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        /* Glitch effect */
+        .glitch {
+            position: relative;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); filter: hue-rotate(0deg); }
+            20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+            40% { transform: translate(-2px, -2px); filter: hue-rotate(180deg); }
+            60% { transform: translate(2px, 2px); filter: hue-rotate(270deg); }
+            80% { transform: translate(2px, -2px); filter: hue-rotate(360deg); }
+        }
+        
+        h1 {
+            margin: 0 0 15px 0;
+            color: var(--neon-orange);
+            text-shadow: 0 0 20px var(--neon-orange), 0 0 40px var(--burnt-orange);
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            animation: pulse 3s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { text-shadow: 0 0 20px var(--neon-orange), 0 0 40px var(--burnt-orange); }
+            100% { text-shadow: 0 0 30px var(--neon-orange), 0 0 60px var(--burnt-orange), 0 0 80px var(--rust-red); }
+        }
+        
+        canvas {
+            border: 2px solid var(--neon-cyan);
+            background: #000;
+            display: block;
+            margin: 15px auto;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+        
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--terminal-green);
+        }
+
+        .terminal-lights {
+            display: flex;
+            gap: 0.5rem;
+            margin-right: 15px;
+        }
+
+        .light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        .light.red { background: var(--neon-red); animation-delay: 0s; }
+        .light.yellow { background: #ffff00; animation-delay: 0.5s; }
+        .light.green { background: var(--terminal-green); animation-delay: 1s; }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .terminal-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            margin: 15px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        button {
+            background: transparent;
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-cyan);
+            transform: translateY(-2px);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+        
+        .status-display {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            margin: 8px 0;
+            color: var(--terminal-green);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            padding: 8px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 5px;
+            padding: 3px;
+        }
+
+        .status-label {
+            color: var(--neon-orange);
+        }
+
+        .power-ups-display {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(148, 0, 211, 0.1);
+            border: 1px solid rgba(148, 0, 211, 0.3);
+            color: var(--quantum-purple);
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .power-up-active {
+            animation: powerup-pulse 0.5s infinite;
+        }
+
+        @keyframes powerup-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .game-over {
+            color: var(--neon-red);
+            font-size: 18px;
+            margin: 10px 0;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            animation: warning-blink 1s infinite;
+        }
+
+        @keyframes warning-blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+        
+        .instructions {
+            margin-top: 15px;
+            font-size: 11px;
+            color: var(--neon-cyan);
+            line-height: 1.6;
+            font-family: 'Share Tech Mono', monospace;
+            text-align: left;
+            background: rgba(0, 255, 255, 0.1);
+            padding: 12px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .instructions strong {
+            color: var(--neon-orange);
+            display: block;
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--neon-cyan);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-orange);
+            border-radius: 4px;
+        }
+
+        /* Leaderboard Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.95);
+            margin: 5% auto;
+            padding: 20px;
+            border: 2px solid var(--neon-orange);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(255, 102, 0, 0.5);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--neon-orange);
+        }
+
+        .modal-header h2 {
+            color: var(--neon-orange);
+            margin: 0;
+            text-shadow: 0 0 10px var(--neon-orange);
+        }
+
+        .close {
+            color: var(--neon-red);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close:hover {
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-red);
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .leaderboard-table th {
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .leaderboard-table tr:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .rank-1 { color: #ffd700; text-shadow: 0 0 10px #ffd700; }
+        .rank-2 { color: #c0c0c0; text-shadow: 0 0 8px #c0c0c0; }
+        .rank-3 { color: #cd7f32; text-shadow: 0 0 6px #cd7f32; }
+
+        .leaderboard-loading {
+            text-align: center;
+            color: var(--neon-cyan);
+            padding: 20px;
+        }
+
+        /* Responsive design */
+        @media (max-height: 800px) {
+            h1 { font-size: 1.5rem; margin-bottom: 10px; }
+            canvas { width: 350px !important; height: 350px !important; margin: 10px auto; }
+            .controls { margin: 10px 0; gap: 5px; }
+            button { padding: 6px 12px; font-size: 12px; }
+            .status-display { font-size: 12px; }
+            .power-ups-display { font-size: 11px; padding: 8px; }
+            .instructions { font-size: 10px; padding: 10px; }
+        }
+
+        @media (max-height: 700px) {
+            canvas { width: 300px !important; height: 300px !important; }
+            .game-container { padding: 15px; }
+        }
+
+        @media (min-height: 1000px) {
+            .game-container { margin: auto; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background particles -->
+    <div class="bg-particles" id="particles"></div>
+
+    <div class="game-container">
+        <div class="terminal-header">
+            <div class="terminal-lights">
+                <div class="light red"></div>
+                <div class="light yellow"></div>
+                <div class="light green"></div>
+            </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>NEURAL NETWORK LEADERBOARD</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div id="leaderboardContent">
+                <div class="leaderboard-loading">ACCESSING VAULT DATABASE...</div>
+            </div>
+        </div>
+    </div>
+            <div class="terminal-title">NEURAL_SERPENT.exe v3.077 - WASTELAND SURVIVAL MODE</div>
+        </div>
+
+        <h1 class="glitch">NEURAL SERPENT</h1>
+        
+        <div class="status-display">
+            <div class="status-item">
+                <span class="status-label">RADIATION:</span>
+                <span id="score">0</span> RADS
+            </div>
+            <div class="status-item">
+                <span class="status-label">HIGH_SCORE:</span>
+                <span id="highScore">0</span> RADS
+            </div>
+            <div class="status-item">
+                <span class="status-label">PLAYER:</span>
+                <span id="playerName" onclick="changePlayerName()" style="cursor: pointer; text-decoration: underline;">WANDERER</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">AI_MODE:</span>
+                <span id="mode">HUMAN</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">STATUS:</span>
+                <span id="status">ONLINE</span>
+            </div>
+        </div>
+
+        <div class="power-ups-display" id="powerUpDisplay">
+            SYSTEM NOMINAL - NO ACTIVE MUTATIONS
+        </div>
+        
+        <div id="gameOver" class="game-over" style="display: none;">SYSTEM FAILURE! PRESS [SPACE] TO REBOOT</div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="controls">
+            <button onclick="toggleAI()">AI_PROTOCOL</button>
+            <button onclick="resetGame()">SYSTEM_RESET</button>
+            <button onclick="toggleDifficulty()">DIFFICULTY: <span id="difficulty">NORMAL</span></button>
+            <button onclick="toggleMode()">MODE: <span id="gameMode">CLASSIC</span></button>
+            <button onclick="showLeaderboard()">LEADERBOARD</button>
+        </div>
+        
+        <div class="instructions">
+            <strong>WASTELAND SURVIVAL PROTOCOL:</strong>
+            → ARROW KEYS: Navigate | SPACE: Pause | L: Leaderboard<br>
+            → Click your name to change designation<br>
+            → Consume FUSION CORES (red) to evolve<br>
+            → Collect power-ups for mutations & abilities<br>
+            → Avoid walls, obstacles & self-termination<br>
+            → Scores uploaded to VAULT-TEC database
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff0040;"></div>
+                    <span>FUSION CORE (+10)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9400d3;"></div>
+                    <span>QUANTUM COLA (2X Speed)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #00ff00;"></div>
+                    <span>RAD-AWAY (-20 RADS)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #00ffff;"></div>
+                    <span>STEALTH BOY (Ghost)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ffff00;"></div>
+                    <span>MINI NUKE (+50)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff6600;"></div>
+                    <span>VAULT-TEC (Mystery)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Game constants
+        const baseCanvasSize = 400;
+        const gridSize = 20;
+        const tileCount = baseCanvasSize / gridSize;
+        
+        // Set canvas internal size (this stays constant)
+        canvas.width = baseCanvasSize;
+        canvas.height = baseCanvasSize;
+        
+        // Game state
+        let snake = [{x: 10, y: 10}];
+        let dx = 0;
+        let dy = 0;
+        let score = 0;
+        let highScore = 0;
+        let playerName = localStorage.getItem('neuralSerpentPlayerName') || 'WANDERER';
+        let gameRunning = true;
+        let aiMode = false;
+        let difficulty = 'NORMAL';
+        let gameMode = 'CLASSIC';
+        let gameSpeed = 100;
+        let leaderboard = [];
+        let gameStartTime = Date.now();
+        
+        // Items
+        let apple = {x: 15, y: 15};
+        let powerUps = [];
+        let obstacles = [];
+        
+        // Power-up effects
+        let activeEffects = {
+            speed: 0,
+            ghost: 0,
+            rainbow: 0
+        };
+        
+        // Power-up types
+        const POWER_UP_TYPES = {
+            QUANTUM_COLA: { color: '#9400d3', name: 'QUANTUM COLA', effect: 'speed' },
+            RAD_AWAY: { color: '#00ff00', name: 'RAD-AWAY', effect: 'cleanse' },
+            STEALTH_BOY: { color: '#00ffff', name: 'STEALTH BOY', effect: 'ghost' },
+            MINI_NUKE: { color: '#ffff00', name: 'MINI NUKE', effect: 'nuke' },
+            VAULT_TEC_BOX: { color: '#ff6600', name: 'VAULT-TEC LUNCHBOX', effect: 'mystery' }
+        };
+        
+        // Update high score display
+        document.getElementById('highScore').textContent = highScore;
+        document.getElementById('playerName').textContent = playerName;
+        
+        // Database API URL
+        const API_URL = '/game-api/scores.php';
+        
+        // Fetch high scores from database
+        async function fetchHighScores() {
+            try {
+                const response = await fetch(`${API_URL}?mode=${gameMode}&difficulty=${difficulty}&limit=10`);
+                const data = await response.json();
+                
+                if (data.success && data.scores.length > 0) {
+                    highScore = data.scores[0].score;
+                    document.getElementById('highScore').textContent = highScore;
+                    leaderboard = data.scores;
+                }
+            } catch (error) {
+                console.error('Failed to fetch high scores:', error);
+            }
+        }
+        
+        // Submit score to database
+        async function submitScore() {
+            if (score === 0) return;
+            
+            // Basic anti-cheat: Check if game lasted reasonable time
+            const gameDuration = (Date.now() - gameStartTime) / 1000; // seconds
+            const minDuration = score / 20; // At least 0.5 seconds per 10 points
+            
+            if (gameDuration < minDuration) {
+                showNotification('SUSPICIOUS ACTIVITY DETECTED', '#ff0040');
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        player_name: playerName,
+                        score: score,
+                        game_mode: gameMode,
+                        difficulty: difficulty
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification(`SCORE UPLOADED! RANK: #${data.rank}`, '#00ff00');
+                    
+                    // Special message for top 3
+                    if (data.rank <= 3) {
+                        setTimeout(() => {
+                            showNotification(`🏆 TOP 3 WASTELAND SURVIVOR! 🏆`, '#ffd700');
+                        }, 2000);
+                    }
+                    
+                    fetchHighScores(); // Refresh leaderboard
+                }
+            } catch (error) {
+                console.error('Failed to submit score:', error);
+                showNotification('UPLOAD FAILED - DATABASE OFFLINE', '#ff0040');
+            }
+        }
+        
+        // Show leaderboard modal
+        function showLeaderboard() {
+            const modal = document.getElementById('leaderboardModal');
+            const content = document.getElementById('leaderboardContent');
+            
+            modal.style.display = 'block';
+            content.innerHTML = '<div class="leaderboard-loading">ACCESSING VAULT DATABASE...</div>';
+            
+            // Fetch fresh leaderboard data
+            fetch(`${API_URL}?mode=${gameMode}&difficulty=${difficulty}&limit=10`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayLeaderboard(data.scores);
+                    } else {
+                        content.innerHTML = '<div class="leaderboard-loading">DATABASE ERROR</div>';
+                    }
+                })
+                .catch(error => {
+                    content.innerHTML = '<div class="leaderboard-loading">CONNECTION FAILED</div>';
+                });
+        }
+        
+        // Display leaderboard in modal
+        function displayLeaderboard(scores) {
+            const content = document.getElementById('leaderboardContent');
+            
+            if (scores.length === 0) {
+                content.innerHTML = '<div class="leaderboard-loading">NO RECORDS FOUND</div>';
+                return;
+            }
+            
+            let html = `
+                <div style="text-align: center; margin-bottom: 15px; color: #00ff00; font-size: 12px;">
+                    MODE: ${gameMode} | DIFFICULTY: ${difficulty}
+                </div>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>RANK</th>
+                            <th>PLAYER</th>
+                            <th>RADS</th>
+                            <th>DATE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            scores.forEach((score, index) => {
+                const rank = index + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                const date = new Date(score.created_at).toLocaleDateString();
+                const isCurrentPlayer = score.player_name === playerName;
+                
+                html += `
+                    <tr class="${rankClass}" ${isCurrentPlayer ? 'style="background: rgba(255, 102, 0, 0.2); border: 1px solid #ff6600;"' : ''}>
+                        <td>#${rank}</td>
+                        <td>${score.player_name} ${isCurrentPlayer ? '<span style="color: #ff6600;">(YOU)</span>' : ''}</td>
+                        <td>${score.score}</td>
+                        <td>${date}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            content.innerHTML = html;
+        }
+        
+        // Change player name
+        function changePlayerName() {
+            const newName = prompt('ENTER DESIGNATION:', playerName);
+            if (newName && newName.trim()) {
+                playerName = newName.trim().substring(0, 50).toUpperCase();
+                localStorage.setItem('neuralSerpentPlayerName', playerName);
+                document.getElementById('playerName').textContent = playerName;
+                showNotification(`DESIGNATION UPDATED: ${playerName}`, '#00ffff');
+            }
+        }
+        
+        // Modal close handler        
+        window.onclick = function(event) {
+            const modal = document.getElementById('leaderboardModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Create background particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                if (Math.random() > 0.5) {
+                    particle.style.background = '#00ffff';
+                    particle.style.boxShadow = '0 0 6px #00ffff';
+                }
+                container.appendChild(particle);
+            }
+        }
+
+        // Neural AI with enhanced pathfinding
+        function getAIDirection() {
+            const head = snake[0];
+            
+            // Find nearest target (apple or power-up)
+            let targets = [{x: apple.x, y: apple.y, priority: 1}];
+            
+            // Add power-ups as targets with different priorities
+            powerUps.forEach(powerUp => {
+                let priority = 0.5;
+                if (powerUp.type === 'MINI_NUKE') priority = 2;
+                else if (powerUp.type === 'QUANTUM_COLA' && !activeEffects.speed) priority = 1.5;
+                else if (powerUp.type === 'RAD_AWAY' && score > 100) priority = 0.1;
+                
+                targets.push({x: powerUp.x, y: powerUp.y, priority});
+            });
+            
+            // Sort by priority and distance
+            targets.sort((a, b) => {
+                const distA = Math.abs(head.x - a.x) + Math.abs(head.y - a.y);
+                const distB = Math.abs(head.x - b.x) + Math.abs(head.y - b.y);
+                return (distB * b.priority) - (distA * a.priority);
+            });
+            
+            const target = targets[0];
+            
+            let possibleMoves = [
+                {dx: 0, dy: -1, dist: 0}, // up
+                {dx: 1, dy: 0, dist: 0},  // right
+                {dx: 0, dy: 1, dist: 0},  // down
+                {dx: -1, dy: 0, dist: 0}  // left
+            ];
+            
+            // Filter out dangerous moves
+            possibleMoves = possibleMoves.filter(move => {
+                const newX = head.x + move.dx;
+                const newY = head.y + move.dy;
+                
+                // Check boundaries
+                if (newX < 0 || newX >= tileCount || newY < 0 || newY >= tileCount) {
+                    return false;
+                }
+                
+                // Check self collision (unless ghost mode)
+                if (!activeEffects.ghost) {
+                    for (let segment of snake) {
+                        if (newX === segment.x && newY === segment.y) {
+                            return false;
+                        }
+                    }
+                }
+                
+                // Check obstacles
+                for (let obstacle of obstacles) {
+                    if (newX === obstacle.x && newY === obstacle.y && !activeEffects.ghost) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            if (possibleMoves.length === 0) {
+                return {dx: 0, dy: -1};
+            }
+            
+            // Calculate distance to target
+            possibleMoves.forEach(move => {
+                const newX = head.x + move.dx;
+                const newY = head.y + move.dy;
+                move.dist = Math.abs(newX - target.x) + Math.abs(newY - target.y);
+            });
+            
+            possibleMoves.sort((a, b) => a.dist - b.dist);
+            
+            return {dx: possibleMoves[0].dx, dy: possibleMoves[0].dy};
+        }
+        
+        function drawGame() {
+            // Clear with digital static effect
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, baseCanvasSize, baseCanvasSize);
+            
+            // Add subtle grid lines
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < tileCount; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * gridSize, 0);
+                ctx.lineTo(i * gridSize, baseCanvasSize);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, i * gridSize);
+                ctx.lineTo(baseCanvasSize, i * gridSize);
+                ctx.stroke();
+            }
+            
+            // Draw obstacles
+            obstacles.forEach(obstacle => {
+                ctx.fillStyle = '#666666';
+                ctx.fillRect(obstacle.x * gridSize + 2, obstacle.y * gridSize + 2, gridSize - 4, gridSize - 4);
+                
+                // Warning stripes
+                ctx.strokeStyle = '#ffff00';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(obstacle.x * gridSize + 5, obstacle.y * gridSize + 5);
+                ctx.lineTo(obstacle.x * gridSize + gridSize - 5, obstacle.y * gridSize + gridSize - 5);
+                ctx.moveTo(obstacle.x * gridSize + gridSize - 5, obstacle.y * gridSize + 5);
+                ctx.lineTo(obstacle.x * gridSize + 5, obstacle.y * gridSize + gridSize - 5);
+                ctx.stroke();
+            });
+            
+            // Draw power-ups
+            powerUps.forEach(powerUp => {
+                const pulse = Math.sin(Date.now() * 0.008) * 0.3 + 0.7;
+                const type = POWER_UP_TYPES[powerUp.type];
+                
+                ctx.shadowBlur = 15 * pulse;
+                ctx.shadowColor = type.color;
+                
+                // Outer ring
+                ctx.strokeStyle = type.color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.rect(powerUp.x * gridSize + 4, powerUp.y * gridSize + 4, gridSize - 8, gridSize - 8);
+                ctx.stroke();
+                
+                // Inner fill
+                ctx.fillStyle = type.color;
+                ctx.globalAlpha = pulse;
+                ctx.fillRect(powerUp.x * gridSize + 8, powerUp.y * gridSize + 8, gridSize - 16, gridSize - 16);
+                ctx.globalAlpha = 1;
+            });
+            
+            // Draw neural serpent with effects
+            snake.forEach((segment, index) => {
+                const intensity = 1 - (index / snake.length * 0.7);
+                
+                // Ghost effect
+                if (activeEffects.ghost > 0) {
+                    ctx.globalAlpha = 0.5;
+                }
+                
+                // Rainbow effect
+                let hue = 120; // Default green
+                if (activeEffects.rainbow > 0) {
+                    hue = (Date.now() / 10 + index * 30) % 360;
+                }
+                
+                // Neon glow effect
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+                
+                // Main body
+                ctx.fillStyle = `hsla(${hue}, 100%, 50%, ${intensity})`;
+                ctx.fillRect(segment.x * gridSize + 2, segment.y * gridSize + 2, gridSize - 4, gridSize - 4);
+                
+                // Inner core
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = `rgba(0, 255, 255, ${intensity * 0.5})`;
+                ctx.fillRect(segment.x * gridSize + 6, segment.y * gridSize + 6, gridSize - 12, gridSize - 12);
+                
+                // Head details
+                if (index === 0) {
+                    ctx.fillStyle = '#ff6600';
+                    ctx.shadowBlur = 5;
+                    ctx.shadowColor = '#ff6600';
+                    
+                    // Eyes
+                    ctx.fillRect(segment.x * gridSize + 5, segment.y * gridSize + 5, 5, 5);
+                    ctx.fillRect(segment.x * gridSize + 15, segment.y * gridSize + 5, 5, 5);
+                    
+                    // Neural indicator
+                    if (aiMode) {
+                        ctx.fillStyle = '#00ffff';
+                        ctx.fillRect(segment.x * gridSize + 10, segment.y * gridSize + 18, 5, 3);
+                    }
+                }
+                
+                ctx.globalAlpha = 1;
+            });
+            
+            // Draw fusion core (apple)
+            const pulse = Math.sin(Date.now() * 0.006) * 0.3 + 0.7;
+            ctx.shadowBlur = 20 * pulse;
+            ctx.shadowColor = '#ff0040';
+            
+            // Radiation ring
+            ctx.strokeStyle = `rgba(255, 0, 64, ${pulse * 0.5})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(
+                apple.x * gridSize + gridSize / 2,
+                apple.y * gridSize + gridSize / 2,
+                gridSize / 2 + 5,
+                0,
+                Math.PI * 2
+            );
+            ctx.stroke();
+            
+            // Core
+            ctx.fillStyle = '#ff0040';
+            ctx.beginPath();
+            ctx.arc(
+                apple.x * gridSize + gridSize / 2,
+                apple.y * gridSize + gridSize / 2,
+                gridSize / 2 - 2,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            
+            // Inner energy
+            ctx.fillStyle = '#ff6600';
+            ctx.beginPath();
+            ctx.arc(
+                apple.x * gridSize + gridSize / 2,
+                apple.y * gridSize + gridSize / 2,
+                gridSize / 4,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            
+            ctx.shadowBlur = 0;
+            
+            // Draw initialization message
+            if (dx === 0 && dy === 0 && !aiMode) {
+                ctx.fillStyle = 'rgba(255, 102, 0, 0.8)';
+                ctx.font = '14px Share Tech Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText('>>> AWAITING INPUT SIGNAL <<<', baseCanvasSize / 2, baseCanvasSize / 2 + 40);
+            }
+            
+            // Draw effect overlays
+            if (activeEffects.speed > 0) {
+                ctx.strokeStyle = `rgba(148, 0, 211, ${0.2 * Math.sin(Date.now() * 0.01)})`;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(0, 0, baseCanvasSize, baseCanvasSize);
+            }
+            
+            if (activeEffects.ghost > 0) {
+                ctx.fillStyle = `rgba(0, 255, 255, ${0.1 * Math.sin(Date.now() * 0.01)})`;
+                ctx.fillRect(0, 0, baseCanvasSize, baseCanvasSize);
+            }
+        }
+        
+        function updateGame() {
+            if (!gameRunning) return;
+            
+            // Update power-up effects
+            if (activeEffects.speed > 0) activeEffects.speed--;
+            if (activeEffects.ghost > 0) activeEffects.ghost--;
+            if (activeEffects.rainbow > 0) activeEffects.rainbow--;
+            
+            updatePowerUpDisplay();
+            
+            // Neural AI activation
+            if (aiMode) {
+                const aiMove = getAIDirection();
+                if (!(dx === -aiMove.dx && dy === -aiMove.dy && snake.length > 1)) {
+                    dx = aiMove.dx;
+                    dy = aiMove.dy;
+                }
+            }
+            
+            // Skip if awaiting initialization
+            if (dx === 0 && dy === 0) {
+                return;
+            }
+            
+            // Calculate new position
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            
+            // Firewall collision detection
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                gameOver();
+                return;
+            }
+            
+            // Self-termination detection (unless ghost mode)
+            if (!activeEffects.ghost) {
+                for (let segment of snake) {
+                    if (head.x === segment.x && head.y === segment.y) {
+                        gameOver();
+                        return;
+                    }
+                }
+            }
+            
+            // Obstacle collision (unless ghost mode)
+            if (!activeEffects.ghost) {
+                for (let obstacle of obstacles) {
+                    if (head.x === obstacle.x && head.y === obstacle.y) {
+                        gameOver();
+                        return;
+                    }
+                }
+            }
+            
+            snake.unshift(head);
+            
+            // Check power-up collision
+            let powerUpEaten = false;
+            powerUps = powerUps.filter(powerUp => {
+                if (head.x === powerUp.x && head.y === powerUp.y) {
+                    handlePowerUp(powerUp.type);
+                    powerUpEaten = true;
+                    return false;
+                }
+                return true;
+            });
+            
+            // Fusion core consumption
+            if (head.x === apple.x && head.y === apple.y) {
+                score += 10;
+                updateScore();
+                placeApple();
+                spawnPowerUp();
+            } else if (!powerUpEaten) {
+                snake.pop();
+            }
+            
+            // Spawn new power-ups occasionally
+            if (Math.random() < 0.005 && powerUps.length < 3) {
+                spawnPowerUp();
+            }
+        }
+        
+        function handlePowerUp(type) {
+            const powerUp = POWER_UP_TYPES[type];
+            
+            switch(powerUp.effect) {
+                case 'speed':
+                    activeEffects.speed = 150;
+                    showNotification('QUANTUM BOOST ACTIVATED!', '#9400d3');
+                    break;
+                case 'cleanse':
+                    score = Math.max(0, score - 20);
+                    updateScore();
+                    showNotification('RADIATION CLEANSED! -20 RADS', '#00ff00');
+                    break;
+                case 'ghost':
+                    activeEffects.ghost = 200;
+                    showNotification('STEALTH MODE ENGAGED!', '#00ffff');
+                    break;
+                case 'nuke':
+                    score += 50;
+                    updateScore();
+                    obstacles = [];
+                    showNotification('MINI NUKE DETONATED! +50 RADS', '#ffff00');
+                    // Screen flash effect
+                    canvas.style.filter = 'brightness(2)';
+                    setTimeout(() => canvas.style.filter = 'brightness(1)', 200);
+                    break;
+                case 'mystery':
+                    const effects = ['speed', 'ghost', 'rainbow', 'points'];
+                    const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+                    
+                    switch(randomEffect) {
+                        case 'speed':
+                            activeEffects.speed = 100;
+                            showNotification('VAULT-TEC SURPRISE: SPEED!', '#ff6600');
+                            break;
+                        case 'ghost':
+                            activeEffects.ghost = 150;
+                            showNotification('VAULT-TEC SURPRISE: GHOST!', '#ff6600');
+                            break;
+                        case 'rainbow':
+                            activeEffects.rainbow = 300;
+                            showNotification('VAULT-TEC SURPRISE: RAINBOW!', '#ff6600');
+                            break;
+                        case 'points':
+                            score += 30;
+                            updateScore();
+                            showNotification('VAULT-TEC SURPRISE: +30 RADS!', '#ff6600');
+                            break;
+                    }
+                    break;
+            }
+        }
+        
+        function showNotification(text, color) {
+            const display = document.getElementById('powerUpDisplay');
+            display.textContent = text;
+            display.style.color = color;
+            display.style.borderColor = color;
+            display.style.background = `${color}20`;
+            display.classList.add('power-up-active');
+            
+            setTimeout(() => {
+                display.classList.remove('power-up-active');
+            }, 2000);
+        }
+        
+        function updatePowerUpDisplay() {
+            const display = document.getElementById('powerUpDisplay');
+            const effects = [];
+            
+            if (activeEffects.speed > 0) effects.push(`QUANTUM: ${Math.ceil(activeEffects.speed / 10)}s`);
+            if (activeEffects.ghost > 0) effects.push(`STEALTH: ${Math.ceil(activeEffects.ghost / 10)}s`);
+            if (activeEffects.rainbow > 0) effects.push(`RAINBOW: ${Math.ceil(activeEffects.rainbow / 10)}s`);
+            
+            if (effects.length === 0) {
+                display.textContent = 'SYSTEM NOMINAL - NO ACTIVE MUTATIONS';
+                display.style.color = '#9400d3';
+                display.style.borderColor = 'rgba(148, 0, 211, 0.3)';
+                display.style.background = 'rgba(148, 0, 211, 0.1)';
+            } else {
+                display.textContent = 'ACTIVE: ' + effects.join(' | ');
+            }
+        }
+        
+        function placeApple() {
+            do {
+                apple = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            } while (
+                snake.some(segment => segment.x === apple.x && segment.y === apple.y) ||
+                obstacles.some(obstacle => obstacle.x === apple.x && obstacle.y === apple.y) ||
+                powerUps.some(powerUp => powerUp.x === apple.x && powerUp.y === apple.y)
+            );
+        }
+        
+        function spawnPowerUp() {
+            if (powerUps.length >= 3) return;
+            
+            const types = Object.keys(POWER_UP_TYPES);
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * tileCount);
+                y = Math.floor(Math.random() * tileCount);
+            } while (
+                snake.some(segment => segment.x === x && segment.y === y) ||
+                obstacles.some(obstacle => obstacle.x === x && obstacle.y === y) ||
+                powerUps.some(powerUp => powerUp.x === x && powerUp.y === y) ||
+                (x === apple.x && y === apple.y)
+            );
+            
+            powerUps.push({x, y, type});
+        }
+        
+        function spawnObstacles() {
+            obstacles = [];
+            if (gameMode !== 'SURVIVAL') return;
+            
+            const count = difficulty === 'HARD' ? 10 : difficulty === 'NORMAL' ? 6 : 3;
+            
+            for (let i = 0; i < count; i++) {
+                let x, y;
+                do {
+                    x = Math.floor(Math.random() * tileCount);
+                    y = Math.floor(Math.random() * tileCount);
+                } while (
+                    (Math.abs(x - 10) < 3 && Math.abs(y - 10) < 3) || // Keep spawn area clear
+                    obstacles.some(obstacle => obstacle.x === x && obstacle.y === y)
+                );
+                
+                obstacles.push({x, y});
+            }
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+            
+            // Check if new high score (locally)
+            if (score > highScore) {
+                highScore = score;
+                document.getElementById('highScore').textContent = highScore;
+                
+                // Visual feedback for new high score
+                const highScoreElement = document.getElementById('highScore');
+                highScoreElement.style.color = '#ffd700';
+                highScoreElement.style.textShadow = '0 0 20px #ffd700';
+                setTimeout(() => {
+                    highScoreElement.style.color = '';
+                    highScoreElement.style.textShadow = '';
+                }, 1000);
+            }
+        }
+        
+        function gameOver() {
+            gameRunning = false;
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('status').textContent = 'OFFLINE';
+            document.getElementById('status').style.color = '#ff0040';
+            
+            const messages = [
+                "CRITICAL SYSTEM FAILURE DETECTED!",
+                "NEURAL NETWORK CORRUPTED!",
+                "FIREWALL BREACH - TERMINATION PROTOCOL ACTIVATED!",
+                "RADIATION OVERLOAD - CORE MELTDOWN!",
+                "AI CONSCIOUSNESS FRAGMENTED!",
+                "QUANTUM ENTANGLEMENT COLLAPSED!",
+                "VAULT DOOR SEALED - NO ESCAPE!"
+            ];
+            document.getElementById('gameOver').textContent = 
+                messages[Math.floor(Math.random() * messages.length)] + 
+                " PRESS [SPACE] TO REBOOT";
+            
+            // Submit score to database
+            submitScore();
+        }
+        
+        function resetGame() {
+            snake = [{x: 10, y: 10}];
+            dx = 0;
+            dy = 0;
+            score = 0;
+            gameRunning = true;
+            powerUps = [];
+            activeEffects = {speed: 0, ghost: 0, rainbow: 0};
+            gameStartTime = Date.now();
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('status').textContent = 'ONLINE';
+            document.getElementById('status').style.color = '#00ff00';
+            
+            placeApple();
+            spawnObstacles();
+            updatePowerUpDisplay();
+        }
+        
+        function toggleAI() {
+            aiMode = !aiMode;
+            document.getElementById('mode').textContent = aiMode ? 'AUTONOMOUS' : 'HUMAN';
+            if (aiMode && dx === 0 && dy === 0) {
+                dx = 1;
+                dy = 0;
+            }
+        }
+        
+        function toggleDifficulty() {
+            const difficulties = ['EASY', 'NORMAL', 'HARD'];
+            const current = difficulties.indexOf(difficulty);
+            difficulty = difficulties[(current + 1) % difficulties.length];
+            document.getElementById('difficulty').textContent = difficulty;
+            
+            // Adjust game speed
+            switch(difficulty) {
+                case 'EASY': gameSpeed = 120; break;
+                case 'NORMAL': gameSpeed = 100; break;
+                case 'HARD': gameSpeed = 70; break;
+            }
+            
+            if (gameMode === 'SURVIVAL') {
+                spawnObstacles();
+            }
+            
+            // Fetch new high scores for this difficulty
+            fetchHighScores();
+        }
+        
+        function toggleMode() {
+            gameMode = gameMode === 'CLASSIC' ? 'SURVIVAL' : 'CLASSIC';
+            document.getElementById('gameMode').textContent = gameMode;
+            
+            if (gameMode === 'SURVIVAL') {
+                spawnObstacles();
+            } else {
+                obstacles = [];
+            }
+            
+            // Fetch new high scores for this mode
+            fetchHighScores();
+        }
+        
+        // Input handlers
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning && e.key === ' ') {
+                resetGame();
+                return;
+            }
+            
+            if (e.key === ' ') {
+                gameRunning = !gameRunning;
+                document.getElementById('status').textContent = gameRunning ? 'ONLINE' : 'PAUSED';
+                return;
+            }
+            
+            if (e.key.toLowerCase() === 'l') {
+                showLeaderboard();
+                return;
+            }
+            
+            if (!aiMode && gameRunning) {
+                switch(e.key) {
+                    case 'ArrowUp':
+                        if (dy !== 1 || snake.length === 1) {
+                            dx = 0;
+                            dy = -1;
+                        }
+                        break;
+                    case 'ArrowDown':
+                        if (dy !== -1 || snake.length === 1) {
+                            dx = 0;
+                            dy = 1;
+                        }
+                        break;
+                    case 'ArrowLeft':
+                        if (dx !== 1 || snake.length === 1) {
+                            dx = -1;
+                            dy = 0;
+                        }
+                        break;
+                    case 'ArrowRight':
+                        if (dx !== -1 || snake.length === 1) {
+                            dx = 1;
+                            dy = 0;
+                        }
+                        break;
+                }
+            }
+        });
+        
+        // Main loop with dynamic speed
+        let lastUpdate = 0;
+        function gameLoop(timestamp) {
+            const deltaTime = timestamp - lastUpdate;
+            const updateInterval = activeEffects.speed > 0 ? gameSpeed / 2 : gameSpeed;
+            
+            if (deltaTime >= updateInterval) {
+                updateGame();
+                lastUpdate = timestamp;
+            }
+            
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Initialize
+        createParticles();
+        resetGame();
+        fetchHighScores(); // Load high scores from database
+        requestAnimationFrame(gameLoop);
+        
+        // Setup modal close handler
+        const closeBtn = document.querySelector('.close');
+        if (closeBtn) {
+            closeBtn.onclick = function() {
+                document.getElementById('leaderboardModal').style.display = 'none';
+            }
+        }
+        
+        // Console easter eggs
+        console.log('%cNEURAL_SERPENT.exe v3.077 LOADED', 'color: #ff6600; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #ff6600;');
+        console.log('%c⚠️ WARNING: This version contains experimental mutations', 'color: #ff0040; font-size: 14px;');
+        console.log('%c🧪 Side effects may include: Quantum entanglement, temporal displacement, and uncontrollable growth', 'color: #9400d3;');
+        console.log('%c💊 Remember: Rad-Away is for quitters. Embrace the glow! ☢️', 'color: #00ff00;');
+        console.log('%c📡 VAULT-TEC DATABASE: Connected to PostgreSQL cluster', 'color: #00ffff;');
+        console.log('%c🏆 Leaderboard API: Online at /api/scores.php', 'color: #ffff00;');
+    </script>
+	
+	<!-- BurntAI ARG System -->
+	<script src="/js/burntai-arg.js"></script>
+</body>
+</html>

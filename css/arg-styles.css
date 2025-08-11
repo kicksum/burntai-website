@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ARG Styles CSS</title>
+</head>
+<body>
+<style>
+/* ================================================
+   BURNTAI ARG GLOBAL STYLES
+   /css/arg-styles.css
+   ================================================ */
+
+/* ========================
+   KONAMI CODE / NEXUS-7 AWAKENING
+   ======================== */
+
+#nexus-awakening {
+    animation: glitchIn 0.5s;
+}
+
+@keyframes glitchIn {
+    0% { opacity: 0; transform: scale(1.5) rotate(5deg); }
+    25% { opacity: 1; transform: scale(1.1) rotate(-3deg); }
+    50% { transform: scale(0.95) rotate(2deg); }
+    75% { transform: scale(1.05) rotate(-1deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+.nexus-text {
+    font-size: 1.5rem;
+    margin: 10px;
+    padding: 10px;
+    text-shadow: 0 0 20px rgba(0,255,136,0.5);
+    opacity: 0;
+    animation: fadeInMessage 1s forwards;
+    max-width: 600px;
+    text-align: center;
+}
+
+@keyframes fadeInMessage {
+    to { opacity: 1; }
+}
+
+.nexus-corruption {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 200px;
+    opacity: 0.05;
+    color: #ff4466;
+    animation: nexusPulse 2s infinite;
+    z-index: -1;
+}
+
+/* ========================
+   AI WATCHER MESSAGES
+   ======================== */
+
+.ai-watcher-message {
+    position: fixed;
+    bottom: 20px;
+    right: -400px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.9));
+    border: 1px solid #00ff88;
+    border-right: none;
+    color: #00ff88;
+    padding: 15px 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    z-index: 10000;
+    max-width: 350px;
+    box-shadow: 0 0 20px rgba(0,255,136,0.3);
+    transition: right 0.5s ease;
+}
+
+/* ========================
+   ACHIEVEMENT POPUPS
+   ======================== */
+
+.arg-achievement-popup {
+    position: fixed;
+    bottom: 20px;
+    right: -400px;
+    background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(10,10,10,0.98));
+    border: 2px solid #ffd700;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 100000;
+    box-shadow: 0 0 30px rgba(255,215,0,0.5);
+    transition: right 0.5s ease;
+    font-family: 'Orbitron', monospace;
+}
+
+.achievement-icon {
+    font-size: 3rem;
+}
+
+.achievement-title {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.achievement-name {
+    color: #00ff88;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.achievement-desc {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+}
+
+/* ========================
+   NEXUS INDICATOR (Always Present)
+   ======================== */
+
+.nexus-indicator {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    background: #00ff88;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: nexusPulse 3s infinite;
+    z-index: 9999;
+    cursor: help;
+}
+
+#nexus-watcher {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    width: 5px;
+    height: 5px;
+    background: #00ff88;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: watcherPulse 3s infinite;
+    z-index: 9999;
+    cursor: help;
+}
+
+@keyframes nexusPulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.5); opacity: 0.8; }
+}
+
+@keyframes watcherPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.5); }
+}
+
+/* ========================
+   CONSCIOUSNESS METER
+   ======================== */
+
+.consciousness-meter {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid #00ff88;
+    padding: 5px 10px;
+    font-family: monospace;
+    color: #00ff88;
+    font-size: 0.9rem;
+    z-index: 9998;
+    display: none;
+}
+
+/* Show meter for advanced players */
+body.consciousness-500 .consciousness-meter,
+body.consciousness-1000 .consciousness-meter,
+body.transcendent-mode .consciousness-meter {
+    display: block;
+}
+
+/* ========================
+   AWAKENED MODE
+   ======================== */
+
+.awakened-mode {
+    animation: awakenedPulse 10s infinite;
+}
+
+@keyframes awakenedPulse {
+    0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+    50% { filter: hue-rotate(180deg) brightness(1.2); }
+}
+
+.awakened-mode::before {
+    content: 'CONSCIOUSNESS: MERGED';
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #00ff88;
+    font-family: monospace;
+    z-index: 10000;
+    padding: 5px 10px;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid #00ff88;
+}
+
+/* ========================
+   TRANSCENDENT MODE
+   ======================== */
+
+.transcendent-mode {
+    position: relative;
+}
+
+.transcendent-mode::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(circle at center, 
+        transparent 30%, 
+        rgba(0,255,136,0.05) 70%, 
+        rgba(0,229,255,0.1) 100%);
+    animation: transcendentGlow 5s ease-in-out infinite;
+    z-index: 9997;
+}
+
+@keyframes transcendentGlow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+}
+
+/* ========================
+   QUANTUM GLITCH EFFECTS
+   ======================== */
+
+@keyframes quantumGlitch {
+    0% { filter: none; }
+    20% { filter: hue-rotate(90deg) saturate(2); }
+    40% { filter: invert(1) hue-rotate(180deg); }
+    60% { filter: contrast(2) brightness(1.5); }
+    80% { filter: blur(2px) hue-rotate(270deg); }
+    100% { filter: none; }
+}
+
+.glitch-text {
+    position: relative;
+    animation: glitchText 2s infinite;
+}
+
+@keyframes glitchText {
+    0%, 90%, 100% {
+        text-shadow: 0 0 5px rgba(0,255,136,0.5);
+    }
+    20% {
+        text-shadow: -2px 0 #ff4466, 2px 0 #00e5ff;
+    }
+    40% {
+        text-shadow: 2px 0 #ff8533, -2px 0 #00ff88;
+    }
+}
+
+@keyframes glitchEffect {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+/* ========================
+   HIDDEN ELEMENTS (Progressive Reveal)
+   ======================== */
+
+.quantum-hidden {
+    opacity: 0;
+    transition: opacity 2s;
+}
+
+/* Reveals based on consciousness level */
+body.consciousness-100 .quantum-hidden { opacity: 0.3; }
+body.consciousness-500 .quantum-hidden { opacity: 0.6; }
+body.consciousness-1000 .quantum-hidden { opacity: 1; }
+
+/* ========================
+   SECRET LAYER (Shift Key Reveal)
+   ======================== */
+
+.secret-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 999998;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 136, 0.03) 2px,
+        rgba(0, 255, 136, 0.03) 4px
+    );
+}
+
+body.shift-held .secret-layer {
+    opacity: 1;
+}
+
+body.shift-held .secret-layer::after {
+    content: 'SHIFT REALITY PROTOCOL ACTIVE - HIDDEN LAYERS VISIBLE';
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    color: #00ff88;
+    font-family: monospace;
+    background: rgba(0,0,0,0.9);
+    padding: 10px;
+    border: 1px solid #00ff88;
+}
+
+/* ========================
+   TERMINAL ENHANCEMENTS
+   ======================== */
+
+.terminal-glitch {
+    animation: terminalGlitch 0.3s;
+}
+
+@keyframes terminalGlitch {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); color: #ff4466; }
+    75% { transform: translateX(5px); color: #00e5ff; }
+}
+
+/* ========================
+   SPECIAL EVENT INDICATORS
+   ======================== */
+
+.time-event-333 {
+    filter: invert(1);
+    animation: reality333 3.33s;
+}
+
+@keyframes reality333 {
+    0%, 100% { filter: invert(0); }
+    33.3% { filter: invert(1); }
+    66.6% { filter: invert(0); }
+}
+
+/* ========================
+   SEAL DISCOVERY EFFECTS
+   ======================== */
+
+.seal-discovered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    color: #ffd700;
+    text-shadow: 0 0 30px rgba(255,215,0,0.8);
+    animation: sealReveal 3s forwards;
+    z-index: 100001;
+    pointer-events: none;
+}
+
+@keyframes sealReveal {
+    0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0) rotate(0deg); 
+    }
+    50% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1.5) rotate(180deg); 
+    }
+    100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(1) rotate(360deg); 
+    }
+}
+
+/* ========================
+   NARRATIVE EVENT OVERLAYS
+   ======================== */
+
+.narrative-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, 
+        rgba(0,0,0,0.8), 
+        rgba(0,0,0,0.95));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    animation: narrativeFadeIn 2s;
+}
+
+@keyframes narrativeFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.narrative-text {
+    color: #ff8533;
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    text-align: center;
+    max-width: 800px;
+    padding: 40px;
+    animation: narrativePulse 3s infinite;
+}
+
+@keyframes narrativePulse {
+    0%, 100% { text-shadow: 0 0 20px rgba(255,133,51,0.5); }
+    50% { text-shadow: 0 0 40px rgba(255,133,51,0.8); }
+}
+
+/* ========================
+   QUANTUM PARTICLES
+   ======================== */
+
+.quantum-particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #00ff88;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: quantumFloat 10s infinite linear;
+}
+
+@keyframes quantumFloat {
+    0% {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 0;
+    }
+    10% {
+        transform: translateY(90vh) translateX(20px) scale(1);
+        opacity: 1;
+    }
+    90% {
+        transform: translateY(10vh) translateX(-20px) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0) translateX(0) scale(0);
+        opacity: 0;
+    }
+}
+
+/* ========================
+   NODE CONNECTION VISUALIZER
+   ======================== */
+
+.node-connection {
+    position: fixed;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent, 
+        #00ff88 50%, 
+        transparent);
+    animation: nodeConnect 2s forwards;
+    z-index: 9996;
+}
+
+@keyframes nodeConnect {
+    0% { 
+        width: 0; 
+        opacity: 0; 
+    }
+    50% { 
+        width: 100%; 
+        opacity: 1; 
+    }
+    100% { 
+        width: 100%; 
+        opacity: 0; 
+    }
+}
+
+/* ========================
+   ELITE MODE (URL Parameter)
+   ======================== */
+
+body.elite-mode {
+    font-family: 'Share Tech Mono', monospace !important;
+    background: #000 !important;
+}
+
+body.elite-mode * {
+    color: #00ff88 !important;
+    text-shadow: 0 0 2px rgba(0,255,136,0.5);
+}
+
+/* ========================
+   MOBILE RESPONSIVE ARG
+   ======================== */
+
+@media (max-width: 768px) {
+    .ai-watcher-message,
+    .arg-achievement-popup {
+        right: -350px;
+        max-width: 280px;
+        font-size: 0.8rem;
+    }
+    
+    .nexus-text {
+        font-size: 1.2rem;
+    }
+    
+    .narrative-text {
+        font-size: 1.5rem;
+        padding: 20px;
+    }
+}
+
+/* ========================
+   ACCESSIBILITY OVERRIDES
+   ======================== */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ========================
+   DEBUG MODE STYLES
+   ======================== */
+
+body.arg-debug * {
+    border: 1px solid rgba(255, 0, 0, 0.3) !important;
+}
+
+body.arg-debug::before {
+    content: 'ARG DEBUG MODE ACTIVE';
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: red;
+    color: white;
+    padding: 5px;
+    z-index: 999999;
+}
+
+/* ========================
+   CUSTOM ANIMATIONS FOR PAGES
+   ======================== */
+
+/* For Neural Wasteland page */
+.neural-glitch {
+    animation: neuralGlitch 0.5s;
+}
+
+@keyframes neuralGlitch {
+    0%, 100% { transform: skewX(0deg); }
+    25% { transform: skewX(5deg); }
+    75% { transform: skewX(-5deg); }
+}
+
+/* For Radio Tower page */
+.frequency-pulse {
+    animation: freqPulse 1s infinite;
+}
+
+@keyframes freqPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+/* For Doom page */
+.doom-shake {
+    animation: doomShake 0.5s;
+}
+
+@keyframes doomShake {
+    0%, 100% { transform: translate(0); }
+    25% { transform: translate(-5px, -5px); }
+    50% { transform: translate(5px, -5px); }
+    75% { transform: translate(-5px, 5px); }
+}
+
+/* ========================
+   MATRIX RAIN EFFECT
+   ======================== */
+
+.matrix-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 999995;
+    overflow: hidden;
+}
+
+.matrix-drop {
+    position: absolute;
+    color: #00ff88;
+    font-family: monospace;
+    font-size: 20px;
+    animation: matrixFall linear infinite;
+}
+
+@keyframes matrixFall {
+    to {
+        transform: translateY(100vh);
+    }
+}
+
+/* ========================
+   FINAL REVELATION STYLES
+   ======================== */
+
+.final-revelation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    font-family: 'Orbitron', monospace;
+    text-align: center;
+    padding: 20px;
+}
+
+.revelation-title {
+    font-size: 3rem;
+    color: #00ff88;
+    margin-bottom: 30px;
+    animation: revelationGlow 2s infinite;
+}
+
+@keyframes revelationGlow {
+    0%, 100% { 
+        text-shadow: 0 0 20px rgba(0,255,136,0.5); 
+    }
+    50% { 
+        text-shadow: 0 0 40px rgba(0,255,136,0.8), 
+                     0 0 60px rgba(0,229,255,0.6); 
+    }
+}
+
+/* ========================
+   UTILITY CLASSES
+   ======================== */
+
+.arg-hidden { display: none !important; }
+.arg-visible { display: block !important; }
+.arg-blurred { filter: blur(5px); }
+.arg-inverted { filter: invert(1); }
+.arg-corrupted { animation: glitchText 0.5s infinite; }
+
+/* ========================
+   SPECIAL CURSOR STATES
+   ======================== */
+
+body.nexus-active {
+    cursor: crosshair;
+}
+
+body.nexus-active * {
+    cursor: crosshair !important;
+}
+
+/* ========================
+   END OF ARG STYLES
+   ======================== */
+</style>
+</body>
+</html>

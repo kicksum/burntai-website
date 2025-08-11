@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Konami Test</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; padding: 50px; }
+        #secret { display: none; color: #ff8533; font-size: 50px; }
+    </style>
+</head>
+<body>
+    <h1>Konami Code Test Page</h1>
+    <p>Enter: ↑ ↑ ↓ ↓ ← → ← → B A</p>
+    <p>Keys pressed: <span id="pressed"></span></p>
+    <div id="secret">🔥 SECRET UNLOCKED! 🔥</div>
+    
+    <script>
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 
+                          'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
+        let pressed = [];
+        
+        document.addEventListener('keydown', (e) => {
+            pressed.push(e.key);
+            document.getElementById('pressed').textContent = pressed.slice(-10).join(' ');
+            
+            if (e.key === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    document.getElementById('secret').style.display = 'block';
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+    </script>
+</body>
+</html>

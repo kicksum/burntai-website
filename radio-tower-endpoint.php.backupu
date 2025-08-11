@@ -1,0 +1,301 @@
+<?php
+// api/radio-tower-api.php
+// Place this in your web root under /api/ directory
+
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+header('Access-Control-Allow-Headers: Content-Type');
+
+// Database configuration
+$db_config = [
+    'host' => 'localhost',
+    'port' => '5432',
+    'dbname' => 'burntai_radio',
+    'user' => 'burntai_user',
+    'password' => 'wasteland2077'
+];
+
+// Connect to PostgreSQL
+try {
+    $dsn = "pgsql:host={$db_config['host']};port={$db_config['port']};dbname={$db_config['dbname']}";
+    $pdo = new PDO($dsn, $db_config['user'], $db_config['password']);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die(json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]));
+}
+
+// Get request method and endpoint
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+// Handle PATH_INFO from different sources
+$path_info = $_SERVER['PATH_INFO'] ?? '';
+if (empty($path_info) && !empty($_SERVER['REQUEST_URI'])) {
+    // Extract path after the PHP file name
+    $script_name = $_SERVER['SCRIPT_NAME'];
+    $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if (strpos($request_uri, $script_name) === 0) {
+        $path_info = substr($request_uri, strlen($script_name));
+    }
+}
+
+$request = explode('/', trim($path_info, '/'));
+$endpoint = $request[0] ?? '';
+
+// Route the request
+switch ($endpoint) {
+    case 'terms':
+        handleTerms($method);
+        break;
+    case 'broadcasts':
+        handleBroadcasts($method);
+        break;
+    case 'submissions':
+        handleSubmissions($method);
+        break;
+    case 'stats':
+        handleStats($method);
+        break;
+    case 'updates':
+        handleUpdates($method);
+        break;
+    default:
+        http_response_code(404);
+        echo json_encode(['error' => 'Endpoint not found']);
+}
+
+// Handle AI terms endpoint
+function handleTerms($method) {
+    global $pdo;
+    
+    switch ($method) {
+        case 'GET':
+            $category = $_GET['category'] ?? 'all';
+            $search = $_GET['search'] ?? '';
+            $last_update = $_GET['last_update'] ?? '1970-01-01';
+            
+            $sql = "SELECT t.*, 
+                    array_agg(DISTINCT e.example) FILTER (WHERE e.example IS NOT NULL) as examples,
+                    array_agg(DISTINCT rt_term.name) FILTER (WHERE rt_term.name IS NOT NULL) as related_terms
+                    FROM ai_terms t
+                    LEFT JOIN term_examples e ON t.id = e.term_id
+                    LEFT JOIN related_terms rt ON t.id = rt.term_id
+                    LEFT JOIN ai_terms rt_term ON rt.related_term_id = rt_term.id
+                    WHERE t.is_active = true AND t.approved = true";
+            
+            $params = [];
+            
+            if ($category !== 'all') {
+                $sql .= " AND t.category = :category";
+                $params['category'] = $category;
+            }
+            
+            if ($search) {
+                $sql .= " AND (LOWER(t.name) LIKE :search OR LOWER(t.definition) LIKE :search OR LOWER(t.expanded_info) LIKE :search)";
+                $params['search'] = '%' . strtolower($search) . '%';
+            }
+            
+            if ($last_update !== '1970-01-01') {
+                $sql .= " AND t.updated_at > :last_update";
+                $params['last_update'] = $last_update;
+            }
+            
+            $sql .= " GROUP BY t.id ORDER BY t.name";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $terms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Increment view count for searched terms
+            if ($search) {
+                $update_sql = "UPDATE ai_terms SET view_count = view_count + 1 WHERE LOWER(name) LIKE :search";
+                $update_stmt = $pdo->prepare($update_sql);
+                $update_stmt->execute(['search' => '%' . strtolower($search) . '%']);
+            }
+            
+            echo json_encode([
+                'terms' => $terms,
+                'last_update' => date('Y-m-d H:i:s'),
+                'count' => count($terms)
+            ]);
+            break;
+            
+        case 'POST':
+            // Add new term (admin only - add authentication here)
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            $stmt = $pdo->prepare("INSERT INTO ai_terms (name, category, definition, expanded_info, submitted_by) 
+                                  VALUES (:name, :category, :definition, :expanded_info, :submitted_by)
+                                  RETURNING id");
+            
+            $stmt->execute([
+                'name' => $data['name'],
+                'category' => $data['category'],
+                'definition' => $data['definition'],
+                'expanded_info' => $data['expanded_info'] ?? null,
+                'submitted_by' => $data['submitted_by'] ?? 'ADMIN'
+            ]);
+            
+            $term_id = $stmt->fetchColumn();
+            
+            // Add examples
+            if (!empty($data['examples'])) {
+                $example_stmt = $pdo->prepare("INSERT INTO term_examples (term_id, example) VALUES (:term_id, :example)");
+                foreach ($data['examples'] as $example) {
+                    $example_stmt->execute(['term_id' => $term_id, 'example' => $example]);
+                }
+            }
+            
+            // Log the update
+            logUpdate('CREATE', 'ai_terms', $term_id, 'New term added: ' . $data['name']);
+            
+            echo json_encode(['success' => true, 'id' => $term_id]);
+            break;
+    }
+}
+
+// Handle broadcast messages
+function handleBroadcasts($method) {
+    global $pdo;
+    
+    if ($method === 'GET') {
+        $stmt = $pdo->prepare("SELECT * FROM broadcast_messages 
+                              WHERE is_active = true 
+                              AND (expires_at IS NULL OR expires_at > NOW())
+                              ORDER BY priority DESC, created_at DESC");
+        $stmt->execute();
+        $broadcasts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        echo json_encode(['broadcasts' => $broadcasts]);
+    }
+}
+
+// Handle user submissions
+function handleSubmissions($method) {
+    global $pdo;
+    
+    switch ($method) {
+        case 'POST':
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            $stmt = $pdo->prepare("INSERT INTO term_submissions 
+                                  (name, category, definition, expanded_info, examples, related_terms, submitted_by, submission_email)
+                                  VALUES (:name, :category, :definition, :expanded_info, :examples, :related_terms, :submitted_by, :email)");
+            
+            $stmt->execute([
+                'name' => $data['name'],
+                'category' => $data['category'],
+                'definition' => $data['definition'],
+                'expanded_info' => $data['expanded_info'] ?? null,
+                'examples' => json_encode($data['examples'] ?? []),
+                'related_terms' => json_encode($data['related_terms'] ?? []),
+                'submitted_by' => $data['submitted_by'] ?? 'Anonymous Wanderer',
+                'email' => $data['email'] ?? null
+            ]);
+            
+            echo json_encode(['success' => true, 'message' => 'Submission received. Broadcasting to administrators...']);
+            break;
+            
+        case 'GET':
+            // Admin only - list pending submissions
+            $stmt = $pdo->prepare("SELECT * FROM term_submissions WHERE status = 'pending' ORDER BY submission_date DESC");
+            $stmt->execute();
+            $submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['submissions' => $submissions]);
+            break;
+    }
+}
+
+// Handle statistics
+function handleStats($method) {
+    global $pdo;
+    
+    if ($method === 'GET') {
+        $stats = [];
+        
+        // Total terms
+        $stmt = $pdo->query("SELECT COUNT(*) FROM ai_terms WHERE is_active = true AND approved = true");
+        $stats['total_terms'] = $stmt->fetchColumn();
+        
+        // Terms by category
+        $stmt = $pdo->query("SELECT category, COUNT(*) as count FROM ai_terms 
+                            WHERE is_active = true AND approved = true 
+                            GROUP BY category");
+        $stats['by_category'] = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        
+        // Most viewed terms
+        $stmt = $pdo->query("SELECT name, view_count FROM ai_terms 
+                            WHERE is_active = true AND approved = true 
+                            ORDER BY view_count DESC LIMIT 10");
+        $stats['most_viewed'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Recent updates
+        $stmt = $pdo->query("SELECT COUNT(*) FROM ai_terms 
+                            WHERE updated_at > NOW() - INTERVAL '24 hours'");
+        $stats['recent_updates'] = $stmt->fetchColumn();
+        
+        // Pending submissions
+        $stmt = $pdo->query("SELECT COUNT(*) FROM term_submissions WHERE status = 'pending'");
+        $stats['pending_submissions'] = $stmt->fetchColumn();
+        
+        echo json_encode($stats);
+    }
+}
+
+// Handle update checks
+function handleUpdates($method) {
+    global $pdo;
+    
+    if ($method === 'GET') {
+        $last_check = $_GET['last_check'] ?? '1970-01-01 00:00:00';
+        
+        // Check for new or updated terms
+        $stmt = $pdo->prepare("SELECT COUNT(*) as new_terms FROM ai_terms 
+                              WHERE updated_at > :last_check 
+                              AND is_active = true AND approved = true");
+        $stmt->execute(['last_check' => $last_check]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Check for new broadcasts
+        $stmt = $pdo->prepare("SELECT COUNT(*) as new_broadcasts FROM broadcast_messages 
+                              WHERE created_at > :last_check AND is_active = true");
+        $stmt->execute(['last_check' => $last_check]);
+        $broadcasts = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        echo json_encode([
+            'has_updates' => ($result['new_terms'] > 0 || $broadcasts['new_broadcasts'] > 0),
+            'new_terms' => $result['new_terms'],
+            'new_broadcasts' => $broadcasts['new_broadcasts'],
+            'last_check' => date('Y-m-d H:i:s')
+        ]);
+    }
+}
+
+// Log updates
+function logUpdate($action, $table, $record_id, $details, $user = 'SYSTEM') {
+    global $pdo;
+    
+    $stmt = $pdo->prepare("INSERT INTO update_log (action, table_name, record_id, details, performed_by)
+                          VALUES (:action, :table, :record_id, :details, :user)");
+    
+    $stmt->execute([
+        'action' => $action,
+        'table' => $table,
+        'record_id' => $record_id,
+        'details' => $details,
+        'user' => $user
+    ]);
+}
+
+// Clean up old data (run via cron)
+function cleanupOldData() {
+    global $pdo;
+    
+    // Remove expired broadcasts
+    $pdo->exec("UPDATE broadcast_messages SET is_active = false WHERE expires_at < NOW()");
+    
+    // Archive old submissions
+    $pdo->exec("DELETE FROM term_submissions WHERE status != 'pending' AND submission_date < NOW() - INTERVAL '90 days'");
+}
+?>
