@@ -31,3 +31,8 @@ Thumbs.db
 # API keys and configs
 config.php
 api/ai/config.php
+keys/
+*.key
+*.pem
+id_rsa*
+id_ed25519*
