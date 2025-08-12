@@ -820,6 +820,11 @@
             .container {
                 padding-top: 80px;
             }
+            
+            /* Hide HUD on mobile */
+            #complexityHUD {
+                display: none !important;
+            }
         }
         
         /* Sound Toggle */
@@ -912,6 +917,98 @@
         </div>
         <div class="broadcast-content" id="broadcastContent">
             Loading transmission...
+        </div>
+    </div>
+    
+    <!-- Floating HUD Style Display -->
+    <div id="complexityHUD" style="
+        position: fixed;
+        top: 120px;
+        right: 20px;
+        background: rgba(10, 10, 10, 0.9);
+        border: 1px solid rgba(77, 208, 225, 0.5);
+        border-radius: 10px;
+        padding: 15px;
+        min-width: 200px;
+        backdrop-filter: blur(10px);
+        z-index: 100;
+        font-family: 'Share Tech Mono', monospace;
+        box-shadow: 0 0 20px rgba(77, 208, 225, 0.2);
+    ">
+        <div style="
+            color: var(--neon-cyan);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(77, 208, 225, 0.3);
+            cursor: move;
+        ">
+            📡 Signal Analysis
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="hud-item" style="display: flex; justify-content: space-between; align-items: center; transition: all 0.3s;">
+                <span style="color: #66bb6a; font-size: 0.9rem;">⚡ Beginner</span>
+                <span style="
+                    color: #66bb6a;
+                    background: rgba(102, 187, 106, 0.2);
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    font-weight: bold;
+                " id="hudBeginner">0</span>
+            </div>
+            
+            <div class="hud-item" style="display: flex; justify-content: space-between; align-items: center; transition: all 0.3s;">
+                <span style="color: #4dd0e1; font-size: 0.9rem;">⚡⚡ Intermediate</span>
+                <span style="
+                    color: #4dd0e1;
+                    background: rgba(77, 208, 225, 0.2);
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    font-weight: bold;
+                " id="hudIntermediate">0</span>
+            </div>
+            
+            <div class="hud-item" style="display: flex; justify-content: space-between; align-items: center; transition: all 0.3s;">
+                <span style="color: #ff9800; font-size: 0.9rem;">⚡⚡⚡ Advanced</span>
+                <span style="
+                    color: #ff9800;
+                    background: rgba(255, 152, 0, 0.2);
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    font-weight: bold;
+                " id="hudAdvanced">0</span>
+            </div>
+            
+            <div class="hud-item" style="display: flex; justify-content: space-between; align-items: center; transition: all 0.3s;">
+                <span style="color: #ff5722; font-size: 0.9rem;">⚡⚡⚡⚡ Expert</span>
+                <span style="
+                    color: #ff5722;
+                    background: rgba(255, 87, 34, 0.2);
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    font-weight: bold;
+                " id="hudExpert">0</span>
+            </div>
+        </div>
+        
+        <div style="
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(77, 208, 225, 0.3);
+            text-align: center;
+        ">
+            <div style="color: rgba(255, 255, 255, 0.5); font-size: 0.7rem; text-transform: uppercase;">
+                Total Broadcasts
+            </div>
+            <div style="
+                color: var(--neon-orange);
+                font-size: 1.5rem;
+                font-weight: bold;
+                text-shadow: 0 0 10px var(--neon-orange);
+            " id="hudTotal">0</div>
         </div>
     </div>
     
@@ -1084,11 +1181,175 @@
         const frequencySlider = document.getElementById('frequencySlider');
         const frequencyValue = document.getElementById('frequencyValue');
         
+        // Define complexity levels for categories
+        const complexityMap = {
+            'core': 1,      // 88-92 MHz - Beginner
+            'ml': 2,        // 92-96 MHz - Intermediate  
+            'neural': 3,    // 96-100 MHz - Advanced
+            'nlp': 3,       // 96-100 MHz - Advanced
+            'vision': 4,    // 100-104 MHz - Expert
+            'ethics': 2     // 92-96 MHz - Intermediate
+        };
+        
+        // Update the HTML labels
+        document.querySelector('.frequency-label').textContent = 'Knowledge Complexity';
+        document.querySelector('.frequency-value').innerHTML = '<span id="complexityLabel">Intermediate</span>';
+        
+        // Update HUD function
+        function updateComplexityHUD() {
+            const counts = {
+                beginner: allTerms.filter(t => (complexityMap[t.category] || 2) === 1).length,
+                intermediate: allTerms.filter(t => (complexityMap[t.category] || 2) === 2).length,
+                advanced: allTerms.filter(t => (complexityMap[t.category] || 2) === 3).length,
+                expert: allTerms.filter(t => (complexityMap[t.category] || 2) === 4).length
+            };
+            
+            // Animate the number updates
+            animateNumber('hudBeginner', counts.beginner);
+            animateNumber('hudIntermediate', counts.intermediate);
+            animateNumber('hudAdvanced', counts.advanced);
+            animateNumber('hudExpert', counts.expert);
+            animateNumber('hudTotal', allTerms.length);
+            
+            // Highlight current selection
+            const freq = parseFloat(document.getElementById('frequencySlider').value);
+            document.querySelectorAll('.hud-item').forEach(item => {
+                item.style.opacity = '0.6';
+                item.style.transform = 'scale(1)';
+            });
+            
+            let activeIndex = -1;
+            if (freq >= 88 && freq < 92) activeIndex = 0;
+            else if (freq >= 92 && freq < 96) activeIndex = 1;
+            else if (freq >= 96 && freq < 100) activeIndex = 2;
+            else if (freq >= 100 && freq < 104) activeIndex = 3;
+            
+            if (activeIndex >= 0) {
+                const items = document.querySelectorAll('.hud-item');
+                items[activeIndex].style.opacity = '1';
+                items[activeIndex].style.transform = 'scale(1.05)';
+            }
+        }
+        
+        // Animate number changes
+        function animateNumber(elementId, newValue) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const currentValue = parseInt(element.textContent) || 0;
+            const duration = 500; // ms
+            const steps = 20;
+            const increment = (newValue - currentValue) / steps;
+            let step = 0;
+            
+            const timer = setInterval(() => {
+                step++;
+                if (step >= steps) {
+                    element.textContent = newValue;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.round(currentValue + increment * step);
+                }
+            }, duration / steps);
+        }
+        
         frequencySlider.addEventListener('input', function() {
-            frequencyValue.textContent = this.value + ' MHz';
-            updateSignalStrength();
-            playSound('tune');
+            const freq = parseFloat(this.value);
+            let complexityLabel = 'All Levels';
+            let complexityRange = null;
+            let labelColor = '#cc5533';
+            
+            // Determine complexity range
+            if (freq >= 88 && freq < 92) {
+                complexityRange = 1;
+                complexityLabel = 'Beginner';
+                labelColor = '#66bb6a';
+            } else if (freq >= 92 && freq < 96) {
+                complexityRange = 2;
+                complexityLabel = 'Intermediate';
+                labelColor = '#4dd0e1';
+            } else if (freq >= 96 && freq < 100) {
+                complexityRange = 3;
+                complexityLabel = 'Advanced';
+                labelColor = '#ff9800';
+            } else if (freq >= 100 && freq < 104) {
+                complexityRange = 4;
+                complexityLabel = 'Expert';
+                labelColor = '#ff5722';
+            } else {
+                complexityRange = null; // Show all
+            }
+            
+            // Update display
+            const labelElement = document.getElementById('complexityLabel');
+            labelElement.textContent = complexityLabel;
+            labelElement.style.color = labelColor;
+            labelElement.style.textShadow = `0 0 10px ${labelColor}`;
+            
+            // Filter terms by complexity
+            let complexityFilteredTerms = allTerms;
+            
+            if (complexityRange !== null) {
+                complexityFilteredTerms = allTerms.filter(term => {
+                    const termComplexity = complexityMap[term.category] || 2;
+                    return termComplexity === complexityRange;
+                });
+            }
+            
+            // Apply existing search/category filters on top
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            filteredTerms = complexityFilteredTerms.filter(term => {
+                const matchesCategory = currentCategory === 'all' || term.category === currentCategory;
+                const matchesSearch = !searchQuery || 
+                    term.name.toLowerCase().includes(searchQuery) ||
+                    term.definition.toLowerCase().includes(searchQuery);
+                return matchesCategory && matchesSearch;
+            });
+            
+            // Update display
+            displayTerms();
+            
+            // Update signal strength (more terms = stronger signal)
+            const signalStrength = Math.min(5, Math.ceil((filteredTerms.length / 10)));
+            const bars = document.querySelectorAll('.signal-bar');
+            bars.forEach((bar, index) => {
+                if (index < signalStrength) {
+                    bar.classList.add('active');
+                    bar.style.background = labelColor;
+                } else {
+                    bar.classList.remove('active');
+                    bar.style.background = 'rgba(0, 255, 255, 0.2)';
+                }
+            });
+            
+            // Add some flair
+            if (filteredTerms.length === 0) {
+                document.querySelector('.static-noise').style.opacity = '0.05';
+            } else {
+                document.querySelector('.static-noise').style.opacity = '0.01';
+            }
+            
+            // Update HUD
+            updateComplexityHUD();
         });
+        
+        // Add help text below the slider
+        const sliderHelp = document.createElement('div');
+        sliderHelp.style.cssText = `
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        `;
+        sliderHelp.innerHTML = `
+            <span style="color: #66bb6a">88-92: Beginner</span> | 
+            <span style="color: #4dd0e1">92-96: Intermediate</span> | 
+            <span style="color: #ff9800">96-100: Advanced</span> | 
+            <span style="color: #ff5722">100-104: Expert</span>
+        `;
+        document.querySelector('.frequency-display').appendChild(sliderHelp);
         
         // Update signal strength based on search/filter
         function updateSignalStrength() {
@@ -1114,6 +1375,7 @@
                 if (data.status === 'success') {
                     allTerms = data.data;
                     filterTerms();
+                    updateComplexityHUD(); // Update HUD after loading
                 }
             } catch (error) {
                 console.error('Error loading terms:', error);
@@ -1183,6 +1445,7 @@
         }
         
         // Show term detail modal
+        // Show term detail modal - COMPLETE WORKING FUNCTION
         function showTermDetail(termId) {
             const term = allTerms.find(t => t.id === termId);
             if (!term) return;
@@ -1206,6 +1469,162 @@
                         ${escapeHtml(term.definition)}
                     </p>
                 </div>
+                
+                <div style="
+                    margin: 25px 0;
+                    padding: 20px;
+                    background: rgba(77, 208, 225, 0.05);
+                    border: 1px solid rgba(77, 208, 225, 0.3);
+                    border-radius: 10px;
+                ">
+                    <h3 style="
+                        color: var(--neon-cyan);
+                        margin-bottom: 15px;
+                        font-size: 0.9rem;
+                        text-transform: uppercase;
+                        letter-spacing: 0.1em;
+                    ">
+                        🔍 Deep Dive Research
+                    </h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <a href="https://www.google.com/search?q=${encodeURIComponent(term.name + ' AI technology')}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           style="
+                               display: inline-flex;
+                               align-items: center;
+                               gap: 5px;
+                               padding: 8px 15px;
+                               background: rgba(66, 133, 244, 0.1);
+                               border: 1px solid rgba(66, 133, 244, 0.5);
+                               border-radius: 20px;
+                               color: #4285f4;
+                               text-decoration: none;
+                               font-size: 0.9rem;
+                               transition: all 0.3s;
+                           "
+                           onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(66, 133, 244, 0.5)'"
+                           onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                            🔎 Google Search
+                        </a>
+                        
+                        <a href="https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(term.name)}" 
+                           target="_blank"
+                           rel="noopener noreferrer" 
+                           style="
+                               display: inline-flex;
+                               align-items: center;
+                               gap: 5px;
+                               padding: 8px 15px;
+                               background: rgba(255, 255, 255, 0.1);
+                               border: 1px solid rgba(255, 255, 255, 0.5);
+                               border-radius: 20px;
+                               color: #ffffff;
+                               text-decoration: none;
+                               font-size: 0.9rem;
+                               transition: all 0.3s;
+                           "
+                           onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(255, 255, 255, 0.5)'"
+                           onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                            📚 Wikipedia
+                        </a>
+                        
+                        <a href="https://arxiv.org/search/?query=${encodeURIComponent(term.name)}&searchtype=all" 
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           style="
+                               display: inline-flex;
+                               align-items: center;
+                               gap: 5px;
+                               padding: 8px 15px;
+                               background: rgba(183, 28, 28, 0.1);
+                               border: 1px solid rgba(183, 28, 28, 0.5);
+                               border-radius: 20px;
+                               color: #b71c1c;
+                               text-decoration: none;
+                               font-size: 0.9rem;
+                               transition: all 0.3s;
+                           "
+                           onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(183, 28, 28, 0.5)'"
+                           onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                            📄 arXiv Papers
+                        </a>
+                        
+                        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(term.name + ' explained')}" 
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           style="
+                               display: inline-flex;
+                               align-items: center;
+                               gap: 5px;
+                               padding: 8px 15px;
+                               background: rgba(255, 0, 0, 0.1);
+                               border: 1px solid rgba(255, 0, 0, 0.5);
+                               border-radius: 20px;
+                               color: #ff0000;
+                               text-decoration: none;
+                               font-size: 0.9rem;
+                               transition: all 0.3s;
+                           "
+                           onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(255, 0, 0, 0.5)'"
+                           onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                            📺 YouTube
+                        </a>
+                        
+                        <a href="https://claude.ai/new?q=${encodeURIComponent('Explain ' + term.name + ' in detail with examples and applications')}" 
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           style="
+                               display: inline-flex;
+                               align-items: center;
+                               gap: 5px;
+                               padding: 8px 15px;
+                               background: rgba(204, 85, 51, 0.1);
+                               border: 1px solid rgba(204, 85, 51, 0.5);
+                               border-radius: 20px;
+                               color: var(--neon-orange);
+                               text-decoration: none;
+                               font-size: 0.9rem;
+                               transition: all 0.3s;
+                           "
+                           onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(204, 85, 51, 0.5)'"
+                           onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                            🤖 Ask Claude
+                        </a>
+                        
+                        <a href="https://chat.openai.com/?q=${encodeURIComponent('Explain ' + term.name + ' in detail')}" 
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           style="
+                               display: inline-flex;
+                               align-items: center;
+                               gap: 5px;
+                               padding: 8px 15px;
+                               background: rgba(16, 163, 127, 0.1);
+                               border: 1px solid rgba(16, 163, 127, 0.5);
+                               border-radius: 20px;
+                               color: #10a37f;
+                               text-decoration: none;
+                               font-size: 0.9rem;
+                               transition: all 0.3s;
+                           "
+                           onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(16, 163, 127, 0.5)'"
+                           onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                            💬 ChatGPT
+                        </a>
+                    </div>
+                    <div style="
+                        margin-top: 15px;
+                        padding-top: 15px;
+                        border-top: 1px solid rgba(77, 208, 225, 0.2);
+                        font-size: 0.8rem;
+                        color: rgba(255, 255, 255, 0.4);
+                        text-align: center;
+                    ">
+                        <em>External signals detected • Click to intercept transmissions</em>
+                    </div>
+                </div>
+                
                 ${term.examples && term.examples.length > 0 ? `
                     <div style="margin-bottom: 30px;">
                         <h3 style="color: var(--neon-cyan); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.1em;">
@@ -1240,7 +1659,7 @@
             document.getElementById('termModal').classList.add('active');
             playSound('click');
         }
-        
+                
         // Search for related term
         function searchRelatedTerm(term) {
             closeTermModal();
@@ -1435,6 +1854,31 @@
             return categories[code] || code;
         }
         
+        // Make HUD draggable
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        
+        const hud = document.getElementById('complexityHUD');
+        const hudHeader = hud.querySelector('div');
+        
+        hudHeader.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            dragOffset.x = e.clientX - hud.offsetLeft;
+            dragOffset.y = e.clientY - hud.offsetTop;
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                hud.style.left = (e.clientX - dragOffset.x) + 'px';
+                hud.style.top = (e.clientY - dragOffset.y) + 'px';
+                hud.style.right = 'auto';
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
         // Close modals on outside click
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
@@ -1448,10 +1892,11 @@
             loadTerms();
             loadBroadcasts();
             
+            // Initialize HUD
+            updateComplexityHUD();
+            
             // Auto-refresh every 5 minutes
             setInterval(checkForUpdates, 5 * 60 * 1000);
-            
-            // Removed glitch effect for less distraction
         });
         
         // Keyboard shortcuts
