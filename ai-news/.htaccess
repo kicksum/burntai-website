@@ -1,0 +1,14 @@
+# Deny access to .env file
+<Files .env>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Deny access to cache directory listing
+Options -Indexes
+
+# Protect PHP files except news_proxy.php
+<FilesMatch "^(?!news_proxy\.php$).*\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

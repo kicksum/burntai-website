@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BURNT.AI - Admin Control Center</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+        
+        :root {
+            --neon-orange: #cc5533;
+            --neon-cyan: #4dd0e1;
+            --neon-green: #66bb6a;
+            --neon-red: #ff4444;
+            --dark-bg: #0a0a0a;
+            --panel-bg: rgba(15, 15, 15, 0.9);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--dark-bg);
+            color: var(--neon-cyan);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(204, 85, 51, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(77, 208, 225, 0.1) 0%, transparent 50%);
+        }
+        
+        /* Scan line effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                transparent 50%,
+                rgba(77, 208, 225, 0.03) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Header */
+        .admin-header {
+            background: linear-gradient(135deg, rgba(204, 85, 51, 0.1), rgba(77, 208, 225, 0.1));
+            border-bottom: 2px solid var(--neon-orange);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .admin-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                var(--neon-cyan), 
+                transparent
+            );
+            animation: scan 3s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--neon-orange);
+            text-shadow: 0 0 20px rgba(204, 85, 51, 0.5);
+            letter-spacing: 0.1em;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(102, 187, 106, 0.1);
+            border: 1px solid var(--neon-green);
+            border-radius: 20px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 187, 106, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(102, 187, 106, 0); }
+        }
+        
+        /* Main Container */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--panel-bg);
+            border: 1px solid rgba(77, 208, 225, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(77, 208, 225, 0.3);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        .stat-change {
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        .stat-up { color: var(--neon-green); }
+        .stat-down { color: var(--neon-red); }
+        
+        /* Activity Feed */
+        .activity-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(77, 208, 225, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            max-height: 600px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(77, 208, 225, 0.2);
+        }
+        
+        .panel-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: var(--neon-orange);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .activity-filters {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 5px 15px;
+            background: rgba(77, 208, 225, 0.1);
+            border: 1px solid rgba(77, 208, 225, 0.3);
+            border-radius: 15px;
+            color: var(--neon-cyan);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(77, 208, 225, 0.2);
+            box-shadow: 0 0 10px rgba(77, 208, 225, 0.3);
+        }
+        
+        .activity-feed {
+            height: 480px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        /* Custom Scrollbar */
+        .activity-feed::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .activity-feed::-webkit-scrollbar-track {
+            background: rgba(77, 208, 225, 0.1);
+            border-radius: 4px;
+        }
+        
+        .activity-feed::-webkit-scrollbar-thumb {
+            background: rgba(77, 208, 225, 0.5);
+            border-radius: 4px;
+        }
+        
+        .activity-feed::-webkit-scrollbar-thumb:hover {
+            background: rgba(77, 208, 225, 0.7);
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: start;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid var(--neon-cyan);
+            border-radius: 5px;
+            transition: all 0.3s;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .activity-item:hover {
+            background: rgba(77, 208, 225, 0.05);
+            transform: translateX(5px);
+        }
+        
+        .activity-icon {
+            font-size: 1.5rem;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .activity-details {
+            flex: 1;
+        }
+        
+        .activity-action {
+            font-weight: 600;
+            color: var(--neon-cyan);
+            margin-bottom: 5px;
+        }
+        
+        .activity-meta {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            gap: 15px;
+        }
+        
+        .activity-time {
+            color: var(--neon-green);
+            font-size: 0.8rem;
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        /* Two Column Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        /* Right Sidebar */
+        .sidebar-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(77, 208, 225, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            height: fit-content;
+        }
+        
+        .threat-level {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid var(--neon-red);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .threat-label {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--neon-red);
+        }
+        
+        .threat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-red);
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        /* Top Pages List */
+        .top-list {
+            list-style: none;
+        }
+        
+        .top-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(77, 208, 225, 0.1);
+        }
+        
+        .top-list li:hover {
+            color: var(--neon-orange);
+        }
+        
+        .page-name {
+            font-size: 0.9rem;
+            color: var(--neon-cyan);
+        }
+        
+        .page-count {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            font-weight: 700;
+        }
+        
+        /* Auto-refresh indicator */
+        .refresh-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(102, 187, 106, 0.1);
+            border: 1px solid var(--neon-green);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .refresh-spinner {
+            width: 15px;
+            height: 15px;
+            border: 2px solid rgba(102, 187, 106, 0.3);
+            border-top: 2px solid var(--neon-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Error State */
+        .error-state {
+            padding: 40px;
+            text-align: center;
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid var(--neon-red);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .error-icon {
+            font-size: 3rem;
+            color: var(--neon-red);
+            margin-bottom: 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-title {
+                font-size: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-cyan);
+            animation: flicker 2s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-text">INITIALIZING ADMIN SYSTEMS...</div>
+    </div>
+    
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-content">
+            <h1 class="admin-title">ADMIN CONTROL CENTER</h1>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>SYSTEM ONLINE</span>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Dashboard -->
+    <div class="dashboard-container">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Active Visitors</div>
+                <div class="stat-value" id="activeVisitors">0</div>
+                <div class="stat-change stat-up">↑ Real-time</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Today's Hits</div>
+                <div class="stat-value" id="todayHits">0</div>
+                <div class="stat-change" id="hitsTrend">Calculating...</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Unique IPs</div>
+                <div class="stat-value" id="uniqueIps">0</div>
+                <div class="stat-change">Last 24h</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">API Calls</div>
+                <div class="stat-value" id="apiCalls">0</div>
+                <div class="stat-change">Radio Tower</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Error Rate</div>
+                <div class="stat-value" id="errorRate">0%</div>
+                <div class="stat-change stat-down">↓ Low</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Load Time</div>
+                <div class="stat-value" id="loadTime">0ms</div>
+                <div class="stat-change">Performance</div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <!-- Activity Feed -->
+            <div class="activity-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Live Activity Feed</h2>
+                    <div class="activity-filters">
+                        <button class="filter-btn active" onclick="filterActivity('all')">All</button>
+                        <button class="filter-btn" onclick="filterActivity('visits')">Visits</button>
+                        <button class="filter-btn" onclick="filterActivity('api')">API</button>
+                        <button class="filter-btn" onclick="filterActivity('errors')">Errors</button>
+                    </div>
+                </div>
+                <div class="activity-feed" id="activityFeed">
+                    <!-- Activity items will be inserted here -->
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div>
+                <!-- Threat Detection -->
+                <div class="sidebar-panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Security Status</h3>
+                    </div>
+                    <div class="threat-level">
+                        <span class="threat-label">Threat Level</span>
+                        <span class="threat-value" id="threatLevel">LOW</span>
+                    </div>
+                    <ul class="top-list" id="suspiciousActivity">
+                        <li>
+                            <span class="page-name">No threats detected</span>
+                            <span class="page-count">✓</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Top Pages -->
+                <div class="sidebar-panel" style="margin-top: 20px;">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Top Pages Today</h3>
+                    </div>
+                    <ul class="top-list" id="topPages">
+                        <!-- Top pages will be inserted here -->
+                    </ul>
+                </div>
+                
+                <!-- Top Referrers -->
+                <div class="sidebar-panel" style="margin-top: 20px;">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Top Referrers</h3>
+                    </div>
+                    <ul class="top-list" id="topReferrers">
+                        <!-- Referrers will be inserted here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Auto-refresh Indicator -->
+    <div class="refresh-indicator">
+        <div class="refresh-spinner"></div>
+        <span>Auto-refresh: <span id="refreshCountdown">30</span>s</span>
+    </div>
+    
+    <script>
+        // Configuration
+        const REFRESH_INTERVAL = 30000; // 30 seconds
+        const API_ENDPOINT = '/admin-activity-api-working.php';
+        
+        // State
+        let currentFilter = 'all';
+        let refreshTimer = 30;
+        let activityData = [];
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            checkAuth();
+            
+            // Load initial data
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                loadDashboardData();
+            }, 1000);
+            
+            // Set up auto-refresh
+            setInterval(loadDashboardData, REFRESH_INTERVAL);
+            setInterval(updateRefreshTimer, 1000);
+        });
+        
+        // Check authentication
+        function checkAuth() {
+            // Simple auth check - enhance this with your actual auth system
+            const authToken = localStorage.getItem('adminAuth');
+            if (!authToken) {
+                // Redirect to login or show auth prompt
+                showAuthPrompt();
+            }
+        }
+        
+        // Show auth prompt
+        function showAuthPrompt() {
+            const password = prompt('Enter admin password:');
+            if (password) {
+                // Verify password via API
+                fetch(API_ENDPOINT + '?action=auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.setItem('adminAuth', data.token);
+                    } else {
+                        alert('Invalid password');
+                        window.location.href = '/';
+                    }
+                });
+            } else {
+                window.location.href = '/';
+            }
+        }
+        
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch(API_ENDPOINT + '?action=dashboard');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStats(data.stats);
+                    updateActivityFeed(data.activities);
+                    updateTopPages(data.topPages);
+                    updateTopReferrers(data.topReferrers);
+                    updateSecurityStatus(data.security);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showError('Failed to load dashboard data');
+            }
+        }
+        
+        // Update stats
+        function updateStats(stats) {
+            animateValue('activeVisitors', stats.activeVisitors || 0);
+            animateValue('todayHits', stats.todayHits || 0);
+            animateValue('uniqueIps', stats.uniqueIps || 0);
+            animateValue('apiCalls', stats.apiCalls || 0);
+            document.getElementById('errorRate').textContent = (stats.errorRate || 0) + '%';
+            document.getElementById('loadTime').textContent = (stats.avgLoadTime || 0) + 'ms';
+            
+            // Update trend
+            const trend = stats.hitsTrend > 0 ? '↑' : '↓';
+            const trendClass = stats.hitsTrend > 0 ? 'stat-up' : 'stat-down';
+            document.getElementById('hitsTrend').textContent = `${trend} ${Math.abs(stats.hitsTrend)}% vs yesterday`;
+            document.getElementById('hitsTrend').className = `stat-change ${trendClass}`;
+        }
+        
+        // Animate number changes
+        function animateValue(id, value) {
+            const element = document.getElementById(id);
+            const current = parseInt(element.textContent) || 0;
+            const increment = (value - current) / 10;
+            let step = 0;
+            
+            const timer = setInterval(() => {
+                step++;
+                if (step >= 10) {
+                    element.textContent = value;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.round(current + increment * step);
+                }
+            }, 50);
+        }
+        
+        // Update activity feed
+        function updateActivityFeed(activities) {
+            activityData = activities;
+            const feed = document.getElementById('activityFeed');
+            const filtered = currentFilter === 'all' ? activities : 
+                            activities.filter(a => a.type === currentFilter);
+            
+            feed.innerHTML = filtered.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">${getActivityIcon(activity.type)}</div>
+                    <div class="activity-details">
+                        <div class="activity-action">${activity.action}</div>
+                        <div class="activity-meta">
+                            <span>📍 ${activity.ip}</span>
+                            <span>📄 ${activity.page}</span>
+                            ${activity.userAgent ? `<span>🖥️ ${activity.userAgent}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="activity-time">${formatTime(activity.timestamp)}</div>
+                </div>
+            `).join('');
+        }
+        
+        // Get activity icon
+        function getActivityIcon(type) {
+            const icons = {
+                'visit': '👁️',
+                'api': '🔌',
+                'error': '⚠️',
+                'auth': '🔐',
+                'submit': '📝',
+                'search': '🔍'
+            };
+            return icons[type] || '📡';
+        }
+        
+        // Format time
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = (now - date) / 1000; // seconds
+            
+            if (diff < 60) return 'now';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            return date.toLocaleDateString();
+        }
+        
+        // Update top pages
+        function updateTopPages(pages) {
+            const list = document.getElementById('topPages');
+            list.innerHTML = pages.map(page => `
+                <li>
+                    <span class="page-name">${page.name}</span>
+                    <span class="page-count">${page.count}</span>
+                </li>
+            `).join('');
+        }
+        
+        // Update top referrers
+        function updateTopReferrers(referrers) {
+            const list = document.getElementById('topReferrers');
+            list.innerHTML = referrers.map(ref => `
+                <li>
+                    <span class="page-name">${ref.source || 'Direct'}</span>
+                    <span class="page-count">${ref.count}</span>
+                </li>
+            `).join('');
+        }
+        
+        // Update security status
+        function updateSecurityStatus(security) {
+            const threatLevel = document.getElementById('threatLevel');
+            threatLevel.textContent = security.level || 'LOW';
+            
+            const list = document.getElementById('suspiciousActivity');
+            if (security.threats && security.threats.length > 0) {
+                list.innerHTML = security.threats.map(threat => `
+                    <li>
+                        <span class="page-name">${threat.description}</span>
+                        <span class="page-count">⚠️</span>
+                    </li>
+                `).join('');
+            }
+        }
+        
+        // Filter activity
+        function filterActivity(type) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            updateActivityFeed(activityData);
+        }
+        
+        // Update refresh timer
+        function updateRefreshTimer() {
+            refreshTimer--;
+            if (refreshTimer <= 0) {
+                refreshTimer = 30;
+            }
+            document.getElementById('refreshCountdown').textContent = refreshTimer;
+        }
+        
+        // Show error
+        function showError(message) {
+            const feed = document.getElementById('activityFeed');
+            feed.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">⚠️</div>
+                    <div>${message}</div>
+                </div>
+            `;
+        }
+    </script>
+<script src="admin-ip-lookup-enhancement.js"></script>
+</body>
+</html>

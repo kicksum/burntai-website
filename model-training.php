@@ -5,34 +5,36 @@
     <style>
         body {
             font-family: serif;
-            margin: 8px;
+            margin: 20px;
             background: white;
         }
         h1 {
-            font-size: 24px;
+            font-size: 36px;
             font-weight: normal;
         }
         table {
             font-family: monospace;
-            font-size: 13px;
+            font-size: 20px;
         }
         th, td {
             text-align: left;
-            padding-right: 14px;
+            padding-right: 25px;
+            padding-top: 6px;
+            padding-bottom: 6px;
         }
         a {
             color: blue;
         }
         hr {
             border: none;
-            border-top: 1px solid #000;
+            border-top: 2px solid #000;
             margin: 0;
         }
     </style>
 </head>
 <body>
     <h1>Index of /apps</h1>
-    <input type="text" id="filter" placeholder="filter..." style="margin-bottom: 10px; font-family: monospace;">
+    <input type="text" id="filter" placeholder="filter..." style="margin-bottom: 15px; font-family: monospace; font-size: 20px; padding: 6px;">
     <table>
         <tr>
             <th valign="top">&nbsp;</th>
@@ -42,13 +44,6 @@
             <th><a href="?C=D;O=A">Description</a></th>
         </tr>
         <tr><th colspan="5"><hr></th></tr>
-        <tr>
-            <td valign="top">&nbsp;</td>
-            <td><a href="/">Parent Directory</a></td>
-            <td>&nbsp;</td>
-            <td align="right">  - </td>
-            <td>&nbsp;</td>
-        </tr>
         
         <?php
         // Get all HTML files from the apps directory
@@ -74,7 +69,7 @@
             
             echo '<tr class="file" data-name="' . htmlspecialchars($filename) . '">';
             echo '<td valign="top">&nbsp;</td>';
-            echo '<td><a href="' . htmlspecialchars($filename) . '">' . htmlspecialchars($filename) . '</a></td>';
+            echo '<td><a href="/apps/' . htmlspecialchars($filename) . '">' . htmlspecialchars($filename) . '</a></td>';
             echo '<td align="right">' . $modified . '  </td>';
             echo '<td align="right">' . str_pad($sizeStr, 4, ' ', STR_PAD_LEFT) . '</td>';
             echo '<td>&nbsp;</td>';

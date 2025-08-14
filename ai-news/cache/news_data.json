@@ -1,0 +1,122 @@
+{
+    "items": {
+        "openai": {
+            "articles": [
+                {
+                    "title": "OpenAI\u2019s letter to Governor Newsom on harmonized regulation",
+                    "url": "https:\/\/openai.com\/global-affairs\/letter-to-governor-newsom-on-harmonized-regulation",
+                    "desc": "We\u2019ve just sent a letter to Gov. Gavin Newsom calling for California to lead the way in harmonizing state-based AI regulation with national\u2014and, by virtue of US leadership, emerging global\u2014standards.",
+                    "date": "2025-08-12T00:00:00+00:00",
+                    "source": "OpenAI Blog"
+                },
+                {
+                    "title": "Scaling accounting capacity with OpenAI",
+                    "url": "https:\/\/openai.com\/index\/basis",
+                    "desc": "Built with OpenAI o3, o3-Pro, GPT-4.1, and GPT-5, Basis\u2019 AI agents help accounting firms save up to 30% of their time and expand capacity for advisory and growth.",
+                    "date": "2025-08-12T00:00:00+00:00",
+                    "source": "OpenAI Blog"
+                },
+                {
+                    "title": "Introducing GPT-5 for developers",
+                    "url": "https:\/\/openai.com\/index\/introducing-gpt-5-for-developers",
+                    "desc": "Introducing GPT-5 in our API platform\u2014offering high reasoning performance, new controls for devs, and best-in-class results on real coding tasks.",
+                    "date": "2025-08-07T10:00:00+00:00",
+                    "source": "OpenAI Blog"
+                }
+            ],
+            "status_url": "https:\/\/status.openai.com",
+            "provider": "OpenAI",
+            "has_api_key": true
+        },
+        "anthropic": {
+            "articles": [
+                {
+                    "title": "Claude API Status: Operational",
+                    "url": "https:\/\/www.anthropic.com\/api",
+                    "desc": "API services running normally with Claude models available",
+                    "date": "2025-08-14T01:10:15+00:00",
+                    "source": "Anthropic API"
+                }
+            ],
+            "status_url": "https:\/\/www.anthropic.com",
+            "provider": "Anthropic",
+            "has_api_key": true
+        },
+        "deepmind": {
+            "articles": [
+                {
+                    "title": "How AI is helping advance the science of bioacoustics to save endangered species",
+                    "url": "https:\/\/deepmind.google\/discover\/blog\/how-ai-is-helping-advance-the-science-of-bioacoustics-to-save-endangered-species\/",
+                    "desc": "Our new Perch model helps conservationists analyze audio faster to protect endangered species, from Hawaiian honeycreepers to coral reefs.",
+                    "date": "2025-08-07T14:59:16+00:00",
+                    "source": "DeepMind Blog"
+                },
+                {
+                    "title": "Genie 3: A new frontier for world models",
+                    "url": "https:\/\/deepmind.google\/discover\/blog\/genie-3-a-new-frontier-for-world-models\/",
+                    "desc": "Genie 3 can generate dynamic worlds that you can navigate in real time at 24 frames per second, retaining consistency for a few minutes at a resolution of 720p.",
+                    "date": "2025-08-05T14:00:00+00:00",
+                    "source": "DeepMind Blog"
+                },
+                {
+                    "title": "Rethinking how we measure AI intelligence",
+                    "url": "https:\/\/deepmind.google\/discover\/blog\/rethinking-how-we-measure-ai-intelligence\/",
+                    "desc": "Game Arena is a new, open-source platform for rigorous evaluation of AI models. It allows for head-to-head comparison of frontier systems in environments with clear winning conditions.",
+                    "date": "2025-08-04T16:07:18+00:00",
+                    "source": "DeepMind Blog"
+                }
+            ],
+            "status_url": "https:\/\/deepmind.google",
+            "provider": "Google DeepMind"
+        },
+        "tech": {
+            "articles": [
+                {
+                    "title": "Sam Altman, OpenAI will reportedly back a startup that takes on Musk\u2019s Neuralink | TechCrunch",
+                    "url": "https:\/\/techcrunch.com\/2025\/08\/12\/sam-altman-openai-will-reportedly-back-a-startup-that-takes-on-musks-neuralink\/",
+                    "desc": "Sam Altman, OpenAI will reportedly back a startup that takes on Musk\u2019s Neuralink | TechCrunchtechcrunch.com",
+                    "date": "2025-08-13T00:31:29+00:00",
+                    "source": "TechCrunch"
+                },
+                {
+                    "title": "OpenAI adds new ChatGPT third-party tool connectors to Dropbox, MS Teams as Altman clarifies GPT-5 prioritization",
+                    "url": "https:\/\/venturebeat.com\/ai\/openai-adds-new-chatgpt-third-party-tool-connectors-to-dropbox-ms-teams-as-altman-clarifies-gpt-5-prioritization\/",
+                    "desc": "OpenAI is positioning GPT-5 not only as a more powerful AI model but also as part of a more connected workspace.",
+                    "date": "2025-08-12T18:29:34+00:00",
+                    "source": "VentureBeat"
+                },
+                {
+                    "title": "Anthropic just made its latest move in the AI coding wars",
+                    "url": "https:\/\/www.theverge.com\/ai-artificial-intelligence\/757998\/anthropic-just-made-its-latest-move-in-the-ai-coding-wars",
+                    "desc": "The AI coding wars are heating up. One of the main battlegrounds? \"Context windows,\" or an AI model's working memory - the amount of text it can take into account when it's coming up with an answer. On that front, Anthropic just gained some ground. Today, the\u2026",
+                    "date": "2025-08-12T18:10:33+00:00",
+                    "source": "The Verge"
+                },
+                {
+                    "title": "AI companion apps on track to pull in $120M in 2025",
+                    "url": "https:\/\/techcrunch.com\/2025\/08\/12\/ai-companion-apps-on-track-to-pull-in-120m-in-2025\/",
+                    "desc": "The number of AI companion apps has grown more than 60% since 2024.",
+                    "date": "2025-08-12T17:38:42+00:00",
+                    "source": "TechCrunch"
+                },
+                {
+                    "title": "Perplexity offers to buy Chrome for billions more than it's raised | TechCrunch",
+                    "url": "https:\/\/techcrunch.com\/2025\/08\/12\/perplexity-offers-to-buy-chrome-for-billions-more-than-its-raised\/",
+                    "desc": "Perplexity has offered to buy Chrome from Google for $34.5 billion cash in an unsolicited offer.",
+                    "date": "2025-08-12T17:14:11+00:00",
+                    "source": "TechCrunch"
+                }
+            ],
+            "status_url": "https:\/\/newsapi.org",
+            "provider": "Tech News"
+        }
+    },
+    "updated": "2025-08-14T01:10:14+00:00",
+    "stale": false,
+    "cached": false,
+    "api_status": {
+        "openai": "configured",
+        "anthropic": "configured",
+        "newsapi": "configured"
+    }
+}

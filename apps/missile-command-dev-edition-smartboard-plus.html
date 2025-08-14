@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Missile Command — Dev Edition: Smartboard</title>
+<style>
+  :root{
+    --bg:#060a16;
+    --sky1:#1a2d52;
+    --sky2:#0b1838;
+    --hud:#e9f2ff;
+    --accent:#ffd166;
+    --ok:#00ff9a;
+    --danger:#ff4d4d;
+    --muted:#8aa0c7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--hud);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  #wrap{position:relative}
+  canvas{
+    display:block;
+    border:2px solid rgba(255,255,255,.15);
+    border-radius:14px;
+    box-shadow:0 30px 120px rgba(0,0,0,.6), inset 0 0 40px rgba(0,0,0,.6);
+    cursor: crosshair;
+  }
+  #ui{
+    position:absolute; inset:10px 10px auto 10px; display:flex; gap:16px; align-items:center;
+    justify-content:space-between; pointer-events:none; z-index:5; width:calc(100% - 20px);
+  }
+  #leftHUD, #rightHUD {display:flex; gap:16px; align-items:center}
+  .pill{
+    padding:6px 10px; border:1px solid rgba(255,255,255,.2); border-radius:999px;
+    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.2));
+    box-shadow:0 0 12px rgba(0,0,0,.3);
+    font-weight:700; letter-spacing:.5px; font-size:14px;
+  }
+  .mult{color:var(--accent)}
+  .hp{color:var(--ok)}
+  #devPanel{
+    pointer-events:auto;
+    position:absolute; right:8px; top:56px; z-index:6;
+    width:320px; border:1px solid rgba(255,255,255,.15); border-radius:12px;
+    background:rgba(12,18,32,.9); padding:12px; backdrop-filter: blur(2px);
+  }
+  #devPanel h3{font-size:13px; opacity:.95; margin-bottom:6px}
+  #devPanel .row{display:flex; align-items:center; gap:8px; margin:6px 0}
+  #devPanel label{font-size:12px; white-space:nowrap}
+  #devPanel input[type=range]{width:100%}
+  #devPanel .stat{display:flex; justify-content:space-between; font-size:12px; opacity:.95}
+  #devPanel .muted{color:var(--muted)}
+  .hidden{display:none !important}
+  #overlay{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(6,10,22,.65); backdrop-filter: blur(2px);
+    z-index:10;
+  }
+  .panel{
+    width:min(92vw,600px);
+    border:2px solid var(--ok);
+    border-radius:14px; padding:24px;
+    background:rgba(5,12,20,.9);
+    box-shadow:0 0 30px rgba(0,255,140,.25);
+    text-align:center;
+  }
+  h1{font-size:28px; color:var(--ok); margin-bottom:8px; text-shadow:0 0 10px rgba(0,255,140,.5)}
+  h2{font-size:24px; color:var(--danger); margin-bottom:8px; text-shadow:0 0 10px rgba(255,77,77,.5)}
+  .small{opacity:.9; font-size:13px; line-height:1.6; margin-top:8px}
+  button{
+    margin-top:14px;
+    font:700 16px ui-monospace, monospace;
+    padding:10px 16px; border-radius:10px;
+    border:0; cursor:pointer; color:#03070f;
+    background:var(--ok);
+    transition: transform .08s ease, box-shadow .2s ease;
+    box-shadow:0 6px 0 #0fa, 0 0 24px rgba(0,255,140,.2);
+  }
+  button:active{ transform: translateY(2px); box-shadow:0 4px 0 #0fa}
+  input[type=text]{
+    width:260px; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.06); color:#fff; font:600 14px ui-monospace, monospace;
+    outline:none;
+  }
+  table{width:100%; border-collapse:collapse; margin-top:10px; font-size:13px}
+  th,td{padding:6px 8px; border-bottom:1px solid rgba(255,255,255,.1); text-align:left}
+  th{color:#9ed7ff}
+  #footerTips{position:absolute; inset:auto 0 10px 0; text-align:center; font-size:12px; opacity:.75; pointer-events:none}
+</style>
+</head>
+<body>
+  <div id="wrap">
+    <div id="ui">
+      <div id="leftHUD">
+        <div class="pill">PLAYER <span id="playerNameHUD">Commander</span></div>
+        <div class="pill">SCORE <span id="score">0</span></div>
+        <div class="pill">WAVE <span id="wave">1</span></div>
+        <div class="pill mult">MULT <span id="mult">1</span>x</div>
+        <div class="pill hp">CITIES <span id="citiesAlive">6</span>/6</div>
+      </div>
+      <div id="rightHUD">
+        <div class="pill">HIGHSCORE <span id="hi">0</span></div>
+        <div class="pill">ABM <span id="ammo">45</span></div>
+      </div>
+    </div>
+
+    <div id="devPanel" class="hidden">
+      <h3>Developer Controls</h3>
+      <div class="row"><label for="speed">Speed: <span id="speedLabel">1.00×</span></label></div>
+      <input id="speed" type="range" min="0.40" max="1.60" step="0.01" value="1.00" />
+      <div class="row"><label for="diff">Enemy Difficulty: <span id="diffLabel">2</span></label></div>
+      <input id="diff" type="range" min="1" max="5" step="1" value="2" />
+      <div class="row"><label for="smarts">Enemy Smarts: <span id="smartsLabel">3</span></label></div>
+      <input id="smarts" type="range" min="1" max="5" step="1" value="3" />
+      <div class="row"><label class="muted">Secret toggle: Up Up Down Down Left Right Left Right B A</label></div>
+      <div id="stats">
+        <div class="stat"><span>FPS</span><span id="fps">0</span></div>
+        <div class="stat"><span>IPBM px/s</span><span id="ipbmPS">0</span></div>
+        <div class="stat"><span>ABM px/s</span><span id="abmPS">0</span></div>
+        <div class="stat"><span>Spawn interval</span><span id="spawnInt">0.0s</span></div>
+        <div class="stat"><span>Wave size</span><span id="waveSize">0</span></div>
+      </div>
+    </div>
+
+    <canvas id="c" width="900" height="600" aria-label="Missile Command Game"></canvas>
+
+    <div id="overlay" aria-live="polite">
+      <div class="panel" id="startPanel">
+        <h1>MISSILE COMMAND — DEFEND ZARDON</h1>
+        <p>Name your commander and defend the cities. Leaderboard is saved locally.</p>
+        <div style="margin:10px 0">
+          <input id="playerName" type="text" placeholder="Enter player name" maxlength="20" />
+        </div>
+        <p class="small">
+          <span class="kbd">🖱 Left Click</span> Fire ABM •
+          <span class="kbd">Space</span> Pause •
+          <span class="kbd">M</span> Mute •
+          <span class="kbd">R</span> Restart
+        </p>
+        <button id="startBtn">START MISSION</button>
+        <div id="leaderboardStart" style="margin-top:14px"></div>
+      </div>
+      <div class="panel" id="gameOverPanel" style="display:none">
+        <h2>ZARDON HAS FALLEN</h2>
+        <p>Commander <b id="finalName">Commander</b> • Score: <b id="finalScore">0</b> • Wave: <b id="finalWave">1</b></p>
+        <div id="leaderboardGO"></div>
+        <button id="retryBtn">TRY AGAIN</button>
+      </div>
+    </div>
+
+    <div id="footerTips">Tip: Enemy “Smarts” tunes tactics (retargeting, coordination) not raw speed/HP.</div>
+  </div>
+
+<script>
+(() => {
+  // ===== Canvas + DPR scaling =====
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  ctx.lineCap = 'round';
+  let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+  function resize() {
+    const targetW = 900, targetH = 600;
+    const scale = Math.min(
+      window.innerWidth * 0.98 / targetW,
+      window.innerHeight * 0.92 / targetH
+    );
+    const cssW = Math.max(600, Math.floor(targetW * scale));
+    const cssH = Math.max(400, Math.floor(targetH * scale));
+    canvas.style.width = cssW + 'px';
+    canvas.style.height = cssH + 'px';
+    dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    canvas.width = Math.floor(targetW * dpr);
+    canvas.height = Math.floor(targetH * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ===== Dev controls & secret toggle =====
+  const devPanel = document.getElementById('devPanel');
+  const speedInput = document.getElementById('speed');
+  const speedLabel = document.getElementById('speedLabel');
+  const diffInput = document.getElementById('diff');
+  const diffLabel = document.getElementById('diffLabel');
+  const smartsInput = document.getElementById('smarts');
+  const smartsLabel = document.getElementById('smartsLabel');
+
+  const fpsEl = document.getElementById('fps');
+  const ipbmPSEl = document.getElementById('ipbmPS');
+  const abmPSEl = document.getElementById('abmPS');
+  const spawnIntEl = document.getElementById('spawnInt');
+  const waveSizeEl = document.getElementById('waveSize');
+
+  // show panel if ?dev=1 query present
+  if (new URLSearchParams(location.search).get('dev') === '1') {
+    devPanel.classList.remove('hidden');
+  }
+
+  // Konami code to toggle panel
+  const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let kIndex = 0;
+  window.addEventListener('keydown', (e)=>{
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (key === KONAMI[kIndex] || key === KONAMI[kIndex].toLowerCase()){
+      kIndex++;
+      if (kIndex >= KONAMI.length){
+        devPanel.classList.toggle('hidden');
+        kIndex = 0;
+      }
+    } else {
+      kIndex = 0;
+    }
+  });
+
+  let speedScale = parseFloat(speedInput.value);
+  speedLabel.textContent = speedScale.toFixed(2) + '×';
+  speedInput.addEventListener('input', ()=>{
+    speedScale = parseFloat(speedInput.value);
+    speedLabel.textContent = speedScale.toFixed(2) + '×';
+    recalcSpawnInterval();
+  });
+
+  let enemyDifficulty = parseInt(diffInput.value,10); // 1..5
+  diffLabel.textContent = String(enemyDifficulty);
+  diffInput.addEventListener('input', ()=>{
+    enemyDifficulty = parseInt(diffInput.value,10);
+    diffLabel.textContent = String(enemyDifficulty);
+    recalcSpawnInterval();
+  });
+
+  let enemySmarts = parseInt(smartsInput.value,10); // 1..5 (tactics only)
+  smartsLabel.textContent = String(enemySmarts);
+  smartsInput.addEventListener('input', ()=>{
+    enemySmarts = parseInt(smartsInput.value,10);
+    smartsLabel.textContent = String(enemySmarts);
+  });
+
+  function setStat(el, v){ if (el) el.textContent = v; }
+  function format(n){ return Number(n).toFixed(0); }
+  function format1(n){ return Number(n).toFixed(1); }
+
+  // ===== Player + Leaderboard =====
+  const nameInput = document.getElementById('playerName');
+  const playerNameHUD = document.getElementById('playerNameHUD');
+  const finalName = document.getElementById('finalName');
+  const LB_KEY = 'mc_lb_v2';
+  const NAME_KEY = 'mc_player';
+  function getPlayerName(){ return (nameInput?.value?.trim() || localStorage.getItem(NAME_KEY) || 'Commander'); }
+  function setPlayerName(name){
+    localStorage.setItem(NAME_KEY, name);
+    playerNameHUD.textContent = name;
+  }
+  function loadNameToUI(){
+    const saved = localStorage.getItem(NAME_KEY) || '';
+    if (nameInput) nameInput.value = saved;
+    playerNameHUD.textContent = saved || 'Commander';
+  }
+  function getLeaderboard(){
+    try{ return JSON.parse(localStorage.getItem(LB_KEY) || '[]'); }catch{ return []; }
+  }
+  function saveLeaderboard(lb){ localStorage.setItem(LB_KEY, JSON.stringify(lb)); }
+  function submitScore(name, score, wave){
+    const lb = getLeaderboard();
+    lb.push({name, score, wave, date: new Date().toISOString().slice(0,10)});
+    lb.sort((a,b)=> b.score - a.score);
+    if (lb.length>10) lb.length=10;
+    saveLeaderboard(lb);
+  }
+  function renderLeaderboard(containerId, title='Leaderboard'){
+    const lb = getLeaderboard();
+    if (!lb.length){
+      document.getElementById(containerId).innerHTML = '<p class="small">No scores yet. Be the first, Commander.</p>';
+      return;
+    }
+    let html = `<h3>${title}</h3><table><thead><tr><th>#</th><th>Name</th><th>Score</th><th>Wave</th><th>Date</th></tr></thead><tbody>`;
+    lb.forEach((e,i)=>{
+      html += `<tr><td>${i+1}</td><td>${e.name}</td><td>${e.score}</td><td>${e.wave}</td><td>${e.date}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById(containerId).innerHTML = html;
+    // update single high score in HUD
+    document.getElementById('hi').textContent = lb[0]?.score || 0;
+  }
+  loadNameToUI();
+
+  // ===== Game State =====
+  let state = 'menu'; // 'playing' | 'gameover'
+  let score = 0, wave = 1, mult = 1;
+  let paused = false, muted = false;
+  let bonusCityThreshold = 10000;
+
+  // Timing
+  let lastTime = performance.now();
+  let accFPS = 0, fpsFrames = 0, fpsTimer = 0, currentFPS = 60;
+
+  // Base (per-second) speeds
+  const SPEEDS = {
+    IPBM: 110,
+    SMART: 135,
+    SAT: 95,
+    BOMBER: 85,
+    MIRV: 140,
+    ZIG: 120,
+    SHIELD: 105,
+    CLUSTER: 115,
+    STEALTH: 125,
+    ABM: 460,
+    EXPAND: 190,
+    SHRINK: 80
+  };
+
+  // Enemy registry
+  const ENEMY_DEFS = {
+    IPBM:     {col:'#f44', base:SPEEDS.IPBM,   pts:25,  hp:1},
+    Smart:    {col:'#f0f', base:SPEEDS.SMART,  pts:125, hp:1, evade:true},
+    Satellite:{col:'#0ff', base:SPEEDS.SAT,    pts:100, hp:1},
+    Bomber:   {col:'#fa0', base:SPEEDS.BOMBER, pts:100, hp:1, drop:true},
+    MIRV:     {col:'#f33', base:SPEEDS.MIRV,   pts:25,  hp:1, split:true},
+    ZigZag:   {col:'#6cf', base:SPEEDS.ZIG,    pts:60,  hp:1, zig:true},
+    Shielded: {col:'#fff', base:SPEEDS.SHIELD, pts:140, hp:2, shield:true},
+    Cluster:  {col:'#9cf', base:SPEEDS.CLUSTER,pts:120, hp:1, cluster:true},
+    Stealth:  {col:'#8aa0c7', base:SPEEDS.STEALTH, pts:80, hp:1, stealth:true}
+  };
+
+  // Difficulty (affects HP/speed/wave size)
+  function diffHP(){ return 1 + (enemyDifficulty-1)*0.5; }
+  function diffSpeed(){ return 1 + (enemyDifficulty-1)*0.12; }
+  function diffWaveSize(){ return 1 + (enemyDifficulty-1)*0.25; }
+  function diffSpawn(){ return 1 / (1 + (enemyDifficulty-1)*0.12); }
+
+  // Smarts (tactics probabilities only)
+  function smartsP(){ return (enemySmarts-1)/4; } // 0..1
+  function smartRetargetChance(){ return 0.05 + smartsP()*0.30; } // per second chance
+  function smartFocusFireChance(){ return 0.15 + smartsP()*0.50; } // group same target
+  function smartWeakTargetChance(){ return 0.20 + smartsP()*0.50; } // choose weakest city/widest threat
+  function smartFeintChance(){ return smartsP()*0.35; } // initial drift/feint
+  function smartBombPredict(){ return 0.3 + smartsP()*0.5; } // bomber drops predictive
+
+  // Spawning
+  let spawnTimer = 0;
+  let spawnInterval = 1.9; // seconds
+  function recalcSpawnInterval(){
+    spawnInterval = Math.max(0.55, 2.1 - wave*0.12) / Math.sqrt(speedScale) * diffSpawn();
+    setStat(spawnIntEl, format1(spawnInterval) + 's');
+  }
+
+  // Mouse
+  let mouse = {x: 450, y: 300};
+
+  // Entities
+  let cities = [];
+  let bases = [];
+  let pMissiles = [];
+  let eMissiles = [];
+  let explosions = [];
+  let particles = [];
+
+  // Wave scheduling
+  let waveEnemies = [];
+  let enemiesSpawned = 0;
+  let betweenWaves = false;
+  let betweenWaveTimer = 0;
+
+  // ===== Audio =====
+  let actx = null;
+  function ensureAudio() {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+  }
+  function tone({freq=440, dur=0.12, type='square', vol=0.15}){
+    if (muted || !actx) return;
+    const o = actx.createOscillator();
+    const g = actx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.value = vol;
+    o.connect(g); g.connect(actx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur);
+    o.stop(actx.currentTime + dur);
+  }
+  function noise({dur=0.18, vol=0.12}){
+    if (muted || !actx) return;
+    const bufferSize = Math.ceil(actx.sampleRate * dur);
+    const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1) * 0.6;
+    const src = actx.createBufferSource(); src.buffer = buffer;
+    const g = actx.createGain(); g.gain.value = vol;
+    src.connect(g); g.connect(actx.destination);
+    src.start();
+  }
+
+  // ===== Helpers =====
+  function rand(min, max){ return Math.random()*(max-min)+min; }
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+  // ===== Classes =====
+  class City{
+    constructor(x,y){
+      this.x=x; this.y=y; this.alive=true;
+      this.b = this.gen();
+    }
+    gen(){
+      const out=[];
+      for (let i=0;i<5;i++){
+        out.push({x:this.x-20+i*10, w:8, h: 10 + Math.random()*20});
+      }
+      return out;
+    }
+    draw(){
+      if (!this.alive) return;
+      ctx.fillStyle = '#6cf5a3';
+      for (const b of this.b) ctx.fillRect(b.x, this.y - b.h, b.w, b.h);
+      ctx.fillStyle = '#ffe066';
+      for (const b of this.b){
+        for (let y=5;y<b.h;y+=8){
+          for (let x=2;x<b.w-2;x+=4){
+            if (Math.random()>.35) ctx.fillRect(b.x+x, this.y-b.h+y, 2, 2);
+          }
+        }
+      }
+    }
+    destroy(){
+      if (!this.alive) return;
+      this.alive=false;
+      for (let i=0;i<28;i++){
+        particles.push(new Particle(this.x, this.y-15, (Math.random()-0.5)*120, -Math.random()*120, '#6cf5a3', true));
+      }
+      tone({freq:140, dur:.4, type:'sawtooth', vol:.25});
+    }
+  }
+
+  class Base{
+    constructor(x,y){
+      this.x=x; this.y=y; this.alive=true; this.missiles=45/3;
+    }
+    draw(){
+      if (!this.alive) return;
+      ctx.fillStyle = '#5eb3ff';
+      ctx.beginPath();
+      ctx.moveTo(this.x-24, this.y);
+      ctx.lineTo(this.x+24, this.y);
+      ctx.lineTo(this.x+14, this.y-18);
+      ctx.lineTo(this.x-14, this.y-18);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = '12px ui-monospace';
+      ctx.fillText(String(this.missiles), this.x-6, this.y-24);
+      ctx.fillStyle = '#ffd166';
+      const sticks = Math.min(this.missiles, 10);
+      for (let i=0;i<sticks;i++) ctx.fillRect(this.x-20 + i*4, this.y-10, 2, 8);
+    }
+    fire(tx,ty){
+      if (!this.alive || this.missiles<=0) return false;
+      this.missiles--;
+      pMissiles.push(new PMissile(this.x, this.y-18, tx, ty));
+      tone({freq:820, dur:.09, type:'square', vol:.18});
+      return true;
+    }
+    destroy(){
+      if (!this.alive) return;
+      this.alive=false; this.missiles=0;
+      explosions.push(new Explosion(this.x, this.y-8, 42, '#ffd166'));
+      tone({freq:110, dur:.7, type:'sawtooth', vol:.35});
+    }
+  }
+
+  class PMissile{
+    constructor(x,y,tx,ty){
+      this.sx=x; this.sy=y; this.x=x; this.y=y;
+      this.tx=tx; this.ty=ty; this.spd=SPEEDS.ABM;
+      this.trail=[]; this.exploded=false;
+      const dx=tx-x, dy=ty-y, d=Math.hypot(dx,dy)||1;
+      this.vx = dx/d; this.vy = dy/d;
+    }
+    update(dt){
+      if (this.exploded) return;
+      this.trail.push({x:this.x, y:this.y}); if (this.trail.length>20) this.trail.shift();
+      this.x += this.vx * this.spd * dt;
+      this.y += this.vy * this.spd * dt;
+      if (Math.hypot(this.tx-this.x, this.ty-this.y) < 6) this.explode();
+    }
+    explode(){
+      this.exploded=true;
+      explosions.push(new Explosion(this.x, this.y, 86, '#ffffff'));
+      noise({dur:.16, vol:.12});
+    }
+    draw(){
+      if (this.exploded) return;
+      ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 2; ctx.beginPath();
+      ctx.moveTo(this.sx, this.sy);
+      for (const p of this.trail) ctx.lineTo(p.x,p.y);
+      ctx.lineTo(this.x, this.y); ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.fillRect(this.x-2, this.y-2, 4, 4);
+    }
+  }
+
+  class EMissile{
+    constructor(x,y,tx,ty,type='IPBM'){
+      const def = ENEMY_DEFS[type];
+      this.type=type;
+      this.x=x; this.y=y; this.tx=tx; this.ty=ty;
+      this.col=def.col; this.base=def.base; this.pts=def.pts;
+      this.evade=!!def.evade; this.drop=!!def.drop; this.split=!!def.split;
+      this.zig=!!def.zig; this.shield=!!def.shield; this.cluster=!!def.cluster; this.stealth=!!def.stealth;
+      this.hp = Math.ceil(def.hp * diffHP());
+      this.trail=[]; this.active=true;
+      this.bombT=0; this.zigT=0; this.retargetT=0;
+      // initial vector
+      let dx=tx-x, dy=ty-y, d=Math.hypot(dx,dy)||1;
+      // feint angle (smarts): slight initial offset
+      if (Math.random() < smartFeintChance()){
+        const ang = Math.atan2(dy,dx) + rand(-0.5,0.5) * smartsP(); // radians
+        dx = Math.cos(ang); dy = Math.sin(ang); d=1;
+      } else { dx/=d; dy/=d; }
+      this.vx = dx; this.vy = dy;
+    }
+    pickTarget(avoidX=null, avoidY=null){
+      // choose weakest city or random based on smarts
+      const aliveCities = cities.filter(c=>c.alive);
+      let target = null;
+      if (aliveCities.length && Math.random() < smartWeakTargetChance()){
+        // weakest = side with fewest alive or nearest destroyed edge; here pick the city with least neighbors alive (simple heuristic)
+        target = aliveCities.sort((a,b)=> Math.abs(a.x-450) - Math.abs(b.x-450))[0];
+      } else {
+        const targets = [...aliveCities, ...bases.filter(b=>b.alive)];
+        if (!targets.length) return null;
+        target = targets[(Math.random()*targets.length)|0];
+      }
+      // nudge target away from a big explosion if provided (avoidance)
+      if (avoidX!=null){
+        const dx = target.x - avoidX, dy = target.y - avoidY;
+        const len = Math.hypot(dx,dy)||1;
+        target = {x: avoidX + dx/len*80, y: avoidY + dy/len*80}; // offset 80px away
+      }
+      return target;
+    }
+    update(dt){
+      if (!this.active) return;
+      const spd = this.base * speedScale * diffSpeed();
+      this.trail.push({x:this.x,y:this.y}); if (this.trail.length>30) this.trail.shift();
+
+      // smarter retargeting if original target is gone or periodically
+      this.retargetT += dt;
+      const retargetInterval = 0.6 + (1 - smartsP())*0.7; // smarter = checks more often
+      if (this.retargetT > retargetInterval && Math.random() < smartRetargetChance()){
+        this.retargetT = 0;
+        const nearExpl = explosions.find(e => Math.hypot(e.x-this.x, e.y-this.y) < e.radius+40);
+        const t = this.pickTarget(nearExpl?.x, nearExpl?.y);
+        if (t){
+          const dx = t.x - this.x, dy = t.y - this.y, d=Math.hypot(dx,dy)||1;
+          this.vx = dx/d; this.vy = dy/d;
+          this.tx = t.x; this.ty = t.y;
+        }
+      }
+
+      // behaviors
+      if (this.evade){
+        const e = explosions.find(e => Math.hypot(e.x-this.x, e.y-this.y) < (120 + smartsP()*60) && e.radius>10);
+        if (e){
+          // steer away using vector from explosion to missile
+          let ax = this.x - e.x, ay = this.y - e.y;
+          const len = Math.hypot(ax,ay)||1; ax/=len; ay/=len;
+          this.vx = (this.vx + ax*0.9) / 1.2; this.vy = (this.vy + ay*0.9) / 1.2;
+          const d=Math.hypot(this.vx,this.vy)||1; this.vx/=d; this.vy/=d;
+        }
+      }
+      if (this.drop){
+        this.bombT += dt;
+        const dropEvery = Math.max(1.6, 2.5 - 0.2*enemyDifficulty);
+        if (this.bombT>dropEvery){
+          this.bombT=0;
+          // predictive drop if smart
+          let t = pickRandomTarget();
+          if (t && Math.random()<smartBombPredict()){
+            // predict player intercept crosshair vicinity (rough: drop a bit ahead towards center)
+            const leadX = t.x + (450 - t.x)*0.15;
+            t = {x: leadX, y: t.y};
+          }
+          if (t) eMissiles.push(new EMissile(this.x, this.y, t.x, t.y, 'IPBM'));
+        }
+      }
+      if (this.split && this.y > 170){
+        this.split=false;
+        const count = 2 + Math.min(3, enemyDifficulty);
+        for (let i=0;i<count;i++){
+          const target = pickRandomTarget();
+          if (target) eMissiles.push(new EMissile(this.x, this.y, target.x, target.y, 'IPBM'));
+        }
+        tone({freq:600, dur:.08, type:'sawtooth', vol:.18});
+      }
+      if (this.zig){
+        this.zigT += dt*6;
+      }
+
+      // move
+      let vx = this.vx, vy = this.vy;
+      if (this.zig){
+        vx += Math.sin(this.zigT) * 0.5;
+        const d=Math.hypot(vx,vy)||1; vx/=d; vy/=d;
+      }
+      this.x += vx * spd * dt;
+      this.y += vy * spd * dt;
+
+      if (this.cluster && this.y > 200){
+        this.cluster=false;
+        const focus = (Math.random() < smartFocusFireChance());
+        let t = pickRandomTarget();
+        for (let i=0;i<4;i++){
+          let tt = t;
+          if (!focus || !tt) tt = pickRandomTarget();
+          if (tt) eMissiles.push(new EMissile(this.x, this.y, tt.x, tt.y, 'IPBM'));
+        }
+      }
+
+      if (this.y >= this.ty - 2) this.hit();
+    }
+    damage(){
+      this.hp -= 1;
+      if (this.hp <= 0){
+        this.active=false;
+        score += this.pts * mult;
+        bumpScore();
+        explosions.push(new Explosion(this.x, this.y, 30, '#ffd166'));
+        for (let i=0;i<10;i++) particles.push(new Particle(this.x, this.y, (Math.random()-.5)*120, (Math.random()-.5)*120, this.col, true));
+        tone({freq: rand(260,420), dur:.09, type:'square', vol:.12});
+      } else {
+        // shield hit flash
+        explosions.push(new Explosion(this.x, this.y, 18, '#9ff'));
+      }
+    }
+    hit(){
+      this.active=false;
+      for (const c of cities){ if (c.alive && Math.abs(c.x - this.x) < 28) c.destroy(); }
+      for (const b of bases){ if (b.alive && Math.abs(b.x - this.x) < 28) b.destroy(); }
+      explosions.push(new Explosion(this.x, this.y, 30, this.col));
+    }
+    draw(){
+      if (!this.active) return;
+      ctx.globalAlpha = this.stealth ? 0.4 : 1;
+      ctx.strokeStyle=this.col; ctx.lineWidth=1; ctx.beginPath();
+      if (this.trail.length){
+        ctx.moveTo(this.trail[0].x, this.trail[0].y);
+        for (const p of this.trail) ctx.lineTo(p.x,p.y);
+      }
+      ctx.stroke();
+      if (this.type==='Smart'){
+        ctx.strokeStyle=this.col; ctx.lineWidth=2; ctx.beginPath();
+        ctx.moveTo(this.x-4,this.y-4); ctx.lineTo(this.x+4,this.y+4);
+        ctx.moveTo(this.x+4,this.y-4); ctx.lineTo(this.x-4,this.y+4); ctx.stroke();
+      }else if (this.type==='Satellite'){
+        ctx.fillStyle=this.col; ctx.fillRect(this.x-3,this.y-3,6,6);
+        ctx.fillRect(this.x-8,this.y-1,16,2); ctx.fillRect(this.x-1,this.y-8,2,16);
+      }else if (this.type==='Bomber'){
+        ctx.fillStyle=this.col; ctx.beginPath();
+        ctx.moveTo(this.x, this.y+4); ctx.lineTo(this.x-8, this.y-4); ctx.lineTo(this.x+8, this.y-4);
+        ctx.closePath(); ctx.fill();
+      }else if (this.type==='ZigZag'){
+        ctx.fillStyle=this.col; ctx.beginPath();
+        ctx.arc(this.x,this.y,3,0,Math.PI*2); ctx.fill();
+      }else if (this.type==='Shielded'){
+        ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.beginPath();
+        ctx.arc(this.x,this.y,5,0,Math.PI*2); ctx.stroke();
+      }else if (this.type==='Stealth'){
+        ctx.fillStyle=this.col; ctx.fillRect(this.x-2,this.y-2,4,4);
+      }else{
+        ctx.fillStyle=this.col; ctx.fillRect(this.x-1,this.y-3,2,6); ctx.fillRect(this.x-2,this.y-1,4,2);
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  class Explosion{
+    constructor(x,y,maxR,col){
+      this.x=x; this.y=y; this.radius=1; this.maxR=maxR; this.col=col; this.grow=true; this.active=true;
+    }
+    update(dt){
+      if (!this.active) return;
+      this.radius += this.grow ? SPEEDS.EXPAND*dt : -SPEEDS.SHRINK*dt;
+      if (this.radius>=this.maxR) this.grow=false;
+      if (this.radius<=0){ this.active=false; return; }
+      for (const m of eMissiles){
+        if (!m.active) continue;
+        if (Math.hypot(m.x-this.x, m.y-this.y) < this.radius){
+          m.damage ? m.damage() : (m.active=false);
+          if (!m.active && !m.damage){ score += m.pts * mult; bumpScore(); explosions.push(new Explosion(m.x, m.y, 30, '#ffd166')); }
+        }
+      }
+    }
+    draw(){
+      if (!this.active) return;
+      const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+      g.addColorStop(0, this.col);
+      g.addColorStop(.4, this.col);
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  class Particle{
+    constructor(x,y,vx,vy,col,fromExplosion=false){
+      this.x=x; this.y=y; this.vx=vx; this.vy=vy; this.col=col; this.life=1; this.active=true;
+      this.fromExplosion = fromExplosion;
+    }
+    update(dt){
+      if (!this.active) return;
+      this.x+=this.vx*dt; this.y+=this.vy*dt;
+      this.vy += (this.fromExplosion ? 50 : 70) * dt;
+      this.life -= .8*dt;
+      if (this.life<=0) this.active=false;
+    }
+    draw(){ if (!this.active) return; ctx.globalAlpha=Math.max(0,this.life); ctx.fillStyle=this.col; ctx.fillRect(this.x-1,this.y-1,2,2); ctx.globalAlpha=1; }
+  }
+
+  // ===== Setup / Reset =====
+  function setup(){
+    ensureAudio();
+    cities.length=0; bases.length=0; pMissiles.length=0; eMissiles.length=0; explosions.length=0; particles.length=0;
+    score=0; wave=1; mult=1; bonusCityThreshold=10000; enemiesSpawned=0; betweenWaves=false; betweenWaveTimer=0;
+    // cities: 6 spread
+    for (let i=0;i<6;i++){
+      const x = 100 + (i<3 ? i*120 : (i-3)*120 + 400);
+      cities.push(new City(x, 600-30));
+    }
+    // three bases
+    bases.push(new Base(250, 600-30));
+    bases.push(new Base(450, 600-30));
+    bases.push(new Base(650, 600-30));
+    updateHUD();
+    buildWave();
+    recalcSpawnInterval();
+  }
+
+  function buildWave(){
+    mult = wave<=2?1 : wave<=4?2 : wave<=6?3 : wave<=8?4 : wave<=10?5 : 6;
+    waveEnemies.length=0;
+    const baseCount = Math.round((3 + wave*2) * diffWaveSize());
+    const bag = compositionForWave(wave);
+    // focus fire packs if smarts high
+    const focus = Math.random() < smartFocusFireChance();
+    let focusTarget = null;
+    if (focus){ focusTarget = pickRandomTarget() || {x:450,y:570}; }
+    for (let i=0;i<baseCount;i++){
+      waveEnemies.push({type: bag[(Math.random()*bag.length)|0], focus: focusTarget});
+    }
+    enemiesSpawned = 0;
+    document.getElementById('wave').textContent = wave;
+    document.getElementById('mult').textContent = mult;
+    setStat(waveSizeEl, String(baseCount));
+  }
+
+  function compositionForWave(w){
+    const bag = ['IPBM','IPBM','IPBM','MIRV','Satellite'];
+    if (w>=2){ bag.push('Bomber'); }
+    if (w>=3){ bag.push('Smart'); }
+    if (w>=4){ bag.push('ZigZag'); }
+    if (w>=5){ bag.push('Shielded'); }
+    if (w>=6){ bag.push('Cluster'); }
+    if (w>=7){ bag.push('Stealth'); }
+    for (let i=0;i<enemyDifficulty-1;i++){
+      bag.push('Smart','Shielded','ZigZag','MIRV');
+      if (w>=6) bag.push('Cluster');
+      if (w>=7) bag.push('Stealth');
+    }
+    return bag;
+  }
+
+  function spawnEnemy(){
+    if (enemiesSpawned >= waveEnemies.length) return;
+    const slot = waveEnemies[enemiesSpawned];
+    const type = slot.type;
+    const x = Math.random()*900;
+    let t;
+    if (slot.focus && Math.random() < smartFocusFireChance()){
+      t = slot.focus;
+    } else if (Math.random() < smartWeakTargetChance()){
+      const aliveCities = cities.filter(c=>c.alive);
+      t = aliveCities[0] || pickRandomTarget();
+    } else {
+      t = pickRandomTarget();
+    }
+    if (t){
+      eMissiles.push(new EMissile(x, -10, t.x, t.y, type));
+      enemiesSpawned++;
+    }
+  }
+
+  function pickRandomTarget(){
+    const targets = [...cities.filter(c=>c.alive), ...bases.filter(b=>b.alive)];
+    if (!targets.length) return null;
+    return targets[(Math.random()*targets.length)|0];
+  }
+
+  // ===== HUD =====
+  function updateHUD(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('citiesAlive').textContent = cities.filter(c=>c.alive).length;
+    document.getElementById('ammo').textContent = bases.reduce((a,b)=>a+(b.alive?b.missiles:0),0);
+  }
+  function bumpScore(){
+    document.getElementById('score').textContent = score;
+    const top = getLeaderboard()[0]?.score || 0;
+    document.getElementById('hi').textContent = Math.max(top, score);
+    if (score >= bonusCityThreshold){
+      bonusCityThreshold += 10000;
+      const dead = cities.find(c=>!c.alive);
+      if (dead){ dead.alive=true; dead.b=dead.gen(); tone({freq:1000, dur:.42, type:'sine', vol:.18}); }
+      updateHUD();
+    }
+  }
+
+  // ===== Input =====
+  function toLocalCoords(e){
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = clamp((e.clientX - rect.left) / (rect.width) * 900, 0, 900);
+    mouse.y = clamp((e.clientY - rect.top) / (rect.height) * 600, 0, 600);
+  }
+  canvas.addEventListener('mousemove', toLocalCoords);
+  canvas.addEventListener('click', e => {
+    toLocalCoords(e);
+    if (state!=='playing' || paused) return;
+    // choose base that intercepts fastest
+    let best=null, bestT=1e9;
+    for (const b of bases){
+      if (!b.alive || b.missiles<=0) continue;
+      const dx = mouse.x - b.x, dy = mouse.y - (b.y-18);
+      const t = Math.hypot(dx,dy)/SPEEDS.ABM;
+      if (t<bestT){ bestT=t; best=b; }
+    }
+    if (best){ best.fire(mouse.x, mouse.y); updateHUD(); }
+  });
+
+  document.addEventListener('keydown', e=>{
+    if (e.code==='Space' && state==='playing'){ e.preventDefault(); paused=!paused; }
+    else if (e.key==='m' || e.key==='M'){ muted=!muted; }
+    else if (e.key==='r' || e.key==='R'){ if (state==='playing'){ state='playing'; setup(); }}
+  });
+
+  // ===== Loop =====
+  function update(dt){
+    if (state!=='playing' || paused) return;
+
+    // spawn pacing
+    spawnTimer += dt;
+    if (!betweenWaves && spawnTimer >= spawnInterval){
+      spawnTimer = 0;
+      spawnEnemy();
+      if (enemiesSpawned >= waveEnemies.length && eMissiles.every(m=>!m.active)){
+        betweenWaves=true; betweenWaveTimer=0;
+        // award bonus
+        let bonus=0;
+        for (const c of cities) if (c.alive) bonus += 120;
+        for (const b of bases) bonus += (b.alive?b.missiles:0)*6;
+        score += bonus; bumpScore();
+      }
+    } else if (betweenWaves){
+      betweenWaveTimer += dt;
+      if (betweenWaveTimer>1.8){
+        betweenWaves=false; wave++; buildWave();
+        for (const b of bases) if (b.alive) b.missiles = Math.min(b.missiles + 18, 45);
+        updateHUD();
+        recalcSpawnInterval();
+      }
+    }
+
+    for (const m of pMissiles) m.update(dt);
+    for (const m of eMissiles) m.update(dt);
+    for (const ex of explosions) ex.update(dt);
+    for (const p of particles) p.update(dt);
+
+    // cleanup
+    pMissiles = pMissiles.filter(m=>!m.exploded);
+    eMissiles = eMissiles.filter(m=>m.active);
+    explosions = explosions.filter(e=>e.active);
+    particles = particles.filter(p=>p.active);
+
+    if (cities.every(c=>!c.alive)) endGame();
+  }
+
+  function drawBackground(){
+    ctx.clearRect(0,0,900,600);
+    const g = ctx.createLinearGradient(0,0,0,600);
+    g.addColorStop(0,'#20304d');
+    g.addColorStop(.5,'#0a1430');
+    g.addColorStop(1,'#050813');
+    ctx.fillStyle = g; ctx.fillRect(0,0,900,600);
+    ctx.fillStyle = '#644a2a';
+    ctx.fillRect(0, 600-30, 900, 30);
+  }
+
+  function draw(){
+    drawBackground();
+    for (const cty of cities) cty.draw();
+    for (const b of bases) b.draw();
+    for (const em of eMissiles) em.draw();
+    for (const pm of pMissiles) pm.draw();
+    for (const ex of explosions) ex.draw();
+    for (const p of particles) p.draw();
+
+    if (state==='playing' && !paused){
+      ctx.strokeStyle = '#00ff7b'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(mouse.x-10, mouse.y); ctx.lineTo(mouse.x+10, mouse.y);
+      ctx.moveTo(mouse.x, mouse.y-10); ctx.lineTo(mouse.x, mouse.y+10); ctx.stroke();
+      ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 8, 0, Math.PI*2); ctx.stroke();
+    }
+
+    if (betweenWaves){
+      ctx.fillStyle = '#00ffb2'; ctx.font = 'bold 32px ui-monospace';
+      ctx.textAlign='center'; ctx.fillText('WAVE COMPLETE!', 900/2, 600/2);
+      ctx.font = '16px ui-monospace';
+      const alive = cities.filter(c=>c.alive).length;
+      ctx.fillText(`Bonus: ${alive*120} + ABM left`, 900/2, 600/2 + 28);
+      ctx.textAlign='left';
+    }
+
+    if (paused){
+      ctx.fillStyle = 'rgba(0,0,0,.5)';
+      ctx.fillRect(0,0,900,600);
+      ctx.fillStyle = '#00ffb2';
+      ctx.font = 'bold 42px ui-monospace'; ctx.textAlign='center';
+      ctx.fillText('PAUSED', 450, 300); ctx.textAlign='left';
+    }
+  }
+
+  function loop(now){
+    const dt = Math.min(0.033, (now - lastTime)/1000);
+    lastTime = now;
+    update(dt);
+    draw();
+
+    // FPS + dev stats
+    fpsTimer += dt; accFPS += 1/dt; fpsFrames++;
+    if (fpsTimer >= 0.5){
+      currentFPS = accFPS / fpsFrames;
+      setStat(fpsEl, format(currentFPS));
+      accFPS = 0; fpsFrames = 0; fpsTimer = 0;
+    }
+    setStat(ipbmPSEl, format(SPEEDS.IPBM * speedScale * diffSpeed()));
+    setStat(abmPSEl, format(SPEEDS.ABM));
+
+    requestAnimationFrame(loop);
+  }
+
+  function endGame(){
+    state='gameover';
+    const name = getPlayerName();
+    submitScore(name, score, wave);
+    renderLeaderboard('leaderboardGO', 'Top 10');
+    document.getElementById('finalName').textContent = name;
+    document.getElementById('finalScore').textContent = score;
+    document.getElementById('finalWave').textContent = wave;
+    document.getElementById('startPanel').style.display='none';
+    document.getElementById('gameOverPanel').style.display='block';
+    overlay.style.display = 'flex';
+    for (let i=0;i<10;i++){
+      setTimeout(()=>{
+        const x = Math.random()*900; const y = 600-30 - Math.random()*100;
+        explosions.push(new Explosion(x,y, 50+Math.random()*50, '#f44'));
+        tone({freq: rand(90,180), dur:.5, type:'sawtooth', vol:.22});
+      }, i*200);
+    }
+  }
+
+  // ===== UI wiring =====
+  const overlay = document.getElementById('overlay');
+  const startBtn = document.getElementById('startBtn');
+  const retryBtn = document.getElementById('retryBtn');
+
+  startBtn.addEventListener('click', () => {
+    ensureAudio();
+    const nm = getPlayerName();
+    setPlayerName(nm);
+    renderLeaderboard('leaderboardStart', 'Top 10');
+    document.getElementById('startPanel').style.display='none';
+    document.getElementById('gameOverPanel').style.display='none';
+    overlay.style.display='none';
+    // optional: show dev panel initially; hide for prod
+    // devPanel.classList.remove('hidden');
+    state='playing'; setup(); updateHUD(); lastTime = performance.now();
+  });
+  retryBtn.addEventListener('click', () => {
+    ensureAudio();
+    document.getElementById('gameOverPanel').style.display='none';
+    overlay.style.display='none';
+    state='playing'; setup(); updateHUD(); lastTime = performance.now();
+  });
+
+  // initial HUD + leaderboard preload
+  loadNameToUI();
+  renderLeaderboard('leaderboardStart', 'Top 10');
+  canvas.addEventListener('pointerdown', ensureAudio, {once:true});
+
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

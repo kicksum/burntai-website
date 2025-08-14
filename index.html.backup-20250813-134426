@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BurntAI - AI Experimentation Platform</title>
+    <meta name="description" content="A personal AI experimentation platform. Explore AI tools, demos, and integrations built by an infrastructure architect with 20+ years of experience.">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Clean, professional color palette */
+            --primary-orange: #ff6b35;
+            --primary-blue: #4361ee;
+            --accent-purple: #7209b7;
+            --accent-teal: #00b4d8;
+            --accent-green: #06ffa5;
+            --light-bg: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --success-green: #10b981;
+            --warning-yellow: #f59e0b;
+            --error-red: #ef4444;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Subtle geometric pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(30deg, #f0f0f0 12%, transparent 12.5%, transparent 87%, #f0f0f0 87.5%, #f0f0f0),
+                linear-gradient(150deg, #f0f0f0 12%, transparent 12.5%, transparent 87%, #f0f0f0 87.5%, #f0f0f0),
+                linear-gradient(30deg, #f0f0f0 12%, transparent 12.5%, transparent 87%, #f0f0f0 87.5%, #f0f0f0),
+                linear-gradient(150deg, #f0f0f0 12%, transparent 12.5%, transparent 87%, #f0f0f0 87.5%, #f0f0f0);
+            background-size: 80px 140px;
+            background-position: 0 0, 0 0, 40px 70px, 40px 70px;
+            opacity: 0.05;
+            z-index: -1;
+        }
+
+        /* Floating shapes - subtle depth */
+        .floating-shape {
+            position: fixed;
+            opacity: 0.03;
+            z-index: -1;
+        }
+
+        .shape-1 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-teal));
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            top: 10%;
+            left: -100px;
+            animation: float 25s infinite ease-in-out;
+        }
+
+        .shape-2 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--warning-yellow));
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            bottom: 10%;
+            right: -50px;
+            animation: float 20s infinite ease-in-out reverse;
+        }
+
+        .shape-3 {
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(135deg, var(--accent-teal), var(--success-green));
+            clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+            top: 50%;
+            left: 50%;
+            animation: float 30s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+            background: rgba(67, 97, 238, 0.08);
+        }
+
+        /* Main Content Container */
+        .main-container {
+            background: rgba(255, 255, 255, 0.98);
+            margin-top: 80px;
+            border-radius: 30px 30px 0 0;
+            min-height: calc(100vh - 80px);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 5rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(180deg, 
+                rgba(255, 255, 255, 0) 0%, 
+                rgba(248, 249, 250, 0.5) 50%,
+                rgba(248, 249, 250, 1) 100%);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* AI Quote Section */
+        .ai-quote-container {
+            margin: 2rem auto;
+            max-width: 800px;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 100%);
+            border: 2px solid var(--medium-gray);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            position: relative;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .ai-quote {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-style: italic;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+
+        .quote-mark {
+            color: var(--primary-orange);
+            font-size: 2rem;
+            position: absolute;
+            opacity: 0.3;
+        }
+
+        .quote-mark.left {
+            top: 10px;
+            left: 10px;
+        }
+
+        .quote-mark.right {
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-blue));
+            border: none;
+            color: white;
+            padding: 1rem 2.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            display: inline-block;
+            animation: fadeInUp 1s ease 0.6s both;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        }
+
+        /* Platform Links Section */
+        .platform-section {
+            background: linear-gradient(180deg, var(--light-gray) 0%, #ffffff 100%);
+            padding: 4rem 2rem;
+            margin: 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .platform-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 2px solid var(--medium-gray);
+        }
+
+        .platform-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-blue);
+        }
+
+        .platform-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .platform-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Demo Notice */
+        .demo-notice {
+            background: linear-gradient(135deg, var(--warning-yellow), var(--primary-orange));
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Features Grid */
+        .features {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 2px solid var(--medium-gray);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-blue);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        .feature-card:nth-child(2n) .feature-icon {
+            animation-delay: 0.2s;
+        }
+
+        .feature-card:nth-child(3n) .feature-icon {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-status {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-live {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+            border: 2px solid var(--success-green);
+        }
+
+        .status-demo {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-yellow);
+            border: 2px solid var(--warning-yellow);
+        }
+
+        .status-coming {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        /* Info Banner */
+        .info-banner {
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-blue));
+            color: white;
+            padding: 2.5rem;
+            margin: 3rem auto;
+            text-align: center;
+            border-radius: 16px;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(67, 97, 238, 0.2);
+            max-width: 1200px;
+            line-height: 1.6;
+        }
+
+        .info-banner div {
+            margin: 0.5rem 0;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-primary);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+            opacity: 0.9;
+        }
+
+        .footer-links {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+                padding: 2rem 1rem;
+            }
+            
+            .platform-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Clean Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-gray);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-teal));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--accent-teal), var(--primary-blue));
+        }
+    </style>
+</head>
+<body>
+    <!-- Geometric shapes for subtle depth -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+
+    <header>
+        <nav>
+            <a href="index.html" class="logo">BURNTAI</a>
+            <ul class="nav-links">
+                <li><a href="#home">HOME</a></li>
+                <li><a href="#news">NEWS</a></li>
+                <li><a href="#projects">PROJECTS</a></li>
+                <li><a href="#about">ABOUT</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <section class="hero" id="home">
+            <h1>AI EXPERIMENTATION PLATFORM</h1>
+            
+            <!-- AI Quote Section -->
+            <div class="ai-quote-container">
+                <span class="quote-mark left">"</span>
+                <p class="ai-quote" id="ai-quote">Loading insights...</p>
+                <span class="quote-mark right">"</span>
+            </div>
+            
+            <p class="hero-subtitle">Personal Projects, Demos, and Experiments with AI</p>
+            <a href="#projects" class="cta-button">Explore Projects</a>
+        </section>
+
+        <section class="platform-section" id="news">
+            <div class="section-header">
+                <h2 class="section-title">Latest AI News</h2>
+                <p style="color: var(--text-secondary);">
+                    Recent developments in artificial intelligence
+                </p>
+            </div>
+
+            <div class="platform-grid">
+                <!-- News Card 1 -->
+                <a href="https://openai.com/news" target="_blank" rel="noopener noreferrer" class="platform-card">
+                    <div class="platform-icon">🚀</div>
+                    <h3 class="platform-name">GPT-4o Released</h3>
+                    <p class="platform-desc">OpenAI announces multimodal capabilities with improved reasoning and vision understanding</p>
+                </a>
+
+                <!-- News Card 2 -->
+                <a href="https://www.anthropic.com/news" target="_blank" rel="noopener noreferrer" class="platform-card">
+                    <div class="platform-icon">🧠</div>
+                    <h3 class="platform-name">Claude 3.5 Sonnet</h3>
+                    <p class="platform-desc">Anthropic's latest model shows significant improvements in coding and analysis tasks</p>
+                </a>
+
+                <!-- News Card 3 -->
+                <a href="https://deepmind.google/discover/blog" target="_blank" rel="noopener noreferrer" class="platform-card">
+                    <div class="platform-icon">🔬</div>
+                    <h3 class="platform-name">Gemini 2.0 Flash</h3>
+                    <p class="platform-desc">Google DeepMind unveils faster inference speeds with maintained accuracy</p>
+                </a>
+
+                <!-- News Card 4 -->
+                <a href="https://huggingface.co/blog" target="_blank" rel="noopener noreferrer" class="platform-card">
+                    <div class="platform-icon">🤗</div>
+                    <h3 class="platform-name">Open Source Advances</h3>
+                    <p class="platform-desc">Community models closing the gap with proprietary systems</p>
+                </a>
+            </div>
+
+            <div class="demo-notice">
+                💡 This is a demonstration and experimentation site. Some features are prototypes or concept demos.
+            </div>
+        </section>
+
+        <!-- AI Leaders Section -->
+        <section class="platform-section" style="background: white; padding: 3rem 2rem;">
+            <div class="section-header">
+                <h2 class="section-title">Voices Shaping AI</h2>
+                <p style="color: var(--text-secondary);">
+                    Insights from leaders pushing the boundaries
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto;">
+                <!-- Sam Altman -->
+                <a href="https://www.google.com/search?q=Sam+Altman+AGI+cognitive+capabilities" target="_blank" rel="noopener noreferrer" class="platform-card">
+                    <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-blue); margin-bottom: 0.5rem;">Sam Altman</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">CEO, OpenAI</div>
+                    <p style="font-style: italic; color: var(--text-primary); line-height: 1.6;">
+                        "AGI has the potential to give everyone incredible new capabilities; we can imagine a world where all of us have access to help with almost any cognitive task."
+                    </p>
+                </a>
+
+                <!-- Demis Hassabis -->
+                <a href="https://www.google.com/search?q=Demis+Hassabis+AI+most+important+invention" target="_blank" rel="noopener noreferrer" class="platform-card">
+                    <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-blue); margin-bottom: 0.5rem;">Demis Hassabis</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">CEO, Google DeepMind</div>
+                    <p style="font-style: italic; color: var(--text-primary); line-height: 1.6;">
+                        "I've always believed that AI would be the most important invention that humanity will ever make."
+                    </p>
+                </a>
+
+                <!-- Dario Amodei -->
+                <a href="https://www.google.com/search?q=Dario+Amodei+AI+aligned+human+values+helpful+harmless+honest" target="_blank" rel="noopener noreferrer" class="platform-card">
+                    <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-blue); margin-bottom: 0.5rem;">Dario Amodei</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">CEO, Anthropic</div>
+                    <p style="font-style: italic; color: var(--text-primary); line-height: 1.6;">
+                        "We're trying to build AI systems that are understandable, that are aligned with human values, and that are helpful, harmless, and honest."
+                    </p>
+                </a>
+
+                <!-- Yann LeCun -->
+                <a href="https://www.google.com/search?q=Yann+LeCun+intelligence+human+AI+extension" target="_blank" rel="noopener noreferrer" class="platform-card">
+                    <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-blue); margin-bottom: 0.5rem;">Yann LeCun</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Chief AI Scientist, Meta</div>
+                    <p style="font-style: italic; color: var(--text-primary); line-height: 1.6;">
+                        "Our intelligence is what makes us human, and AI is an extension of that quality."
+                    </p>
+                </a>
+
+                <!-- Andrew Ng -->
+                <a href="https://www.google.com/search?q=Andrew+Ng+AI+new+electricity+transform+industry" target="_blank" rel="noopener noreferrer" class="platform-card">
+                    <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-blue); margin-bottom: 0.5rem;">Andrew Ng</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Founder, DeepLearning.AI</div>
+                    <p style="font-style: italic; color: var(--text-primary); line-height: 1.6;">
+                        "AI is the new electricity. It will transform every industry and create huge economic value."
+                    </p>
+                </a>
+
+                <!-- Fei-Fei Li -->
+                <a href="https://www.google.com/search?q=Fei-Fei+Li+machine+vision+foundation+intelligence" target="_blank" rel="noopener noreferrer" class="platform-card">
+                    <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-blue); margin-bottom: 0.5rem;">Fei-Fei Li</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Co-Director, Stanford HAI</div>
+                    <p style="font-style: italic; color: var(--text-primary); line-height: 1.6;">
+                        "If we want machines to think, we need to teach them to see. Vision is the foundation of intelligence."
+                    </p>
+                </a>
+            </div>
+        </section>
+
+        <section class="features" id="projects">
+            <div class="section-header" style="text-align: center; margin-bottom: 3rem;">
+                <h2 class="section-title">Experimental Projects</h2>
+                <p style="color: var(--text-secondary);">
+                    Live demos and prototypes built with AI
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <a href="/ai-lab/" class="feature-card">
+                    <div class="feature-icon">🧪</div>
+                    <h3 class="feature-title">AI Chat Interface</h3>
+                    <p class="feature-desc">Custom chat interface experiment with multiple AI models. Testing conversational flows and response handling.</p>
+                    <div class="feature-status status-demo">Demo</div>
+                </a>
+            
+            <a href="ai-intel-feed.html" class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Intelligence Feed</h3>
+                <p class="feature-desc">Real-time AI industry news aggregator. Pulls from multiple sources to track breakthroughs, research, and market updates.</p>
+                <div class="feature-status status-demo">Demo</div>
+            </a>
+            
+            <a href="wasteland-doom.html" class="feature-card">
+                <div class="feature-icon">🎮</div>
+                <h3 class="feature-title">Retro Game Clone</h3>
+                <p class="feature-desc">JavaScript implementation of classic Wolfenstein gameplay. Canvas rendering and game physics experimentation.</p>
+                <div class="feature-status status-live">Live</div>
+            </a>
+            
+             <a href="radio-tower.html" class="feature-card">
+                <div class="feature-icon">📡</div>
+                <h3 class="feature-title">Radio Tower Networks</h3>
+                <p class="feature-desc">Tune into the AI Networks broadcasted all over the internet. Dial into different terminology difficulties.</p>
+                <div class="feature-status status-demo">Demo</div>
+            </a>
+
+            <a href="neural-serpent.html" class="feature-card">
+                <div class="feature-icon">🐍</div>
+                <h3 class="feature-title">Snake AI Game</h3>
+                <p class="feature-desc">Classic Snake game with AI-powered opponent. Neural network pathfinding demonstration.</p>
+                <div class="feature-status status-live">Live</div>
+            </a>
+            
+            <a href="ghoul-proof.html" class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Security Scanner</h3>
+                <p class="feature-desc">Web vulnerability scanner prototype. Testing common security checks and reporting mechanisms.</p>
+                <div class="feature-status status-demo">Demo</div>
+            </a>
+            
+            <a href="https://burntai.blog" target="_blank" rel="noopener noreferrer" class="feature-card">
+                <div class="feature-icon">📄</div>
+                <h3 class="feature-title">BurntAI Blog</h3>
+                <p class="feature-desc">Thoughts on AI, infrastructure, and 20+ years of building systems. Where experience meets experimentation.</p>
+                <div class="feature-status status-live">Live</div>
+            </a>
+            
+            <a href="model-training.php" class="feature-card">
+                <div class="feature-icon">🔬</div>
+                <h3 class="feature-title">Different Projects</h3>
+                <p class="feature-desc">A directory listing of current AI projects.</p>
+                <div class="feature-status status-coming">Coming Soon</div>
+            </a>
+            
+            <a href="developer-portal.html" class="feature-card">
+                <div class="feature-icon">💻</div>
+                <h3 class="feature-title">API Documentation</h3>
+                <p class="feature-desc">Mock API documentation portal. Testing documentation generation and interactive API explorers.</p>
+                <div class="feature-status status-demo">Demo</div>
+            </a>
+        </section>
+
+        <section class="info-banner" id="about">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">About This Platform</div>
+            <div>This is my personal playground for experimenting with AI technologies and web development.</div>
+            <div>Built by an infrastructure architect exploring the intersection of traditional development and AI.</div>
+            <div>Some projects are fully functional, others are prototypes or concept demonstrations.</div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 BurntAI - Personal AI Experimentation Platform</p>
+        <p>Built with curiosity, powered by experimentation.</p>
+        <div class="footer-links">
+            <a href="https://github.com" target="_blank">GitHub</a>
+            <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+            <a href="mailto:contact@burntai.com">Contact</a>
+        </div>
+    </footer>
+
+    <script>
+        // Authentic quotes about AI and experimentation
+        const aiQuotes = [
+            "The best way to understand AI is to build with it.",
+            "Every failed experiment teaches more than a successful copy.",
+            "Infrastructure meets intelligence - that's where magic happens.",
+            "20 years of traditional dev, now exploring what AI can amplify.",
+            "Not replacing skills, augmenting them with AI capabilities.",
+            "From bare metal to neural networks - it's all just computation.",
+            "The future is hybrid: human creativity + AI capability.",
+            "Building bridges between what we know and what AI enables.",
+            "Experimentation is the shortest path to understanding.",
+            "AI doesn't replace developers, it gives them superpowers.",
+            "Every line of code is a hypothesis waiting to be tested.",
+            "The best architectures combine human insight with AI efficiency.",
+            "Learning in public: sharing experiments, failures, and breakthroughs.",
+            "Infrastructure patterns apply to AI - scalability matters everywhere.",
+            "Playing with AI today to build better systems tomorrow."
+        ];
+
+        // Get random AI quote
+        function getRandomAIQuote() {
+            return aiQuotes[Math.floor(Math.random() * aiQuotes.length)];
+        }
+
+        // Set initial quote
+        document.addEventListener('DOMContentLoaded', () => {
+            const quoteElement = document.getElementById('ai-quote');
+            quoteElement.textContent = getRandomAIQuote();
+            
+            // Change quote every 10 seconds
+            setInterval(() => {
+                quoteElement.style.opacity = '0';
+                setTimeout(() => {
+                    quoteElement.textContent = getRandomAIQuote();
+                    quoteElement.style.opacity = '0.9';
+                }, 300);
+            }, 10000);
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Parallax effect on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const shapes = document.querySelectorAll('.floating-shape');
+            
+            shapes.forEach((shape, index) => {
+                const speed = 0.2 + (index * 0.1);
+                shape.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+
+        // Console message - Professional
+        console.log('%c🔬 BurntAI Experimentation Platform', 'color: #4361ee; font-size: 20px; font-weight: bold;');
+        console.log('%cExploring the intersection of infrastructure and AI', 'color: #ff6b35; font-size: 14px;');
+        console.log('Interested in the code? Check out the projects or reach out!');
+    </script>
+</body>
+</html>

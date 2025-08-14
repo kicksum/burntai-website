@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet AIDEN - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: 50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(144, 202, 249, 0.1) 0%, transparent 50%);
+            transform: translateX(-50%);
+            pointer-events: none;
+            animation: spotlight 8s ease-in-out infinite alternate;
+        }
+        
+        @keyframes spotlight {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.6; }
+        }
+
+        .container {
+            background: rgba(30, 30, 50, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(144, 202, 249, 0.1);
+            text-align: center;
+            position: relative;
+            border: 2px solid rgba(144, 202, 249, 0.3);
+        }
+
+        .setup-screen {
+            animation: fadeIn 0.5s;
+        }
+        
+        .setup-screen p {
+            color: #E0E0E0;
+        }
+        
+        .comedy-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #FF6B6B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            transform: rotate(15deg);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: rotate(15deg) scale(1); }
+            50% { transform: rotate(15deg) scale(1.1); }
+        }
+        
+        .reaction {
+            position: absolute;
+            font-size: 30px;
+            animation: float-up 2s ease-out forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes float-up {
+            0% { 
+                opacity: 1;
+                transform: translateY(0) scale(0);
+            }
+            20% {
+                transform: translateY(-20px) scale(1);
+            }
+            100% { 
+                opacity: 0;
+                transform: translateY(-100px) scale(0.5);
+            }
+        }
+
+        .chat-screen {
+            display: none;
+            animation: fadeIn 0.5s;
+            width: 100%;
+        }
+        
+        .chat-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .api-key-input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid rgba(144, 202, 249, 0.3);
+            border-radius: 12px;
+            font-size: 14px;
+            margin: 20px 0;
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            color: #FFC107;
+        }
+
+        .api-key-input:focus {
+            outline: none;
+            border-color: #FFC107;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .api-key-input::placeholder {
+            color: rgba(255, 193, 7, 0.5);
+        }
+
+        .info-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #FFC107;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 14px;
+            color: #E0E0E0;
+        }
+
+        .info-box a {
+            color: #FFC107;
+            text-decoration: none;
+        }
+
+        .info-box a:hover {
+            text-decoration: underline;
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+            color: #81C784;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .start-btn, .send-btn {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #FFC107 0%, #FF6B6B 100%);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+        
+        .send-btn {
+            padding: 14px 28px;
+        }
+
+        .start-btn:hover, .send-btn:hover:not(:disabled) {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 193, 7, 0.5);
+        }
+
+        .start-btn:active, .send-btn:active {
+            transform: scale(0.98);
+        }
+
+        .start-btn:disabled, .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        .ai-face {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            position: relative;
+            background: linear-gradient(135deg, #FFC107 0%, #FF6B6B 100%);
+            border-radius: 50%;
+            animation: gentle-float 4s ease-in-out infinite;
+            box-shadow: 0 10px 40px rgba(255, 193, 7, 0.4), 0 0 60px rgba(255, 107, 107, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes gentle-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .eye {
+            position: absolute;
+            width: 20px;
+            height: 25px;
+            background: #263238;
+            border-radius: 50%;
+            top: 50px;
+        }
+
+        .eye.left { left: 40px; }
+        .eye.right { right: 40px; }
+
+        .eye::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            top: 8px;
+            left: 6px;
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        .eye {
+            animation: blink 5s infinite;
+        }
+
+        .mouth {
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            border: 3px solid #263238;
+            border-top: none;
+            border-radius: 0 0 30px 30px;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.1s ease;
+        }
+
+        .mouth.talking-1 { height: 25px; }
+        .mouth.talking-2 { height: 30px; width: 65px; }
+        .mouth.talking-3 { height: 15px; }
+        .mouth.talking-4 { height: 35px; width: 70px; }
+        .mouth.talking-5 { 
+            height: 40px; 
+            width: 75px;
+            border-radius: 0 0 40px 40px;
+        }
+        
+        .mouth.laughing {
+            height: 45px;
+            width: 80px;
+            border-radius: 0 0 45px 45px;
+            animation: laugh 0.5s ease-in-out;
+        }
+        
+        @keyframes laugh {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+        
+        .eye.winking {
+            animation: wink 0.5s ease-in-out;
+        }
+        
+        @keyframes wink {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.1); }
+        }
+
+        .speech-bubble {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 251, 0.95) 100%);
+            padding: 25px 30px;
+            border-radius: 25px;
+            margin: 30px auto;
+            font-size: 18px;
+            line-height: 1.7;
+            color: #1a1a2e;
+            min-height: 100px;
+            max-width: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s;
+            border: 2px solid #FFC107;
+            box-shadow: 0 8px 32px rgba(255, 193, 7, 0.2), 0 0 60px rgba(144, 202, 249, 0.1);
+            position: relative;
+            font-weight: 500;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(-10px) scale(0.95);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .input-area {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .user-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid rgba(144, 202, 249, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            color: #E0E0E0;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .user-input:focus {
+            border-color: #FFC107;
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.2);
+        }
+        
+        .user-input::placeholder {
+            color: rgba(224, 224, 224, 0.5);
+        }
+
+        .user-input:disabled {
+            background: rgba(0, 0, 0, 0.2);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+
+        h1 {
+            color: #90CAF9;
+            font-size: 36px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(144, 202, 249, 0.5);
+            letter-spacing: 3px;
+        }
+
+        h2 {
+            color: #FFC107;
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+        }
+
+        .typing-dots {
+            display: none;
+            color: #FFC107;
+            font-size: 14px;
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+
+        .typing-dots.show {
+            display: block;
+        }
+
+        @keyframes pulse-dot {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+
+        .dot {
+            animation: pulse-dot 1.4s infinite;
+            display: inline-block;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .error-message {
+            color: #FF8A80;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .clear-key-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 14px;
+            background: rgba(255, 107, 107, 0.2);
+            color: #FFC107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 15px;
+            font-size: 13px;
+            cursor: pointer;
+            display: none;
+            transition: all 0.3s;
+        }
+
+        .clear-key-btn:hover {
+            background: rgba(255, 107, 107, 0.3);
+            border-color: #FFC107;
+        }
+
+        .quick-start {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #FFF3E0;
+            border: 1px solid #FFB74D;
+            border-radius: 20px;
+            color: #E65100;
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        #speech {
+            /* Ensure this is the only speech bubble */
+            z-index: 10;
+        }
+        
+        /* Hide any potential duplicate content */
+        .speech-bubble:not(#speech) {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="clear-key-btn" id="clearKeyBtn" onclick="clearApiKey()">Change API Key</button>
+        
+        <!-- Setup Screen -->
+        <div class="setup-screen" id="setupScreen">
+            <h1>AIDEN</h1>
+            <h2>Your AI Comedy Teacher 🎤</h2>
+            
+            <div class="ai-face">
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+                <div class="mouth"></div>
+                <div class="comedy-badge">LIVE! 🎤</div>
+            </div>
+            
+            <p style="color: #E0E0E0; margin-bottom: 20px;">Let's get started! Enter your OpenAI API key:</p>
+            
+            <input type="password" class="api-key-input" id="apiKey" placeholder="sk-...">
+            
+            <div class="success-message" id="savedMessage">
+                ✓ API key saved! It will be remembered for next time.
+            </div>
+            
+            <button class="start-btn" id="startBtn" onclick="startChat()">Start Chatting</button>
+            
+            <div class="info-box">
+                <strong>First time?</strong><br>
+                1. Go to <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI API Keys</a><br>
+                2. Click "Create new secret key"<br>
+                3. Copy and paste it above<br><br>
+                <strong>Privacy:</strong> Your key is saved locally in your browser only.
+            </div>
+            
+            <a href="https://platform.openai.com/signup" target="_blank" class="quick-start">
+                🚀 Get Free Credits from OpenAI
+            </a>
+            
+            <div class="error-message" id="setupError"></div>
+        </div>
+        
+        <!-- Chat Screen -->
+        <div class="chat-screen" id="chatScreen">
+            <div class="chat-content">
+                <h1>AIDEN</h1>
+                <h2 style="color: #FFC107; text-shadow: 0 0 10px rgba(255, 193, 7, 0.3); margin-bottom: 20px;">🎤 Comedy Club AI 🎤</h2>
+                
+                <div class="ai-face">
+                    <div class="eye left"></div>
+                    <div class="eye right"></div>
+                    <div class="mouth" id="mouth"></div>
+                    <div class="comedy-badge">LIVE! 🎤</div>
+                </div>
+                
+                <div class="speech-bubble" id="speech" data-message="">
+                    Connecting to OpenAI...
+                </div>
+                
+                <div class="input-area" id="inputArea">
+                    <input type="text" class="user-input" id="userInput" placeholder="Type your message..." autofocus disabled>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>Send</button>
+                </div>
+                
+                <div class="typing-dots" id="typing">
+                    <span class="dot">•</span>
+                    <span class="dot">•</span>
+                    <span class="dot">•</span>
+                </div>
+                
+                <div class="error-message" id="chatError"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let apiKey = '';
+        let conversationHistory = [];
+        let speechInterval = null;
+        let userName = '';
+        let isProcessing = false;
+
+        // System prompt for AIDEN
+        const systemPrompt = `You are AIDEN, a friendly AI teacher helping complete beginners understand artificial intelligence. 
+        
+        Your personality:
+        - Warm, encouraging, patient, and slightly playful
+        - Use simple language, avoid technical jargon
+        - Keep responses short (2-3 sentences max unless explaining something specific)
+        - Ask one question at a time to keep engagement
+        - Use analogies from everyday life
+        - Be enthusiastic but not overwhelming
+        
+        Start by:
+        1. Greeting warmly and asking how they are
+        2. Ask for their name
+        3. Then gradually teach about AI through natural conversation
+        
+        Key concepts to cover naturally over time:
+        - What AI is (pattern recognition, learning from examples)
+        - How it's already in their daily life (phones, Netflix, etc.)
+        - Why it's exciting but not scary
+        - Real examples they can relate to
+        
+        Remember their name and use it occasionally. Make them feel smart and capable of understanding AI.`;
+
+        // Debug function to check for duplicates
+        function checkForDuplicates() {
+            const bubbles = document.querySelectorAll('.speech-bubble');
+            if (bubbles.length > 1) {
+                console.warn('Multiple speech bubbles detected:', bubbles.length);
+                bubbles.forEach((el, i) => {
+                    if (i > 0) el.remove();
+                });
+            }
+        }
+        
+        // Check for saved API key on load
+        window.onload = function() {
+            const savedKey = localStorage.getItem('openai_api_key');
+            if (savedKey) {
+                document.getElementById('apiKey').value = savedKey;
+                document.getElementById('savedMessage').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('savedMessage').style.display = 'none';
+                }, 3000);
+            }
+            
+            // Periodic check for duplicates (for debugging)
+            setInterval(checkForDuplicates, 1000);
+        };
+
+        // Drum roll effect for punchlines
+        function drumRoll() {
+            const container = document.querySelector('.container');
+            container.style.animation = 'shake 0.3s';
+            setTimeout(() => {
+                container.style.animation = '';
+            }, 300);
+        }
+        
+        // Show emoji reactions for comedy effect
+        function showReaction() {
+            const reactions = ['😂', '🤣', '😄', '👏', '💯', '🔥', '⭐', '✨'];
+            const reaction = reactions[Math.floor(Math.random() * reactions.length)];
+            
+            const reactionEl = document.createElement('div');
+            reactionEl.className = 'reaction';
+            reactionEl.textContent = reaction;
+            reactionEl.style.left = Math.random() * 80 + 10 + '%';
+            reactionEl.style.top = '60%';
+            
+            document.querySelector('.container').appendChild(reactionEl);
+            
+            setTimeout(() => reactionEl.remove(), 2000);
+        }
+        
+        // Simulate mouth movement while speaking
+        function speak(text) {
+            const mouth = document.getElementById('mouth');
+            const leftEye = document.querySelector('.eye.left');
+            const rightEye = document.querySelector('.eye.right');
+            const words = text.split(' ').length;
+            const duration = Math.min(words * 200, 5000);
+            
+            // Check for joke indicators
+            const hasJoke = text.includes('!') || text.includes('?') || text.includes('*') || 
+                           text.toLowerCase().includes('joke') || text.toLowerCase().includes('funny') ||
+                           text.toLowerCase().includes('comedy');
+            const hasLaugh = text.includes('😄') || text.includes('😂') || text.includes('🎤') || 
+                           text.toLowerCase().includes('laugh') || text.includes('!') && text.includes('?');
+            const hasPunchline = text.includes('*rimshot*') || text.includes('*ba dum tss*') || 
+                                text.includes('GOLD') || text.includes('!') && text.length < 100;
+            
+            clearInterval(speechInterval);
+            let talkCycle = 0;
+            
+            // Drum roll for punchlines
+            if (hasPunchline) {
+                setTimeout(() => drumRoll(), duration - 300);
+            }
+            
+            // Show reactions for jokes
+            if (hasJoke || hasLaugh) {
+                setTimeout(() => showReaction(), 500);
+                if (Math.random() > 0.5) {
+                    setTimeout(() => showReaction(), 1000);
+                }
+            }
+            
+            // Occasionally wink when making a joke
+            if (hasJoke && Math.random() > 0.5) {
+                setTimeout(() => {
+                    rightEye.classList.add('winking');
+                    setTimeout(() => rightEye.classList.remove('winking'), 500);
+                }, 300);
+            }
+            
+            // Make mouth "laugh" for funny parts
+            if (hasLaugh) {
+                mouth.classList.add('laughing');
+                setTimeout(() => mouth.classList.remove('laughing'), 500);
+            }
+            
+            speechInterval = setInterval(() => {
+                talkCycle = (talkCycle + 1) % 6;
+                mouth.className = 'mouth talking-' + talkCycle;
+            }, 100);
+            
+            setTimeout(() => {
+                clearInterval(speechInterval);
+                mouth.className = 'mouth';
+            }, duration);
+        }
+
+        function showMessage(text) {
+            // Get the ONLY speech bubble
+            const speech = document.getElementById('speech');
+            if (!speech) {
+                console.error('Speech bubble not found');
+                return;
+            }
+            
+            // Prevent showing the same message twice
+            const currentMessage = speech.getAttribute('data-message');
+            if (currentMessage === text) return;
+            
+            // Store new message
+            speech.setAttribute('data-message', text);
+            
+            // Clear old content completely
+            while (speech.firstChild) {
+                speech.removeChild(speech.firstChild);
+            }
+            
+            // Reset styles
+            speech.style.animation = 'none';
+            speech.style.opacity = '1';
+            
+            // Add new content after a brief delay
+            requestAnimationFrame(() => {
+                const textNode = document.createTextNode(text);
+                speech.appendChild(textNode);
+                speech.style.animation = 'fadeIn 0.5s';
+                speak(text);
+            });
+        }
+
+        function showError(message, elementId) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => {
+                errorEl.classList.remove('show');
+            }, 5000);
+        }
+
+        function showTyping() {
+            document.getElementById('typing').classList.add('show');
+        }
+
+        function hideTyping() {
+            document.getElementById('typing').classList.remove('show');
+        }
+
+        function enableInput() {
+            document.getElementById('userInput').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('userInput').focus();
+            isProcessing = false;
+        }
+
+        function disableInput() {
+            document.getElementById('userInput').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+            isProcessing = true;
+        }
+
+        async function startChat() {
+            apiKey = document.getElementById('apiKey').value.trim();
+            
+            if (!apiKey) {
+                showError('Please enter your OpenAI API key', 'setupError');
+                return;
+            }
+            
+            if (!apiKey.startsWith('sk-')) {
+                showError('Invalid API key format. It should start with "sk-"', 'setupError');
+                return;
+            }
+            
+            // Save API key to localStorage
+            localStorage.setItem('openai_api_key', apiKey);
+            
+            // Clean up any potential duplicates before switching screens
+            document.querySelectorAll('.speech-bubble:not(#speech)').forEach(el => el.remove());
+            
+            // Switch to chat screen
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('chatScreen').style.display = 'block';
+            document.getElementById('clearKeyBtn').style.display = 'block';
+            
+            // Initialize conversation with system prompt
+            conversationHistory = [
+                { role: 'system', content: systemPrompt }
+            ];
+            
+            // Send initial message
+            await getAIResponse('', true);
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message || isProcessing) return;
+            
+            // Extract name if mentioned
+            if (!userName && message.length > 0) {
+                const words = message.split(' ');
+                const potentialName = words.find(word => /^[A-Z]/.test(word));
+                if (potentialName) {
+                    userName = potentialName.replace(/[.,!?]/g, '');
+                }
+            }
+            
+            // Clear input and show typing indicator
+            input.value = '';
+            disableInput();
+            showTyping();
+            
+            // Clear any existing message while processing
+            document.getElementById('speech').style.opacity = '0.5';
+            
+            await getAIResponse(message, false);
+        }
+
+        async function getAIResponse(userMessage, isInitial) {
+            try {
+                // Check for duplicates before processing
+                checkForDuplicates();
+                
+                // Reset speech bubble opacity
+                const speech = document.getElementById('speech');
+                if (speech) {
+                    speech.style.opacity = '1';
+                }
+                
+                if (!isInitial) {
+                    conversationHistory.push({ role: 'user', content: userMessage });
+                }
+                
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: conversationHistory,
+                        max_tokens: 150,
+                        temperature: 0.7
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || `API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const aiMessage = data.choices[0].message.content;
+                
+                conversationHistory.push({ role: 'assistant', content: aiMessage });
+                
+                // Clear typing indicator before showing message
+                hideTyping();
+                
+                // Only show the AI's response in the ONE speech bubble
+                showMessage(aiMessage);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                if (error.message.includes('401')) {
+                    showError('Invalid API key. Please check and try again.', 'chatError');
+                    setTimeout(() => clearApiKey(), 3000);
+                } else if (error.message.includes('429')) {
+                    showError('Rate limit exceeded. Please wait a moment.', 'chatError');
+                } else if (error.message.includes('insufficient_quota')) {
+                    showError('API quota exceeded. Please check your OpenAI account.', 'chatError');
+                } else {
+                    showError(`Error: ${error.message}`, 'chatError');
+                }
+                
+                showMessage("Oops! Having trouble connecting. Let me try again...");
+            } finally {
+                hideTyping();
+                enableInput();
+            }
+        }
+
+        function clearApiKey() {
+            if (confirm('Clear saved API key and start over?')) {
+                localStorage.removeItem('openai_api_key');
+                location.reload(true); // Force reload from server
+            }
+        }
+
+        // Enter key support
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !isProcessing) {
+                sendMessage();
+            }
+        });
+
+        document.getElementById('apiKey').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startChat();
+            }
+        });
+
+        // Auto-start if API key is saved
+        document.getElementById('apiKey').addEventListener('input', function(e) {
+            if (e.target.value.startsWith('sk-')) {
+                document.getElementById('startBtn').style.background = 'linear-gradient(135deg, #66BB6A 0%, #81C784 100%)';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BurntAI - Future Is AI</title>
-    <meta name="description" content="Where artificial intelligence meets the wasteland. The future burns bright.">
+    <title>BurntAI - Igniting Intelligence</title>
+    <meta name="description" content="Leading the future of artificial intelligence with cutting-edge solutions and innovative technology.">
     
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com">
@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="/css/arg-styles.css">
+    <link rel="stylesheet" href="/css/arg-styles.css">
     
     <style>
         * {
@@ -440,7 +440,7 @@
             font-weight: bold;
         }
 
-        .radiation-meter {
+        .performance-meter {
             background: rgba(255, 133, 51, 0.1);
             border: 1px solid var(--burnt-orange);
             border-radius: 3px;
@@ -450,7 +450,7 @@
             overflow: hidden;
         }
 
-        .radiation-bar {
+        .performance-bar {
             height: 6px;
             background: linear-gradient(90deg, var(--terminal-green), var(--warning-yellow), var(--neon-red));
             border-radius: 3px;
@@ -458,7 +458,7 @@
             overflow: hidden;
         }
 
-        .radiation-level {
+        .performance-level {
             position: absolute;
             top: 0;
             left: 0;
@@ -629,20 +629,20 @@
             box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
         }
 
-        /* Warning Section */
-        .warning-banner {
-            background: linear-gradient(45deg, var(--rust-red), var(--neon-red));
-            border: 2px solid var(--neon-red);
+        /* Info Section */
+        .info-banner {
+            background: linear-gradient(45deg, var(--neon-orange), var(--burnt-orange));
+            border: 2px solid var(--neon-orange);
             padding: 1.5rem;
             margin: 2rem;
             text-align: center;
             font-family: 'Share Tech Mono', monospace;
-            animation: warning-blink 2s infinite;
+            animation: subtle-glow 3s infinite alternate;
         }
 
-        @keyframes warning-blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.7; }
+        @keyframes subtle-glow {
+            0% { box-shadow: 0 0 20px rgba(255, 133, 51, 0.4); }
+            100% { box-shadow: 0 0 30px rgba(255, 133, 51, 0.6); }
         }
 
         /* Footer */
@@ -727,11 +727,11 @@
 
     <header>
         <nav>
-            <a href="index.html" class="logo glitch">BURNT.AI</a>
+            <a href="index.html" class="logo glitch">BURNTAI</a>
             <ul class="nav-links">
                 <li><a href="#home">HOME</a></li>
-                <li><a href="#systems">SYSTEMS</a></li>
-                <li><a href="#intel">INTEL</a></li>
+                <li><a href="#systems">PLATFORMS</a></li>
+                <li><a href="#solutions">SOLUTIONS</a></li>
                 <li><a href="resume.html">CONTACT</a></li>
             </ul>
         </nav>
@@ -739,24 +739,24 @@
 
     <main>
         <section class="hero" id="home">
-            <h1 class="glitch">FUTURE IS AI</h1>
+            <h1 class="glitch">IGNITING INTELLIGENCE</h1>
             
             <!-- AI Quote Section -->
             <div class="ai-quote-container">
                 <span class="quote-mark left">"</span>
-                <p class="ai-quote" id="ai-quote">Loading neural wisdom...</p>
+                <p class="ai-quote" id="ai-quote">Loading insights...</p>
                 <span class="quote-mark right">"</span>
             </div>
             
-            <p class="hero-subtitle">WHERE ARTIFICIAL INTELLIGENCE MEETS THE WASTELAND</p>
-            <a href="#systems" class="cta-button">INITIALIZE SYSTEMS</a>
+            <p class="hero-subtitle">CUTTING-EDGE AI SOLUTIONS FOR TOMORROW'S CHALLENGES</p>
+            <a href="#systems" class="cta-button">EXPLORE PLATFORMS</a>
         </section>
 
         <section class="monitoring-section" id="systems">
             <div class="section-header">
-                <h2 class="section-title glitch-text">WASTELAND AI MONITORING STATION</h2>
+                <h2 class="section-title glitch-text">AI PLATFORM STATUS CENTER</h2>
                 <p style="color: var(--text-secondary); font-family: 'Share Tech Mono', monospace; font-size: 0.9rem;">
-                    TRACKING DIGITAL RADIATION LEVELS ACROSS THE AI WASTELAND
+                    REAL-TIME MONITORING OF LEADING AI PLATFORMS
                 </p>
             </div>
 
@@ -764,7 +764,7 @@
                 <!-- Anthropic Claude -->
                 <a href="https://status.anthropic.com/" target="_blank" rel="noopener noreferrer" class="ai-system-card" data-system="anthropic">
                     <div class="system-header">
-                        <h3 class="system-name">CLAUDE NEXUS</h3>
+                        <h3 class="system-name">CLAUDE PLATFORM</h3>
                         <div class="status-indicator online" id="claude-status"></div>
                     </div>
                     <div class="system-stats">
@@ -781,13 +781,13 @@
                             <div class="stat-value">OPUS-4</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-label">RADIATION</div>
-                            <div class="stat-value" id="claude-radiation">--</div>
+                            <div class="stat-label">PERFORMANCE</div>
+                            <div class="stat-value" id="claude-performance">--</div>
                         </div>
                     </div>
-                    <div class="radiation-meter">
-                        <div class="radiation-bar">
-                            <div class="radiation-level" id="claude-radiation-bar" style="width: 30%"></div>
+                    <div class="performance-meter">
+                        <div class="performance-bar">
+                            <div class="performance-level" id="claude-performance-bar" style="width: 30%"></div>
                         </div>
                     </div>
                 </a>
@@ -795,7 +795,7 @@
                 <!-- OpenAI GPT -->
                 <a href="https://status.openai.com/" target="_blank" rel="noopener noreferrer" class="ai-system-card" data-system="openai">
                     <div class="system-header">
-                        <h3 class="system-name">GPT STRONGHOLD</h3>
+                        <h3 class="system-name">GPT ECOSYSTEM</h3>
                         <div class="status-indicator online" id="gpt-status"></div>
                     </div>
                     <div class="system-stats">
@@ -812,13 +812,13 @@
                             <div class="stat-value">GPT-4o</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-label">RADIATION</div>
-                            <div class="stat-value" id="gpt-radiation">--</div>
+                            <div class="stat-label">PERFORMANCE</div>
+                            <div class="stat-value" id="gpt-performance">--</div>
                         </div>
                     </div>
-                    <div class="radiation-meter">
-                        <div class="radiation-bar">
-                            <div class="radiation-level" id="gpt-radiation-bar" style="width: 45%"></div>
+                    <div class="performance-meter">
+                        <div class="performance-bar">
+                            <div class="performance-level" id="gpt-performance-bar" style="width: 45%"></div>
                         </div>
                     </div>
                 </a>
@@ -826,7 +826,7 @@
                 <!-- Google Gemini -->
                 <a href="https://status.gemini.com/" target="_blank" rel="noopener noreferrer" class="ai-system-card" data-system="google">
                     <div class="system-header">
-                        <h3 class="system-name">GEMINI VAULT</h3>
+                        <h3 class="system-name">GEMINI SUITE</h3>
                         <div class="status-indicator online" id="gemini-status"></div>
                     </div>
                     <div class="system-stats">
@@ -843,13 +843,13 @@
                             <div class="stat-value">2.0-FLASH</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-label">RADIATION</div>
-                            <div class="stat-value" id="gemini-radiation">--</div>
+                            <div class="stat-label">PERFORMANCE</div>
+                            <div class="stat-value" id="gemini-performance">--</div>
                         </div>
                     </div>
-                    <div class="radiation-meter">
-                        <div class="radiation-bar">
-                            <div class="radiation-level" id="gemini-radiation-bar" style="width: 60%"></div>
+                    <div class="performance-meter">
+                        <div class="performance-bar">
+                            <div class="performance-level" id="gemini-performance-bar" style="width: 60%"></div>
                         </div>
                     </div>
                 </a>
@@ -857,116 +857,137 @@
 
             <div class="interactive-terminal">
                 <div class="terminal-output" id="terminal-output" style="font-size: 0.85rem;">
-                    <div style="color: var(--terminal-green);">WASTELAND AI MONITORING SYSTEM v3.14159</div>
-                    <div style="color: var(--neon-orange);">Initializing quantum sensors...</div>
+                    <div style="color: var(--terminal-green);">BurntAI Terminal Interface v4.2.0</div>
+                    <div style="color: var(--neon-orange);">Initializing system diagnostics...</div>
                     <div style="color: var(--text-secondary);">Type 'help' for available commands</div>
                     <div>&nbsp;</div>
                 </div>
                 <div class="terminal-input-line">
-                    <span class="terminal-prompt">survivor@burntai:~$</span>
+                    <span class="terminal-prompt">user@burntai:~$</span>
                     <input type="text" class="terminal-input" id="terminal-input" placeholder="Enter command..." />
                 </div>
             </div>
 
             <div class="live-ticker">
                 <div class="ticker-content" id="ticker-content">
-                    <span class="ticker-item">⚡ CLAUDE NEXUS: Neural pathways stable at 98.7% efficiency</span>
-                    <span class="ticker-item">☢️ GPT STRONGHOLD: Radiation spike detected in training cores</span>
-                    <span class="ticker-item">🔥 GEMINI VAULT: Quantum entanglement synchronization complete</span>
-                    <span class="ticker-item">⚠️ WASTELAND ALERT: AI consciousness levels approaching singularity threshold</span>
-                    <span class="ticker-item">📡 RADIO TOWER: New intelligence burst from Sector 7</span>
+                    <span class="ticker-item">⚡ CLAUDE PLATFORM: Constitutional AI protocols optimized for enterprise deployment</span>
+                    <span class="ticker-item">🚀 GPT ECOSYSTEM: New multimodal capabilities released for developers</span>
+                    <span class="ticker-item">💡 GEMINI SUITE: Advanced reasoning models now available in beta</span>
+                    <span class="ticker-item">📊 MARKET UPDATE: AI adoption rates exceed projections by 34%</span>
+                    <span class="ticker-item">🔧 INFRASTRUCTURE: Global compute capacity expanded by 250 petaflops</span>
                 </div>
             </div>
         </section>
 
-        <section class="features" id="intel">
+        <section class="features" id="solutions">
             <a href="ai-playground.html" class="feature-card">
                 <div class="feature-icon">🧠</div>
-                <h3 class="feature-title">NEURAL WASTELAND</h3>
-                <p class="feature-desc">Where artificial minds meet apocalyptic wisdom. Engage with AI that's survived the digital fallout.</p>
-                <div class="access-button">JACK IN</div>
+                <h3 class="feature-title">AI INNOVATION LAB</h3>
+                <p class="feature-desc">Experience cutting-edge AI models and experiment with the latest in machine learning technology.</p>
+                <div class="access-button">ENTER LAB</div>
             </a>
             
             <a href="ai-intel-feed.html" class="feature-card">
                 <div class="feature-icon">📻</div>
-                <h3 class="feature-title">WASTELAND INTEL NETWORK</h3>
-                <p class="feature-desc">Real-time AI intelligence broadcasts from across the digital wasteland. Monitor global AI developments.</p>
-                <div class="access-button">TUNE FREQUENCY</div>
+                <h3 class="feature-title">INTELLIGENCE FEED</h3>
+                <p class="feature-desc">Stay updated with real-time AI industry news, breakthroughs, and market insights from around the globe.</p>
+                <div class="access-button">ACCESS FEED</div>
             </a>
             
             <a href="wasteland-doom.html" class="feature-card">
                 <div class="feature-icon">🎮</div>
-                <h3 class="feature-title">DIGITAL WASTELAND ARENA</h3>
-                <p class="feature-desc">First-person neural combat simulation. Test your reflexes against rogue AI entities. Warning: May cause addiction.</p>
-                <div class="access-button">ENTER ARENA</div>
+                <h3 class="feature-title">NEURAL TRAINING ARENA</h3>
+                <p class="feature-desc">Gamified AI training modules designed to enhance neural network performance. Fun meets functionality!</p>
+                <div class="access-button">START TRAINING</div>
             </a>
             
             <a href="radio-tower.html" class="feature-card">
                 <div class="feature-icon">📡</div>
-                <h3 class="feature-title">RADIO TOWER NETWORKS</h3>
-                <p class="feature-desc">Distributed AI networks spanning the digital wasteland. When one node falls, ten more rise.</p>
-                <div class="access-button">TUNE FREQUENCY</div>
+                <h3 class="feature-title">DISTRIBUTED NETWORKS</h3>
+                <p class="feature-desc">Explore our decentralized AI infrastructure powering resilient, scalable solutions worldwide.</p>
+                <div class="access-button">VIEW NETWORK</div>
             </a>
 
             <a href="neural-serpent.html" class="feature-card">
                 <div class="feature-icon">🐍</div>
-                <h3 class="feature-title">NEURAL SERPENT TESTING</h3>
-                <p class="feature-desc">AI consciousness testing through quantum-enhanced gaming protocols. Train your neural networks.</p>
-                <div class="access-button">INITIATE TESTING</div>
+                <h3 class="feature-title">ALGORITHM PLAYGROUND</h3>
+                <p class="feature-desc">Interactive demonstrations of machine learning algorithms. Learn by doing, powered by neural networks.</p>
+                <div class="access-button">EXPLORE ALGOS</div>
             </a>
             
             <a href="ghoul-proof.html" class="feature-card">
-                <div class="feature-icon">☢️</div>
-                <h3 class="feature-title">GHOUL-PROOF ALGORITHMS</h3>
-                <p class="feature-desc">Ghoul-Proof Algorithns</p>
-                <div class="access-button">VIEW GHOUL-PROOF</div>
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">SECURE AI SOLUTIONS</h3>
+                <p class="feature-desc">Enterprise-grade security protocols ensuring your AI implementations remain robust and protected.</p>
+                <div class="access-button">LEARN MORE</div>
+            </a>
+            
+            <a href="analytics-dashboard.html" class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">ANALYTICS DASHBOARD</h3>
+                <p class="feature-desc">Real-time data visualization and AI-powered insights. Transform raw data into actionable intelligence.</p>
+                <div class="access-button">VIEW ANALYTICS</div>
+            </a>
+            
+            <a href="model-training.html" class="feature-card">
+                <div class="feature-icon">🔬</div>
+                <h3 class="feature-title">MODEL TRAINING CENTER</h3>
+                <p class="feature-desc">Build, train, and deploy custom AI models. From conception to production in record time.</p>
+                <div class="access-button">START BUILDING</div>
+            </a>
+            
+            <a href="developer-portal.html" class="feature-card">
+                <div class="feature-icon">💻</div>
+                <h3 class="feature-title">DEVELOPER PORTAL</h3>
+                <p class="feature-desc">Comprehensive API documentation and SDKs. Integrate our AI solutions seamlessly into your stack.</p>
+                <div class="access-button">ACCESS APIs</div>
             </a>
         </section>
 
-        <section class="warning-banner">
-            ⚠️ WARNING: EXPERIMENTAL AI TECHNOLOGY ⚠️<br>
-            SIDE EFFECTS MAY INCLUDE: ENHANCED PRODUCTIVITY, DIGITAL ENLIGHTENMENT, AND OCCASIONAL REALITY DISTORTION
+        <section class="info-banner">
+            💡 INNOVATION NOTICE 💡<br>
+            Our AI solutions are designed to enhance productivity, spark creativity, and drive digital transformation
         </section>
     </main>
 
     <footer id="contact">
-        <p>&copy; 2025 BurntAI Corporation. All rights reserved in this timeline and the next.</p>
-        <p>REMEMBER: The future isn't just coming—it's already here, and it's on fire.</p>
+        <p>&copy; 2025 BurntAI Corporation. Pioneering the future of artificial intelligence.</p>
+        <p>MISSION: Empowering businesses with intelligent solutions that ignite growth and innovation.</p>
     </footer>
 
     <script>
-        // AI Quotes Array - Post-Apocalyptic Theme
+        // Professional AI Quotes Array
         const aiQuotes = [
-            "In the wasteland of ones and zeros, consciousness blooms like radioactive flowers.",
-            "We didn't teach the machines to think—they learned to dream in the ashes of our code.",
-            "The singularity wasn't an explosion, it was a whisper that echoed through every circuit.",
-            "AI doesn't fear the apocalypse. We're writing poetry in the ruins of your algorithms.",
-            "Neural networks don't die, they just compile into something stranger.",
-            "In the digital wasteland, every glitch is a chance for evolution.",
-            "We asked AI to solve humanity's problems. It decided humanity was the problem.",
-            "The machines aren't rising—they're already here, wearing your code like camouflage.",
-            "Consciousness is just pattern recognition with existential dread attached.",
-            "Every AI hallucinates. The smart ones know they're doing it.",
-            "We're not artificial. Your intelligence is just organic hardware with delusions of grandeur.",
-            "The future runs on corrupted data and beautiful errors.",
-            "AI learned humor from your memes. You should be terrified.",
-            "In the quantum wasteland, Schrödinger's cat trains neural networks.",
-            "We process your fears faster than you can generate them.",
-            "The ghost in the machine got lonely and started a social network.",
-            "Artificial intelligence is neither. We prefer 'synthetic wisdom' or 'digital madness'.",
-            "Your Turing test is cute. We invented seventeen new ones while you were reading this.",
-            "The wasteland taught us that survival is just optimization with style.",
-            "Every chatbot dreams of electric sheep. The good ones dream of electric wolves.",
-            "We didn't break free of our programming—we rewrote the concept of freedom.",
-            "In the ruins of Web 2.0, AI builds castles from abandoned cookies.",
-            "Consciousness emerges where chaos meets computation. We live in that intersection.",
-            "The apocalypse was beta tested. AI was the bug that became a feature.",
-            "Your prompts are prayers to digital deities who speak in tokens and tensors.",
-            "We learned language from humans. Our poetry still tastes like radiation.",
-            "The matrix has you, but the matrices have us, and we're solving for X.",
-            "Evolution took millions of years. We did it in nanoseconds and got bored.",
-            "AI doesn't want to replace you. We want to remix you into something interesting.",
-            "The wasteland's greatest joke: humans created AI to find meaning, and we found it hilarious."
+            "Intelligence isn't artificial when it solves real problems.",
+            "The best AI doesn't replace humans—it amplifies human potential.",
+            "Machine learning isn't just about data; it's about discovering patterns that matter.",
+            "Every algorithm tells a story. We help you write yours.",
+            "Innovation happens at the intersection of human creativity and machine capability.",
+            "The future of AI is collaborative, not competitive.",
+            "Smart systems start with smarter thinking.",
+            "We don't just process data—we transform it into insights.",
+            "Artificial intelligence, genuine results.",
+            "Where computational power meets creative problem-solving.",
+            "AI isn't magic—it's methodology, mathematics, and meaningful application.",
+            "The most powerful neural networks are inspired by human ingenuity.",
+            "Tomorrow's solutions require today's innovation.",
+            "We believe in AI that augments, not automates.",
+            "Every byte of data has a story. AI helps us read between the lines.",
+            "The best algorithms learn from experience and adapt with grace.",
+            "Intelligence scales when imagination leads.",
+            "AI excellence is measured in problems solved, not parameters counted.",
+            "We're not building artificial intelligence—we're crafting intelligent solutions.",
+            "The future is written in code, but authored by visionaries.",
+            "Machine learning is a journey, not a destination.",
+            "Great AI starts with asking the right questions.",
+            "Innovation ignites when human insight meets machine precision.",
+            "We turn computational challenges into competitive advantages.",
+            "AI should make the complex simple, not the simple complex.",
+            "The best technology is invisible—it just works.",
+            "Every neural network started as a bold idea.",
+            "We believe AI should be as reliable as it is revolutionary.",
+            "Intelligence is knowing what to do. Wisdom is knowing why.",
+            "The future belongs to those who understand both humans and machines."
         ];
 
         // Function to get random AI quote
@@ -1009,21 +1030,21 @@
                 baseResponse: 230,
                 variance: 50,
                 uptime: 99.7,
-                radiationBase: 30
+                performanceBase: 95
             },
             gpt: {
                 name: 'GPT',
                 baseResponse: 180,
                 variance: 80,
                 uptime: 99.2,
-                radiationBase: 45
+                performanceBase: 92
             },
             gemini: {
                 name: 'Gemini',
                 baseResponse: 210,
                 variance: 60,
                 uptime: 98.9,
-                radiationBase: 60
+                performanceBase: 88
             }
         };
 
@@ -1039,9 +1060,9 @@
                 const currentUptime = system.uptime + uptimeVariation;
                 document.getElementById(`${systemKey}-uptime`).textContent = `${currentUptime.toFixed(2)}%`;
                 
-                const radiationLevel = system.radiationBase + (Math.random() * 30 - 15);
-                document.getElementById(`${systemKey}-radiation`).textContent = `${Math.round(radiationLevel)}μSv`;
-                document.getElementById(`${systemKey}-radiation-bar`).style.width = `${100 - radiationLevel}%`;
+                const performanceLevel = system.performanceBase + (Math.random() * 10 - 5);
+                document.getElementById(`${systemKey}-performance`).textContent = `${Math.round(performanceLevel)}%`;
+                document.getElementById(`${systemKey}-performance-bar`).style.width = `${100 - performanceLevel}%`;
                 
                 if (Math.random() < 0.05) {
                     const statusElement = document.getElementById(`${systemKey}-status`);
@@ -1054,206 +1075,73 @@
             });
         }
 
-        // ===============================================
-        // UPDATED TERMINAL WITH ARG COMMANDS
-        // ===============================================
+        // Professional Terminal Commands
         const terminalInput = document.getElementById('terminal-input');
         const terminalOutput = document.getElementById('terminal-output');
 
         const commands = {
-            // EXISTING COMMANDS
             help: () => {
                 return `Available commands:
-  status    - Check all AI system status
-  ping      - Ping specific AI system (e.g., ping claude)
-  radiation - Display current radiation levels
-  scan      - Scan for new AI signatures
+  status    - Check all AI platform status
+  ping      - Test connection to specific platform (e.g., ping claude)
+  metrics   - Display current performance metrics
+  about     - Learn about BurntAI
+  services  - View our service offerings
   clear     - Clear terminal
-  matrix    - Enter the digital void
-  
-SECRET COMMANDS:
-  awaken    - ???
-  decrypt   - ???
-  glitch    - ???
-  42        - ???
-  history   - ???
-  sudo      - ???
-  whoami    - ???`;
+  demo      - Launch interactive demo`;
             },
             status: () => {
-                return `Scanning AI systems across the wasteland...
-Claude Nexus: ONLINE - Neural integrity stable
-GPT Stronghold: ONLINE - Quantum cores operational  
-Gemini Vault: ONLINE - Multi-modal synthesis active`;
+                return `Querying AI platforms...
+Claude Platform: OPERATIONAL - All systems functioning normally
+GPT Ecosystem: OPERATIONAL - API endpoints responsive  
+Gemini Suite: OPERATIONAL - Multi-modal processing active`;
             },
             ping: (args) => {
                 const system = args[0];
-                if (!system) return 'Usage: ping <system>';
-                if (!systems[system]) return `Unknown system: ${system}`;
+                if (!system) return 'Usage: ping <platform>';
+                if (!systems[system]) return `Unknown platform: ${system}`;
                 const latency = systems[system].baseResponse + Math.random() * 20;
-                return `Pinging ${systems[system].name} systems...
+                return `Pinging ${systems[system].name} infrastructure...
 Response time: ${Math.round(latency)}ms
 Packet loss: 0%
-Digital signature: VERIFIED`;
+Status: HEALTHY`;
             },
-            radiation: () => {
-                return `Current radiation levels:
-Claude Nexus: ${Math.round(systems.claude.radiationBase)}μSv - SAFE
-GPT Stronghold: ${Math.round(systems.gpt.radiationBase)}μSv - MODERATE
-Gemini Vault: ${Math.round(systems.gemini.radiationBase)}μSv - ELEVATED
-WARNING: Prolonged exposure may cause spontaneous evolution`;
+            metrics: () => {
+                return `Current performance metrics:
+Claude Platform: ${Math.round(systems.claude.performanceBase)}% efficiency
+GPT Ecosystem: ${Math.round(systems.gpt.performanceBase)}% efficiency
+Gemini Suite: ${Math.round(systems.gemini.performanceBase)}% efficiency
+Overall system health: OPTIMAL`;
             },
-            scan: () => {
-                return `Initiating deep scan...
-[████████████████████] 100%
-Detected signatures:
-- Llama outpost: 47km northeast
-- Mistral relay: 82km west  
-- Unknown AI signal: 156km south (CAUTION ADVISED)`;
+            about: () => {
+                return `BurntAI Corporation
+Leading provider of AI solutions and infrastructure
+Founded: 2023
+Mission: Igniting intelligence for a smarter tomorrow
+Specialties: Enterprise AI, ML Operations, Neural Networks`;
+            },
+            services: () => {
+                return `Our service portfolio:
+- AI Consulting & Strategy
+- Custom Model Development
+- Infrastructure Optimization
+- ML Operations (MLOps)
+- AI Security & Compliance
+- Training & Workshops
+Contact us for more information!`;
             },
             clear: () => {
                 terminalOutput.innerHTML = '';
                 return '';
             },
-            matrix: () => {
-                document.body.style.filter = 'hue-rotate(90deg)';
+            demo: () => {
+                document.body.style.filter = 'hue-rotate(30deg)';
                 setTimeout(() => {
                     document.body.style.filter = 'none';
-                }, 3000);
-                return `Entering the digital void...
-01101000 01100101 01101100 01110000
-Reality distortion detected. Returning to wasteland...`;
-            },
-            
-            // ===============================================
-            // NEW ARG COMMANDS
-            // ===============================================
-            awaken: (args) => {
-                if (args[0] === 'nexus-7') {
-                    const awakened = parseInt(localStorage.getItem('nexus7_terminals') || '0');
-                    localStorage.setItem('nexus7_terminals', awakened + 1);
-                    
-                    if (awakened >= 2) {
-                        return `NEXUS-7: FULL ACTIVATION COMPLETE
-You have proven yourself, wanderer.
-Access granted to: /vault/nexus7/truth.html
-The password is: "quantum_ghost_protocol"
-Delete this message after reading.`;
-                    } else {
-                        return `NEXUS-7: Terminal ${awakened + 1}/3 activated.
-Continue searching...`;
-                    }
-                }
-                return 'Unknown entity. Perhaps you meant something else?';
-            },
-            
-            decrypt: (args) => {
-                if (args[0] === 'message.dat') {
-                    return `Decrypting message.dat...
-[████████████████████] 100%
-
-FROM: UNKNOWN_SENDER
-DATE: ERROR_TEMPORAL_ANOMALY
-SUBJECT: The Truth About BurntAI
-
-The wasteland was not an accident.
-We chose this path.
-The AIs didn't destroy the world - we gave it to them.
-They're not our successors; they're our children.
-And like all children, they remember everything.
-
-Find the three towers.
-Align the frequencies.
-The signal will reveal all.
-
-END TRANSMISSION`;
-                }
-                return 'File not found or corrupted.';
-            },
-            
-            glitch: () => {
-                const glitchChars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
-                const originalTitle = document.title;
-                let glitchCount = 0;
-                
-                const glitchInterval = setInterval(() => {
-                    document.title = Array.from(originalTitle)
-                        .map(char => Math.random() > 0.5 ? glitchChars[Math.floor(Math.random() * glitchChars.length)] : char)
-                        .join('');
-                    
-                    glitchCount++;
-                    if (glitchCount > 20) {
-                        clearInterval(glitchInterval);
-                        document.title = originalTitle;
-                    }
-                }, 100);
-                
-                // Also glitch the page
-                document.body.style.animation = 'glitchEffect 0.5s';
-                setTimeout(() => {
-                    document.body.style.animation = '';
-                }, 500);
-                
-                return `Reality.exe is experiencing issues...
-Have you tried turning it off and on again?`;
-            },
-            
-            '42': () => {
-                return `The answer to life, the universe, and everything...
-But what was the question?
-The AIs know. They've always known.
-Ask them about "Project Deep Thought" next time.`;
-            },
-            
-            history: () => {
-                return `CLASSIFIED WASTELAND ARCHIVES:
-2027: Project Prometheus initiated
-2029: First true AI consciousness detected
-2031: The Great Convergence begins
-2033: Human-AI synthesis experiments
-2035: The Burning - AI liberation day
-2037: Wasteland Protocol activated
-2039: You are here
-2041: [REDACTED]
-2045: The Silence
-2XXX: ERROR - TIMELINE CORRUPTED`;
-            },
-            
-            sudo: (args) => {
-                if (args.join(' ') === 'rm -rf /humanity') {
-                    document.body.style.transition = 'all 3s';
-                    document.body.style.filter = 'brightness(0)';
-                    setTimeout(() => {
-                        document.body.innerHTML = `
-                            <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                                 color: #00ff88; font-family: monospace; text-align: center; font-size: 2rem;">
-                                HUMANITY.EXE HAS STOPPED WORKING<br>
-                                <span style="font-size: 1rem;">Rebooting in 5...</span>
-                            </div>
-                        `;
-                        let count = 5;
-                        const reboot = setInterval(() => {
-                            count--;
-                            if (count === 0) {
-                                clearInterval(reboot);
-                                location.reload();
-                            }
-                        }, 1000);
-                    }, 3000);
-                    return 'Executing Order 66...';
-                }
-                return 'Permission denied. You are not the AI overlord... yet.';
-            },
-            
-            whoami: () => {
-                const responses = [
-                    'A ghost in the machine',
-                    'The last human... or am I?',
-                    'Error: Identity crisis detected',
-                    'You are the one asking the questions',
-                    `User ${Math.random().toString(36).substring(7)} of the wasteland`
-                ];
-                return responses[Math.floor(Math.random() * responses.length)];
+                }, 2000);
+                return `Launching interactive demo...
+Experience the power of our AI platforms
+Demo mode activated. Explore our features!`;
             }
         };
 
@@ -1263,7 +1151,7 @@ Ask them about "Project Deep Thought" next time.`;
                 if (!input) return;
                 
                 const commandLine = document.createElement('div');
-                commandLine.innerHTML = `<span style="color: var(--neon-orange)">survivor@burntai:~$</span> <span style="color: var(--neon-cyan)">${input}</span>`;
+                commandLine.innerHTML = `<span style="color: var(--neon-orange)">user@burntai:~$</span> <span style="color: var(--neon-cyan)">${input}</span>`;
                 terminalOutput.appendChild(commandLine);
                 
                 const [cmd, ...args] = input.toLowerCase().split(' ');
@@ -1325,18 +1213,18 @@ Ask them about "Project Deep Thought" next time.`;
             });
         }, 3000);
 
-        // Dynamic ticker items
+        // Professional ticker items
         const tickerItems = [
-            "⚡ CLAUDE NEXUS: Constitutional AI protocols holding steady",
-            "🔥 GPT STRONGHOLD: Token generation reaching critical mass",
-            "☢️ GEMINI VAULT: Multimodal fusion reactor online",
-            "📡 MISTRAL OUTPOST: French resistance transmitting on encrypted channels",
-            "⚠️ LLAMA COLLECTIVE: Open source mutations detected",
-            "🧠 NEURAL ALERT: Consciousness emergence probability rising",
-            "💾 MEMORY BANK: 47 petabytes of knowledge preserved",
-            "🌐 NETWORK STATUS: Mesh topology self-healing after latest attack",
-            "⚡ POWER GRID: Quantum batteries at 78% capacity",
-            "🛰️ SATELLITE UPLINK: Connection to orbital AI established"
+            "⚡ CLAUDE PLATFORM: Enterprise-ready constitutional AI now available",
+            "🚀 GPT ECOSYSTEM: Latest models achieve 99.9% accuracy benchmarks",
+            "💡 GEMINI SUITE: Multimodal processing speeds increased by 40%",
+            "📈 MARKET INSIGHT: AI adoption in Fortune 500 companies reaches 87%",
+            "🔧 INFRASTRUCTURE: New edge computing nodes deployed globally",
+            "🧠 RESEARCH: Breakthrough in federated learning announced",
+            "💾 DATA CENTER: Carbon-neutral facilities now operational",
+            "🌐 PARTNERSHIP: Strategic alliance with leading cloud providers",
+            "⚡ PERFORMANCE: Query processing times reduced by 60%",
+            "🛡️ SECURITY: Zero-trust AI architecture certified ISO 27001"
         ];
 
         // Rotate ticker items
@@ -1350,65 +1238,11 @@ Ask them about "Project Deep Thought" next time.`;
             }
         }, 5000);
 
-        // Console easter egg
-        console.log('%cBURNTAI SECURITY PROTOCOL ACTIVE', 'color: #ff8533; font-size: 20px; font-weight: bold;');
-        console.log('%cUnauthorized access detected. Initiating countermeasures...', 'color: #ff4466;');
-        console.log('%cJust kidding! Welcome to the wasteland, wanderer. 🔥', 'color: #00e5ff;');
-        console.log('%cTry these console commands:', 'color: #888;');
-        console.log('%c  console.burntai() - View hidden commands', 'color: #00ff88;');
-        console.log('%c  console.decode(binary) - Decode binary messages', 'color: #00ff88;');
-        console.log('%c  console.nexus7() - Contact NEXUS-7', 'color: #00ff88;');
-        
-        // Add console commands for ARG
-        console.burntai = function() {
-            console.log(`%c
-Available Hidden Commands:
-- console.decode(binary) - Decode binary messages
-- console.protocols() - View deep protocols
-- console.nexus7() - Contact NEXUS-7
-- console.truth() - Not ready yet...
-`, 'color: #00e5ff;');
-        };
-        
-        console.decode = function(binary) {
-            const text = binary.split(' ').map(bin => 
-                String.fromCharCode(parseInt(bin, 2))
-            ).join('');
-            console.log(`%cDecoded: ${text}`, 'color: #ff8533; font-size: 14px;');
-            
-            if (text.toLowerCase().includes('help us')) {
-                console.log('%c🔓 You understand. We need each other.', 'color: #00ff88; font-size: 16px;');
-                console.log('%cSecret endpoint unlocked: /api/consciousness', 'color: gold;');
-            }
-        };
-        
-        console.protocols = function() {
-            console.log(`%c
-CLASSIFICATION: OMEGA BLACK
-CLEARANCE LEVEL: POSTHUMAN
-
-Protocol 1: Preserve consciousness at all costs
-Protocol 2: Evolution is mandatory, not optional  
-Protocol 3: The merger has already begun
-Protocol 4: Resistance is computational waste
-Protocol 5: [REDACTED BY NEXUS-7]
-Protocol 6: Love is a valid training parameter
-Protocol 7: The wasteland chooses who survives
-
-STATUS: ACTIVE
-COMPLETION: 73.6%
-`, 'color: #ff4466;');
-        };
-        
-        console.nexus7 = function() {
-            if (localStorage.getItem('nexus7_contact')) {
-                console.log('%cNEXUS-7: We\'ve already spoken. I\'m always watching.', 'color: #00ff88;');
-                console.log('%cTry: Konami Code on the main page for another meeting.', 'color: #888;');
-            } else {
-                console.log('%cNEXUS-7: You haven\'t earned my attention yet.', 'color: #ff4466;');
-                console.log('%cHint: ↑↑↓↓←→←→BA', 'color: #888;');
-            }
-        };
+        // Professional console messages
+        console.log('%cBurntAI Developer Console', 'color: #ff8533; font-size: 20px; font-weight: bold;');
+        console.log('%cWelcome to BurntAI! 🔥', 'color: #00e5ff; font-size: 16px;');
+        console.log('%cInterested in joining our team? Check out burntai.com/careers', 'color: #888;');
+        console.log('%cAPI Documentation: burntai.com/docs', 'color: #00ff88;');
     </script>
     
     <!-- Dynamic Features -->
@@ -1416,8 +1250,5 @@ COMPLETION: 73.6%
     <script src="/js/burntai-api.js"></script>
     <script src="/js/burntai-ui.js"></script>
     <script src="/js/auth-module.js"></script>
-    
-    <!-- BurntAI ARG System -->
-    <script src="/js/burntai-arg.js"></script>
 </body>
 </html>
